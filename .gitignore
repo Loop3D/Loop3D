@@ -1,0 +1,9 @@
+build-loop3d-Desktop-*
+*.exe
+*.so
+*.a
+*~
+*.swp
+*.swo
+__pycache__
+*.xlsx
