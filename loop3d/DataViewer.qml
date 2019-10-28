@@ -60,7 +60,6 @@ Item {
 
         onPositionChanged: {
             if (panning) {
-//                notifyText.text = "Panning " + (lastX-mouse.x) + "," +  (lastY-mouse.y)
                 surface.updateViewAngle(mouse.x-lastX, mouse.y-lastY)
                 lastX = mouse.x
                 lastY = mouse.y

@@ -57,9 +57,9 @@ void PythonText::run(QString code, QString netCDF_Filename)
     QStringList list = netCDF_Filename.split(QRegExp("///"));
     QString name = (list.length() > 1 ? list[1] : list[0]);
     try {
-        int xsteps = 10;
-        int ysteps = 10;
-        int zsteps = 10;
+        int xsteps = 50;
+        int ysteps = 50;
+        int zsteps = 50;
         qDebug() << "Trying to load file " << name;
         auto locals = py::dict("netCDF_Filename"_a = name.toStdString().c_str());
         locals["xsteps"] = xsteps;
