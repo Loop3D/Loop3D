@@ -16,6 +16,7 @@ Isosurface::Isosurface()
     , m_renderer(nullptr)
 {
     m_viewDistance = 20000.0f;
+    m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,qDegreesToRadians(90.0f));
     connect(this, &QQuickItem::windowChanged, this, &Isosurface::handleWindowChanged);
 }
 
@@ -31,9 +32,7 @@ void Isosurface::setIsovalue(qreal isovalue)
 
 void Isosurface::updateViewAngle(float horizontal, float vertical)
 {
-    QQuaternion horRotation; horRotation.fromAxisAndAngle(0.0f,1.0f,0.0f,qDegreesToRadians(horizontal));
-    QQuaternion vertRotation; vertRotation.fromAxisAndAngle(1.0f,0.0f,0.0f,qDegreesToRadians(vertical));
-    m_viewAngle = m_viewAngle * QQuaternion::fromAxisAndAngle(0.0f,1.0f,0.0f,(horizontal)) * QQuaternion::fromAxisAndAngle(1.0f,0.0,0.0f,(vertical));
+    m_viewAngle = m_viewAngle * QQuaternion::fromAxisAndAngle(0.0f,1.0f,0.0f,(horizontal)/2.0f) * QQuaternion::fromAxisAndAngle(1.0f,0.0,0.0f,(vertical)/2.0f);
     if (window()) window()->update();
 }
 
@@ -53,8 +52,7 @@ void Isosurface::updateViewDistance(float angle)
 
 void Isosurface::resetViewAngle()
 {
-    m_viewAngle.setVector(0.0f,0.0f,0.0f);
-    m_viewAngle.setScalar(1.0f);
+    m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,90.0f);
     if (window()) window()->update();
 }
 
@@ -288,7 +286,6 @@ void IsosurfaceRenderer::paint()
         m_program->enableAttributeArray("texCoord");
         m_program->setAttributeBuffer("texCoord", GL_FLOAT, 0, 2);
         m_vao->release();
-//        m_texture = new QOpenGLTexture( QImage( "drag.jpg").mirrored() );
     }
 
     glEnable(GL_DEPTH_TEST);
@@ -307,7 +304,6 @@ void IsosurfaceRenderer::paint()
         stModel->loadTextures();
     }
     stModel->bindTextures();
-//    m_texture->bind(0);
 
     m_program->setUniformValue("isovalue", static_cast<float>(m_isovalue));
     m_program->setUniformValue("textureUnit0",0);
