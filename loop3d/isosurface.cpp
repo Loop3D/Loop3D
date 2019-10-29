@@ -196,23 +196,29 @@ void IsosurfaceRenderer::paint()
                 "           // Interp along line (start -> end)\n"
                 "        newVertex = interp(tetra.geometryPoint[start], tetra.val[start],    \n"
                 "                           tetra.geometryPoint[  end], tetra.val[  end], isovalue);\n"
-//                "        color = vec3((isovalue-tetra.val[start])/(tetra.val[end]-tetra.val[start]));\n"
-                "        color = vec3(0.0,0.0,0.5);\n"
+                "        color = vec3(0.2,0.4,0.4);\n"
                 "\n"
                 "\n"
                 "    } else if (sum == 2) {\n"
                 "        int option = int(above0 == above3) * 2 + int(above0 == above2);\n"
-                "        int start = int(vertex.z);\n"
+                "        int start = int(vertex.x);\n"
                 "        ivec4 offsetReference[3] = {ivec4(3,2,0,1),\n"
                 "                                    ivec4(1,2,3,0),\n"
                 "                                    ivec4(1,3,0,2)};\n"
+                "        int pointIndex = int(vertex.x);\n"
+                "        ivec3 pointIndicies[3] = {ivec3(1,0,3), ivec3(2,0,3), ivec3(1,2,3)};\n"
+                "        if (vertex.x > 2) {\n"
+                "            pointIndex = pointIndicies[option][int(vertex.x)-3];\n"
+                "            start = pointIndex;\n"
+                "        }\n"
+                "        vec3 colorise[3] = {vec3(1.0,0.0,0.0), vec3(0.0,1.0,0.0), vec3(0.0,0.0,1.0)};\n"
                 "        ivec4 ttt = offsetReference[option];\n"
-                "        int end = ttt[int(vertex.z)];\n"
+                "        int end = ttt[pointIndex];\n"
                 "        newVertex = interp(tetra.geometryPoint[start], tetra.val[start],    \n"
                 "                           tetra.geometryPoint[  end], tetra.val[  end], isovalue);\n"
                 "        color = vec3(0.0,0.5,0.0);\n"
-//                "        color = vec3((isovalue-tetra.val[start])/(tetra.val[end]-tetra.val[start]));\n"
-//                "        color = vec3(offsetReference[option]/3.0);"
+                "        color = colorise[option];\n"
+                "        color = color + vec3((isovalue-tetra.val[start])/(tetra.val[end]-tetra.val[start]));\n"
                 "    }\n"
                 "\n"
                 "\n"
@@ -232,7 +238,6 @@ void IsosurfaceRenderer::paint()
                 "void main()\n"
                 "{\n"
                 "    FragColour = vec4(color,1.0);\n"
-//                "    FragColour = vec4(0.0,0.5,0.5,1.0);\n"
                 "}\n";
         if (QOpenGLContext::currentContext()->isOpenGLES()) {
             vertexShaderCode.prepend("#version 300 es\n");
@@ -259,16 +264,16 @@ void IsosurfaceRenderer::paint()
         m_positionsBuffer->bind();
         m_positionsBuffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
         float values[] = {
-            0.0f, 0.0f, 0.0f,
-            1.0f, 1.0f, 1.0f,
-            2.0f, 3.0f, 2.0f,
-            3.0f, 0.0f, 1.0f,
-            4.0f, 0.0f, 2.0f,
-            5.0f, 0.0f, 3.0f
+            0.0f, 0.0f,
+            1.0f, 1.0f,
+            2.0f, 3.0f,
+            3.0f, 0.0f,
+            4.0f, 0.0f,
+            5.0f, 0.0f,
         };
         m_positionsBuffer->allocate(values,18*sizeof(float));
         m_program->enableAttributeArray("vertex");
-        m_program->setAttributeBuffer("vertex", GL_FLOAT, 0, 3);
+        m_program->setAttributeBuffer("vertex", GL_FLOAT, 0, 2);
 
         m_texCoordBuffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
         if (!m_texCoordBuffer->create()) qFatal("Failed to create texCoord buffer");
