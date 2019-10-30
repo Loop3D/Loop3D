@@ -63,10 +63,11 @@ class IsosurfaceRenderer : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
-    IsosurfaceRenderer() : m_isovalue(0), m_program(nullptr) { }
+    IsosurfaceRenderer() : m_numOfIsosurfaces(1), m_program(nullptr) { }
     ~IsosurfaceRenderer() { delete m_program; }
 
-    void setIsovalue(qreal isovalue) { m_isovalue = isovalue; }
+    void setIsovalues(float* isovalues) { for (int i=0;i<6;i++) m_isovalues[i] = isovalues[i]; }
+    void setNumberOfIsosurfaces(int num) { m_numOfIsosurfaces = num; }
     void setViewportSize(const QSize &size) { m_viewportSize = size; }
     void setViewportLocation(const QPointF &loc) { m_viewportLoc = loc; }
     void setWindow(QQuickWindow *window) { m_window = window; }
@@ -79,7 +80,8 @@ public Q_SLOTS:
 private:
     QSize m_viewportSize;
     QPointF m_viewportLoc;
-    qreal m_isovalue;
+    int m_numOfIsosurfaces;
+    float m_isovalues[6];
     QOpenGLShaderProgram *m_program;
     QQuickWindow *m_window;
     QOpenGLTexture* m_texture;
@@ -93,20 +95,19 @@ private:
 class Isosurface : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(qreal isovalue READ isovalue WRITE setIsovalue NOTIFY isovalueChanged)
     Q_PROPERTY(float viewDistance READ viewDistance WRITE setViewDistance NOTIFY viewDistanceChanged)
 
 public:
     Isosurface();
 
-    qreal isovalue() const { return m_isovalue; }
-    void setIsovalue(qreal isovalue);
     float viewDistance() const { return m_viewDistance; }
     void setViewDistance(float distance);
 
     Q_INVOKABLE void updateViewAngle(float horizontal, float vertical);
     Q_INVOKABLE void updateViewDistance(float angle);
     Q_INVOKABLE void resetViewAngle();
+    Q_INVOKABLE void updateNumberOfIsosurfaces(int num);
+    Q_INVOKABLE bool updateIsovalue(int index, float isovalue);
 
 Q_SIGNALS:
     void isovalueChanged();
@@ -120,7 +121,8 @@ private Q_SLOTS:
     void handleWindowChanged(QQuickWindow *win);
 
 private:
-    qreal m_isovalue;
+    float m_isovalues[6];
+    int m_numOfIsosurfaces;
     IsosurfaceRenderer *m_renderer;
     QQuaternion m_viewAngle;
     float m_viewDistance;

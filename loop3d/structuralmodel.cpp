@@ -2,11 +2,10 @@
 #include "projectmanagement.h"
 #include <QDebug>
 
-#define TEST_GRID_SIZE 20
+#define TEST_GRID_SIZE 50
 
 StructuralModel::StructuralModel()
 {
-//    numNodes = 0;
     width  = 0;
     height = 0;
     depth  = 0;

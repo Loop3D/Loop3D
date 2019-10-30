@@ -12,22 +12,13 @@
 #include <QtMath>
 
 Isosurface::Isosurface()
-    : m_isovalue(0)
-    , m_renderer(nullptr)
+    : m_numOfIsosurfaces(1),
+      m_renderer(nullptr)
 {
+    for (int i=0;i<6;i++) m_isovalues[i] = 0.0;
     m_viewDistance = 20000.0f;
     m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,qDegreesToRadians(90.0f));
     connect(this, &QQuickItem::windowChanged, this, &Isosurface::handleWindowChanged);
-}
-
-void Isosurface::setIsovalue(qreal isovalue)
-{
-    if (abs(isovalue - m_isovalue) < 0.00001)
-        return;
-    m_isovalue = isovalue;
-    Q_EMIT isovalueChanged();
-    if (window())
-        window()->update();
 }
 
 void Isosurface::updateViewAngle(float horizontal, float vertical)
@@ -54,6 +45,24 @@ void Isosurface::resetViewAngle()
 {
     m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,90.0f);
     if (window()) window()->update();
+}
+
+void Isosurface::updateNumberOfIsosurfaces(int num)
+{
+    m_numOfIsosurfaces = num;
+    if (window()) window()->update();
+}
+
+bool Isosurface::updateIsovalue(int index, float isovalue)
+{
+    // Sanity checks and check for value change
+    if (index < 0 || index > 6) return false;
+    if (abs(m_isovalues[index] - isovalue) < 0.00001f) return false;
+
+    // Change and update
+    m_isovalues[index] = isovalue;
+    if (window()) window()->update();
+    return true;
 }
 
 void Isosurface::handleWindowChanged(QQuickWindow *win)
@@ -85,7 +94,8 @@ void Isosurface::sync()
         m_renderer->setViewportSize(QSize(static_cast<int>(width()),static_cast<int>(height())));
         m_renderer->setViewportLocation(QPointF(pt.x(),window()->height() - height() - pt.y()));
     }
-    m_renderer->setIsovalue(m_isovalue);
+    m_renderer->setNumberOfIsosurfaces(m_numOfIsosurfaces);
+    m_renderer->setIsovalues(m_isovalues);
     m_renderer->setViewAngle(m_viewAngle);
     m_renderer->setViewDistance(m_viewDistance);
     m_renderer->setWindow(window());
@@ -109,11 +119,12 @@ void IsosurfaceRenderer::paint()
                 "uniform float xstepsize;\n"
                 "uniform float ystepsize;\n"
                 "uniform float zstepsize;\n"
+                "uniform int numTetraPerIso;\n"
                 "out vec2 coords;\n"
                 "out vec3 color;\n"
                 "out float instanceID;\n"
                 "out float vsubcubeTetraID;\n"
-                "uniform float isovalue;"
+                "uniform float isovalues[6];"
                 "out vec3 position;\n"
                 "uniform mat4 modelViewProjectionMatrix;\n"
                 "\n"
@@ -130,6 +141,20 @@ void IsosurfaceRenderer::paint()
                 "        return pt1;\n"
                 "    else\n"
                 "        return pt1 + ((target-val1)/(val2-val1) * (pt2 - pt1));\n"
+                "}\n"
+                "\n"
+                "Tetra applyUpperFunc(Tetra tetra)\n"
+                "{\n"
+                "    for (int i=0;i<4;i++)\n"
+                "        tetra.val[i] = min(tetra.val[i],tetra.geometryPoint[i].x + tetra.geometryPoint[i].y + tetra.geometryPoint[i].z);\n"
+                "    return tetra;\n"
+                "}\n"
+                "\n"
+                "Tetra applyLowerFunc(Tetra tetra)\n"
+                "{\n"
+                "    for (int i=0;i<4;i++)\n"
+                "        tetra.val[i] = max(tetra.val[i],tetra.geometryPoint[i].x + tetra.geometryPoint[i].y + tetra.geometryPoint[i].z - 10000.0);\n"
+                "    return tetra;\n"
                 "}\n"
                 "\n"
                 "Tetra getTetra(int subcubeTetraId, ivec3 referenceIndex)\n"
@@ -161,6 +186,7 @@ void IsosurfaceRenderer::paint()
                 "\n"
                 "void main() {\n"
                 "    instanceID = gl_InstanceID;\n"
+                "    float isovalue = isovalues[int(floor(gl_InstanceID / numTetraPerIso))];\n"
                 "\n"
                 "    int subcubeTetraId = int(instanceID) % 5;\n"
                 "    vsubcubeTetraID = subcubeTetraId;\n"
@@ -169,6 +195,9 @@ void IsosurfaceRenderer::paint()
                 "    if (gridPos.x >= xsize - 1 || gridPos.y >= ysize - 1 || gridPos.z >= zsize - 1) return;"
                 "    Tetra tetra = getTetra(subcubeTetraId, gridPos);\n"
                 "\n"
+                "\n"
+                "    tetra = applyUpperFunc(tetra);\n"
+                "    tetra = applyLowerFunc(tetra);\n"
                 "\n"
                 "    bool above0 = tetra.val[0] > isovalue;\n"
                 "    bool above1 = tetra.val[1] > isovalue;\n"
@@ -299,7 +328,6 @@ void IsosurfaceRenderer::paint()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-
     // Load textures from structural model
     StructuralModel* stModel = ProjectManagement::instance()->getStModel();
 
@@ -310,7 +338,7 @@ void IsosurfaceRenderer::paint()
     }
     stModel->bindTextures();
 
-    m_program->setUniformValue("isovalue", static_cast<float>(m_isovalue));
+    m_program->setUniformValueArray("isovalues",m_isovalues,6,1);
     m_program->setUniformValue("textureUnit0",0);
     m_program->setUniformValue("colourScale",10.0f);
     m_program->setUniformValue("xmin",stModel->m_xmin);
@@ -348,6 +376,9 @@ void IsosurfaceRenderer::paint()
     m_program->setUniformValue("projectionMatrix", projectionMatrix);
     m_program->setUniformValue("modelViewProjectionMatrix", modelViewProjectionMatrix);
 
+    int numberOfTetrasPerIsosurface = (stModel->getWidth()-1)*(stModel->getHeight()-1)*(stModel->getDepth()-1)*5;
+    m_program->setUniformValue("numTetraPerIso", numberOfTetrasPerIsosurface);
+
     glViewport(static_cast<int>(m_viewportLoc.x()), static_cast<int>(m_viewportLoc.y()), m_viewportSize.width(), m_viewportSize.height());
 
     glEnable(GL_BLEND);
@@ -358,7 +389,7 @@ void IsosurfaceRenderer::paint()
 
 
 
-    funcs->glDrawArraysInstanced(GL_TRIANGLES,0,6,(stModel->getWidth()-1)*(stModel->getHeight()-1)*(stModel->getDepth()-1)*5);
+    funcs->glDrawArraysInstanced(GL_TRIANGLES,0,6,numberOfTetrasPerIsosurface * m_numOfIsosurfaces);
 
 
 

@@ -86,7 +86,8 @@ Item {
                             selectByMouse: true
                             PythonText {
                                 id: pythonText
-                                filename: "..\\Notebook1ClaudiusData.py"
+//                                filename: "..\\Notebook1ClaudiusData.py"
+                                filename: "..\\pickle.py"
                                 Component.onCompleted: {
                                     textDocToHighlight = textArea.textDocument
                                     // Use select all and text addition to trigger immediate highlighting
