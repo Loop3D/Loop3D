@@ -23,7 +23,7 @@ Isosurface::Isosurface()
 
 void Isosurface::updateViewAngle(float horizontal, float vertical)
 {
-    m_viewAngle = m_viewAngle * QQuaternion::fromAxisAndAngle(0.0f,1.0f,0.0f,(horizontal)/2.0f) * QQuaternion::fromAxisAndAngle(1.0f,0.0,0.0f,(vertical)/2.0f);
+    m_viewAngle = QQuaternion::fromAxisAndAngle(0.0f,1.0f,0.0f,(horizontal)/2.0f) * QQuaternion::fromAxisAndAngle(1.0f,0.0,0.0f,(vertical)/2.0f)* m_viewAngle;
     if (window()) window()->update();
 }
 
@@ -85,6 +85,8 @@ void Isosurface::cleanup()
 
 void Isosurface::sync()
 {
+    static float old_isovalueMin;
+    static float old_isovalueMax;
     if (!m_renderer) {
         m_renderer = new IsosurfaceRenderer();
         connect(window(), &QQuickWindow::beforeRendering, m_renderer, &IsosurfaceRenderer::paint, Qt::DirectConnection);
@@ -99,6 +101,19 @@ void Isosurface::sync()
     m_renderer->setViewAngle(m_viewAngle);
     m_renderer->setViewDistance(m_viewDistance);
     m_renderer->setWindow(window());
+
+    StructuralModel* stModel = ProjectManagement::instance()->getStModel();
+    if (stModel) {
+        if (abs(stModel->m_valmin - old_isovalueMin) > 0.001f || abs(stModel->m_valmax - old_isovalueMax) > 0.001f) {
+            m_isovalueMin = stModel->m_valmin;
+            m_isovalueMax = stModel->m_valmax;
+            m_renderer->setIsovalueMinMax(m_isovalueMin,m_isovalueMax);
+            isovalueMaxChanged();
+            isovalueMinChanged();
+            old_isovalueMin = m_isovalueMin;
+            old_isovalueMax = m_isovalueMax;
+        }
+    }
 }
 
 void IsosurfaceRenderer::paint()
@@ -121,10 +136,11 @@ void IsosurfaceRenderer::paint()
                 "uniform float zstepsize;\n"
                 "uniform int numTetraPerIso;\n"
                 "out vec2 coords;\n"
-                "out vec3 color;\n"
+                "out vec3 colour;\n"
                 "out float instanceID;\n"
                 "out float vsubcubeTetraID;\n"
-                "uniform float isovalues[6];"
+                "uniform float isovalues[6];\n"
+                "out float isovalue;\n"
                 "out vec3 position;\n"
                 "uniform mat4 modelViewProjectionMatrix;\n"
                 "\n"
@@ -143,14 +159,14 @@ void IsosurfaceRenderer::paint()
                 "        return pt1 + ((target-val1)/(val2-val1) * (pt2 - pt1));\n"
                 "}\n"
                 "\n"
-                "Tetra applyUpperFunc(Tetra tetra)\n"
+                "Tetra applyUpperBound(Tetra tetra)\n"
                 "{\n"
                 "    for (int i=0;i<4;i++)\n"
                 "        tetra.val[i] = min(tetra.val[i],tetra.geometryPoint[i].x + tetra.geometryPoint[i].y + tetra.geometryPoint[i].z);\n"
                 "    return tetra;\n"
                 "}\n"
                 "\n"
-                "Tetra applyLowerFunc(Tetra tetra)\n"
+                "Tetra applyLowerBound(Tetra tetra)\n"
                 "{\n"
                 "    for (int i=0;i<4;i++)\n"
                 "        tetra.val[i] = max(tetra.val[i],tetra.geometryPoint[i].x + tetra.geometryPoint[i].y + tetra.geometryPoint[i].z - 10000.0);\n"
@@ -186,7 +202,7 @@ void IsosurfaceRenderer::paint()
                 "\n"
                 "void main() {\n"
                 "    instanceID = gl_InstanceID;\n"
-                "    float isovalue = isovalues[int(floor(gl_InstanceID / numTetraPerIso))];\n"
+                "    isovalue = isovalues[int(floor(gl_InstanceID / numTetraPerIso))];\n"
                 "\n"
                 "    int subcubeTetraId = int(instanceID) % 5;\n"
                 "    vsubcubeTetraID = subcubeTetraId;\n"
@@ -196,8 +212,8 @@ void IsosurfaceRenderer::paint()
                 "    Tetra tetra = getTetra(subcubeTetraId, gridPos);\n"
                 "\n"
                 "\n"
-                "    tetra = applyUpperFunc(tetra);\n"
-                "    tetra = applyLowerFunc(tetra);\n"
+//                "    tetra = applyUpperBound(tetra);\n"
+//                "    tetra = applyLowerBound(tetra);\n"
                 "\n"
                 "    bool above0 = tetra.val[0] > isovalue;\n"
                 "    bool above1 = tetra.val[1] > isovalue;\n"
@@ -225,7 +241,8 @@ void IsosurfaceRenderer::paint()
                 "           // Interp along line (start -> end)\n"
                 "        newVertex = interp(tetra.geometryPoint[start], tetra.val[start],    \n"
                 "                           tetra.geometryPoint[  end], tetra.val[  end], isovalue);\n"
-                "        color = vec3(0.2,0.4,0.4);\n"
+                "        // Add colour for debugging types of marching tetra polygons\n"
+                "        colour = vec3(0.2,0.4,0.4);\n"
                 "\n"
                 "\n"
                 "    } else if (sum == 2) {\n"
@@ -240,19 +257,20 @@ void IsosurfaceRenderer::paint()
                 "            pointIndex = pointIndicies[option][int(vertex.x)-3];\n"
                 "            start = pointIndex;\n"
                 "        }\n"
-                "        vec3 colorise[3] = {vec3(1.0,0.0,0.0), vec3(0.0,1.0,0.0), vec3(0.0,0.0,1.0)};\n"
                 "        ivec4 ttt = offsetReference[option];\n"
                 "        int end = ttt[pointIndex];\n"
                 "        newVertex = interp(tetra.geometryPoint[start], tetra.val[start],    \n"
                 "                           tetra.geometryPoint[  end], tetra.val[  end], isovalue);\n"
-                "        color = vec3(0.0,0.5,0.0);\n"
-                "        color = colorise[option];\n"
-                "        color = color + vec3((isovalue-tetra.val[start])/(tetra.val[end]-tetra.val[start]));\n"
+                "\n"
+                "        // Add colour for debugging types of marching tetra polygons\n"
+                "        vec3 colourise[3] = {vec3(1.0,0.0,0.0), vec3(0.0,1.0,0.0), vec3(0.0,0.0,1.0)};\n"
+                "        colour = colourise[option];\n"
+                "        colour = colour + vec3((isovalue-tetra.val[start])/(tetra.val[end]-tetra.val[start]));\n"
                 "    }\n"
                 "\n"
                 "\n"
                 "    coords = texCoord.xy;\n"
-                "    position = newVertex / 10000.0f;\n"
+                "    position = newVertex;\n"
                 "    gl_Position = modelViewProjectionMatrix * vec4(newVertex.xyz,1.0);\n"
                 "}\n";
         QString fragmentShaderCode =
@@ -260,13 +278,35 @@ void IsosurfaceRenderer::paint()
                 "in float instanceID;\n"
                 "in float vsubcubeTetraID;\n"
                 "in vec3 position;\n"
-                "in vec3 color;\n"
+//                "in vec3 colour;\n"
+                "in float isovalue;\n"
                 "out vec4 FragColour;\n"
-                "uniform float isovalue;\n"
+                "uniform float valmin;\n"
+                "uniform float valmax;\n"
+                "\n"
+                "vec3 getSpectrumColour(float val)\n"
+                "{\n"
+                "    vec3 spectrum[6] = { vec3(1.0,0.0,0.0),\n"
+                "                         vec3(1.0,1.0,0.0),\n"
+                "                         vec3(0.0,1.0,0.0),\n"
+                "                         vec3(0.0,1.0,1.0),\n"
+                "                         vec3(0.0,0.0,1.0),\n"
+                "                         vec3(1.0,0.0,1.0)};\n"
+                "    int segment = int(floor(val / 0.2));\n"
+                "    vec3 lower = spectrum[segment];\n"
+                "    vec3 upper = spectrum[segment+1];\n"
+                "    return vec3(mix(lower,upper,(val-0.2*segment)*5.0));\n"
+                "}\n"
                 "\n"
                 "void main()\n"
                 "{\n"
-                "    FragColour = vec4(color,1.0);\n"
+                "    float normalisedVal = clamp((isovalue - valmin)/(valmax-valmin),0.0,1.0);\n"
+                "    if (valmax == valmin) normalisedVal = 0.5;\n"
+                "    vec3 colour = getSpectrumColour(normalisedVal) * 0.7 + 0.1;\n"
+                "    // Add contour lines with 5.0 stepped at 200\n"
+                "    colour = mix(vec3(0.0,0.0,0.0),colour,step(5.0,abs(int(position.z)%200)));\n"
+                "\n"
+                "    FragColour = vec4(colour,1.0);\n"
                 "}\n";
         if (QOpenGLContext::currentContext()->isOpenGLES()) {
             vertexShaderCode.prepend("#version 300 es\n");
@@ -330,6 +370,7 @@ void IsosurfaceRenderer::paint()
 
     // Load textures from structural model
     StructuralModel* stModel = ProjectManagement::instance()->getStModel();
+    if (!stModel) return;
 
     m_program->bind();
 
@@ -350,6 +391,8 @@ void IsosurfaceRenderer::paint()
     m_program->setUniformValue("xsize",stModel->getWidth());
     m_program->setUniformValue("ysize",stModel->getHeight());
     m_program->setUniformValue("zsize",stModel->getDepth());
+    m_program->setUniformValue("valmin", m_isovalueMin);
+    m_program->setUniformValue("valmax", m_isovalueMax);
     m_program->setUniformValue("xstepsize",(stModel->m_xmax-stModel->m_xmin)/static_cast<float>(stModel->getWidth()-1));
     m_program->setUniformValue("ystepsize",(stModel->m_ymax-stModel->m_ymin)/static_cast<float>(stModel->getHeight()-1));
     m_program->setUniformValue("zstepsize",(stModel->m_zmax-stModel->m_zmin)/static_cast<float>(stModel->getDepth()-1));

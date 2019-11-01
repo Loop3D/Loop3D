@@ -62,6 +62,7 @@
 class IsosurfaceRenderer : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
+
 public:
     IsosurfaceRenderer() : m_numOfIsosurfaces(1), m_program(nullptr) { }
     ~IsosurfaceRenderer() { delete m_program; }
@@ -73,6 +74,7 @@ public:
     void setWindow(QQuickWindow *window) { m_window = window; }
     void setViewAngle(QQuaternion angle) { m_viewAngle = angle; }
     void setViewDistance(float dist) { m_viewDistance = dist; }
+    void setIsovalueMinMax(float min, float max) { m_isovalueMin = min; m_isovalueMax = max; }
 
 public Q_SLOTS:
     void paint();
@@ -81,6 +83,7 @@ private:
     QSize m_viewportSize;
     QPointF m_viewportLoc;
     int m_numOfIsosurfaces;
+    float m_isovalueMin, m_isovalueMax;
     float m_isovalues[6];
     QOpenGLShaderProgram *m_program;
     QQuickWindow *m_window;
@@ -96,12 +99,17 @@ class Isosurface : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(float viewDistance READ viewDistance WRITE setViewDistance NOTIFY viewDistanceChanged)
-
+    Q_PROPERTY(float isovalueMin READ isovalueMin WRITE setIsovalueMin NOTIFY isovalueMinChanged)
+    Q_PROPERTY(float isovalueMax READ isovalueMax WRITE setIsovalueMax NOTIFY isovalueMaxChanged)
 public:
     Isosurface();
 
     float viewDistance() const { return m_viewDistance; }
     void setViewDistance(float distance);
+    float isovalueMin(void) { return m_isovalueMin; }
+    void setIsovalueMin(float min) { m_isovalueMin = min; }
+    float isovalueMax(void) { return m_isovalueMax; }
+    void setIsovalueMax(float max) { m_isovalueMax = max; }
 
     Q_INVOKABLE void updateViewAngle(float horizontal, float vertical);
     Q_INVOKABLE void updateViewDistance(float angle);
@@ -110,8 +118,10 @@ public:
     Q_INVOKABLE bool updateIsovalue(int index, float isovalue);
 
 Q_SIGNALS:
-    void isovalueChanged();
+    void isovaluesChanged();
     void viewDistanceChanged();
+    void isovalueMinChanged();
+    void isovalueMaxChanged();
 
 public Q_SLOTS:
     void sync();
@@ -121,6 +131,8 @@ private Q_SLOTS:
     void handleWindowChanged(QQuickWindow *win);
 
 private:
+    float m_isovalueMin;
+    float m_isovalueMax;
     float m_isovalues[6];
     int m_numOfIsosurfaces;
     IsosurfaceRenderer *m_renderer;

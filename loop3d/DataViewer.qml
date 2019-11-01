@@ -12,6 +12,8 @@ Item {
         id: surface
         anchors.fill: parent
 
+        Component.onCompleted: resetViewAngle()
+
         MouseArea {
             id: viewerInteraction
             anchors.fill: parent
@@ -100,9 +102,9 @@ Item {
                 id: isovalue
 
                 visible: dataViewerControls.isosurfaces - 1 >= index
-                from: 0
-                value: 0
-                to: 450
+                from: surface.isovalueMin
+                value: surface.isovalueMin
+                to: surface.isovalueMax
                 pressed: surface.updateIsovalue(index, value)
 
                 states: State {

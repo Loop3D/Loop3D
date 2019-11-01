@@ -17,6 +17,9 @@ StructuralModel::StructuralModel()
     m_zmin = -1.0;
     m_zmax =  1.0;
 
+    m_valmin = 0.0;
+    m_valmax = 1.0;
+
     values.clear();
     valueData = nullptr;
     dataChanged = false;
@@ -33,7 +36,7 @@ StructuralModel::~StructuralModel()
 
 }
 
-void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, float xmax,  int xsteps, float ymin, float ymax, int ysteps, float zmin, float zmax, int zsteps)
+void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, float xmax,  int xsteps, float ymin, float ymax, int ysteps, float zmin, float zmax, int zsteps, float valmin, float valmax)
 {
     qDebug() << "Note: Max texture size is" << GL_MAX_TEXTURE_SIZE;
     qDebug() << "Note: Max 3D texture size is" << GL_MAX_3D_TEXTURE_SIZE;
@@ -47,6 +50,8 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
         m_ymax = ymax;
         m_zmin = zmin;
         m_zmax = zmax;
+        m_valmin = valmin;
+        m_valmax = valmax;
         // Texture sizes
         width = static_cast<unsigned int>(xsteps)+1;
         height = static_cast<unsigned int>(ysteps)+1;
@@ -99,7 +104,7 @@ void StructuralModel::createBasicTestStructure(unsigned int size)
             for (unsigned int i=0;i<getWidthUI();i++)
                 for (unsigned int j=0;j<getHeightUI();j++)
                     for (unsigned int k=0;k<getDepthUI();k++) {
-                        float val = static_cast<float>(i) / (static_cast<float>(j) + static_cast<float>(k));// 1.0f);// + 100.0f;
+                        float val = static_cast<float>(i) / (static_cast<float>(j) + static_cast<float>(k));
                         values.push_back(val);
                         valueData[i*getHeightUI()*getDepthUI() + j*getDepthUI() + k] = val;
                     }

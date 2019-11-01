@@ -33,10 +33,12 @@ class StructuralModel : protected QOpenGLFunctions
         void loadData(pybind11::array_t<float> values_in,
                                        float xmin, float xmax, int xsteps,
                                        float ymin, float ymax, int ysteps,
-                                       float zmin, float zmax, int zsteps);
+                                       float zmin, float zmax, int zsteps,
+                                       float valmin, float valmax);
 
         QMutex dataMutex;
         float m_xmin, m_xmax, m_ymin, m_ymax, m_zmin, m_zmax;
+        float m_valmin, m_valmax;
     private:
         void createBasicTestStructure(unsigned int size);
         unsigned int width;

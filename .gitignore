@@ -7,3 +7,4 @@ build-loop3d-Desktop-*
 *.swo
 __pycache__
 *.xlsx
+loop3d.pro.user
