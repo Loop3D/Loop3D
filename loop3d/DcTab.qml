@@ -203,7 +203,7 @@ Item {
             }
             DataSourceModel {
                 id: dataSourceModel
-                property string dsfilename: "../loop3d/DataSource.conf"
+                property string dsfilename: "./DataSource.conf"
                 dataSources: dataSourceList
                 Component.onCompleted: loadDataSources(dsfilename)
             }

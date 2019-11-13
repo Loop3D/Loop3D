@@ -4,7 +4,7 @@ QT += 3drender gui opengl
 
 QT_OPENGL=desktop
 
-CONFIG += c++11 no_keywords
+CONFIG += c++11 no_keywords console
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -28,9 +28,10 @@ linux {
 linux {
     LIBS += -lpython3.6m -lnetcdf -lnetcdf_c++4
 } else :win32 {
-    debug {
+    CONFIG(debug, debug|release) {
         LIBS += -L$$(VCPKGINSTALL)/debug/lib
-    } else {
+    }
+    CONFIG(release, debug|release) {
         LIBS += -L$$(VCPKGINSTALL)/lib
     }
     LIBS += -L$$(PYTHONHOME)/libs
@@ -43,6 +44,8 @@ linux {
 SOURCES += \
         datasourcelist.cpp \
         datasourcemodel.cpp \
+        eventlist.cpp \
+        eventmodel.cpp \
         isosurface.cpp \
         main.cpp \
         projectmanagement.cpp \
@@ -67,6 +70,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     datasourcelist.h \
     datasourcemodel.h \
+    eventlist.h \
+    eventmodel.h \
     isosurface.h \
     projectmanagement.h \
     pythonhighlighter.h \

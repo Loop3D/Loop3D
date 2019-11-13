@@ -103,7 +103,7 @@ Item {
 
                 visible: dataViewerControls.isosurfaces - 1 >= index
                 from: surface.isovalueMin
-                value: surface.isovalueMin
+                value: index / 6 * (surface.isovalueMax - surface.isovalueMin) + surface.isovalueMin
                 to: surface.isovalueMax
                 pressed: surface.updateIsovalue(index, value)
 

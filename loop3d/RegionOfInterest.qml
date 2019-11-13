@@ -303,6 +303,7 @@ Item {
         text: "Approx. Dimensions (m) = " + (project.maxEasting - project.minEasting).toFixed(0) + " x " + (project.maxNorthing - project.minNorthing).toFixed(0)
     }
     Rectangle {
+        id: sampleSize
         anchors.top: size.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -343,6 +344,16 @@ Item {
                 text: project.sampleSpacing
             }
         }
+    }
+    Text {
+        anchors.top: sampleSize.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 2
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: "Add depth limits here!"
     }
 
     Component.onCompleted: reCentreMap()

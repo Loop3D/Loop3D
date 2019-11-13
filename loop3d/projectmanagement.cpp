@@ -3,12 +3,8 @@
 #include <QtDebug>
 
 #include <exception>
-
-#define USING_NETCDF 1
-
-#ifdef USING_NETCDF
 #include <netcdf>
-#endif
+
 
 ProjectManagement* ProjectManagement::m_instance = nullptr;
 
@@ -18,7 +14,6 @@ ProjectManagement::ProjectManagement():
     m_sampleSpacing(100),
     m_filename("")
 {
-//    qDebug() << "Setting global project pointer to (" << this << ")";
 }
 
 void ProjectManagement::clearProject(void)

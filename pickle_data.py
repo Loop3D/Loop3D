@@ -14,4 +14,4 @@
 import pickle
 
 
-result = pickle.load(open("..\save.p","rb"))
+result = pickle.load(open(".\save.p","rb"))

@@ -11,6 +11,8 @@
 #include "projectmanagement.h"
 #include "datasourcemodel.h"
 #include "datasourcelist.h"
+#include "eventmodel.h"
+#include "eventlist.h"
 
 namespace py = pybind11;
 
@@ -34,16 +36,17 @@ void setupOpenGLVersion(void)
 
 int main(int argc, char *argv[])
 {
-    qDebug() << "Starting pybind11 interpreter";
+    QTextStream out (stdout);
+    out << "Starting pybind11 interpreter\n";
     try {
         py::initialize_interpreter();
-        qDebug() << "Interpreter loaded, trying a python file";
+        out << "Interpreter loaded, trying a python file\n";
 
-        py::eval_file("..\\setup.py");
-        qDebug() << "Python interpreter and setup environment file successfully ran";
+        py::eval_file(".\\setupPython.py");
+        out << "Python interpreter and setup environment file successfully ran\n";
     } catch (std::exception& e) {
-        qDebug() << e.what();
-        qDebug() << "Python file DID NOT successfully ran\n";
+        out << e.what();
+        out << "Python file DID NOT successfully ran\n";
     }
 
     setupOpenGLVersion();
@@ -55,6 +58,7 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("loop3d.org");
 
     DataSourceList dataSourceList;
+    EventList eventList;
     qmlRegisterType<Isosurface>("OpenGLUnderQML", 1, 0, "Isosurface");
 
     ProjectManagement* project = ProjectManagement::instance();
@@ -75,14 +79,20 @@ int main(int argc, char *argv[])
     qmlRegisterType<DataSourceModel>("loop3d.datasourcemodel",1,0,"DataSourceModel");
     qmlRegisterUncreatableType<DataSourceList>("loop3d.datasourcemodel",1,0,"DataSourceList",
                                                QStringLiteral("DataSourceList should not be created in QML"));
+    qmlRegisterType<EventModel>("loop3d.eventmodel",1,0,"EventModel");
+    qmlRegisterUncreatableType<EventList>("loop3d.eventmodel",1,0,"EventList",
+                                               QStringLiteral("EventList should not be created in QML"));
 
     QQuickView view;
     view.rootContext()->setContextProperty(QStringLiteral("dataSourceList"), &dataSourceList);
+    view.rootContext()->setContextProperty(QStringLiteral("eventList"), &eventList);
     view.rootContext()->setContextProperty(QStringLiteral("project"), project);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:///main.qml"));
     view.show();
+    QObject::connect(view.rootContext()->engine(),SIGNAL(quit()),qApp,SLOT(quit()));
 
+    out << "Starting qt app exec\n";
     int res = app.exec();
     py::finalize_interpreter();
     return res;
