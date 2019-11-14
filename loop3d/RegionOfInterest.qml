@@ -226,16 +226,16 @@ Item {
             height: parent.height
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
-            font.family: mainWindow.headingFontStyle
-            font.pixelSize: mainWindow.headingFontSize
+            font.family: mainWindow.defaultFontStyle
+            font.pixelSize: mainWindow.defaultFontSize
             width: 20
         }
         Button {
             id: projection
             anchors.left: projectionTag.right
             height: parent.height
-            font.family: mainWindow.headingFontStyle
-            font.pixelSize: mainWindow.headingFontSize
+            font.family: mainWindow.defaultFontStyle
+            font.pixelSize: mainWindow.defaultFontSize
             text: inUTM ? "UTM" : "GEODETIC"
             onClicked: {
                 // Ensure reprojection before swap
@@ -264,8 +264,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.left: parent.left
-                font.family: mainWindow.headingFontStyle
-                font.pixelSize: mainWindow.headingFontSize
+                font.family: mainWindow.defaultFontStyle
+                font.pixelSize: mainWindow.defaultFontSize
                 validator: RegExpValidator { regExp : /[1-9]|[1-5][0-9]|60/ }
                 onTextChanged: if (text != "") project.utmZone = text
             }
@@ -276,8 +276,8 @@ Item {
             anchors.left: highlightExtent.right
             height: parent.height
             width: 20
-            font.family: mainWindow.headingFontStyle
-            font.pixelSize: mainWindow.headingFontSize
+            font.family: mainWindow.defaultFontStyle
+            font.pixelSize: mainWindow.defaultFontSize
             text: project.utmNorthSouthStr
             onClicked: {
                 if (project.utmNorthSouth != 1) {
@@ -297,8 +297,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         height: 20
         width: 200
-        font.family: mainWindow.headingFontStyle
-        font.pixelSize: mainWindow.headingFontSize
+        font.family: mainWindow.defaultFontStyle
+        font.pixelSize: mainWindow.defaultFontSize
         color: "#000000"
         text: "Approx. Dimensions (m) = " + (project.maxEasting - project.minEasting).toFixed(0) + " x " + (project.maxNorthing - project.minNorthing).toFixed(0)
     }
@@ -317,8 +317,8 @@ Item {
 //            anchors.horizontalCenter: parent.horizontalCenter
             height: 20
             width: parent.width / 2
-            font.family: mainWindow.headingFontStyle
-            font.pixelSize: mainWindow.headingFontSize
+            font.family: mainWindow.defaultFontStyle
+            font.pixelSize: mainWindow.defaultFontSize
             color: "#000000"
             text: "Sample spacing (m) "
         }
@@ -338,8 +338,8 @@ Item {
                 anchors.margins: 2
                 horizontalAlignment: Text.AlignHCenter
                 validator: RegExpValidator { regExp : /[1-9][0-9]+/ }
-                font.family: mainWindow.headingFontStyle
-                font.pixelSize: mainWindow.headingFontSize
+                font.family: mainWindow.defaultFontStyle
+                font.pixelSize: mainWindow.defaultFontSize
                 color: "#000000"
                 text: project.sampleSpacing
             }
@@ -354,6 +354,8 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         text: "Add depth limits here!"
+        font.family: mainWindow.defaultFontStyle
+        font.pixelSize: mainWindow.defaultFontSize
     }
 
     Component.onCompleted: reCentreMap()

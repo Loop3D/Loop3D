@@ -105,6 +105,7 @@ void StructuralModel::createBasicTestStructure(unsigned int size)
                 for (unsigned int j=0;j<getHeightUI();j++)
                     for (unsigned int k=0;k<getDepthUI();k++) {
                         float val = static_cast<float>(i) / (static_cast<float>(j) + static_cast<float>(k));
+                        if (val != val || isinf(val)) val = static_cast<float>(i);
                         values.push_back(val);
                         valueData[i*getHeightUI()*getDepthUI() + j*getDepthUI() + k] = val;
                     }

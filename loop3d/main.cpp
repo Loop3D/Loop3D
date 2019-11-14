@@ -62,10 +62,10 @@ int main(int argc, char *argv[])
     qmlRegisterType<Isosurface>("OpenGLUnderQML", 1, 0, "Isosurface");
 
     ProjectManagement* project = ProjectManagement::instance();
-    project->m_minLatitude = -32.5;
-    project->m_maxLatitude = -31.5;
-    project->m_minLongitude = 115.5;
-    project->m_maxLongitude = 116.5;
+    project->m_minLatitude = -35.0;
+    project->m_maxLatitude = -34.5;
+    project->m_minLongitude = 135.5;
+    project->m_maxLongitude = 136.0;
     qmlRegisterUncreatableType<ProjectManagement>("loop3d.projectmanagement",1,0,"Project",
                                                QStringLiteral("ProjectManagement shoudl not be created in QML"));
 

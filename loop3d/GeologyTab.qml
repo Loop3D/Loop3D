@@ -99,6 +99,8 @@ Item {
                         color: isActive ? "#000000" : "#555555"
                         font.italic: isActive ? false : true
                         text: "Event ID " + eventID + ": \t" + type + "\t Age: " + minAge.toFixed(1) + " - " + maxAge.toFixed(1) + "\t\t" + name
+                        font.family: mainWindow.defaultFontStyle
+                        font.pixelSize: mainWindow.defaultFontSize
                     }
                     MouseArea {
                         anchors.fill: parent
@@ -113,6 +115,8 @@ Item {
                         anchors.bottom: parent.bottom
                         width: 80
                         text: isActive ? "Enabled" : "Disabled"
+                        font.family: mainWindow.defaultFontStyle
+                        font.pixelSize: mainWindow.defaultFontSize
                         background: Rectangle {
                             color: isActive ? "#3333ee" : "#ee3333"
                             radius: 5
@@ -288,6 +292,8 @@ Item {
                         anchors.margins: mainWindow.myBorders
                         visible: detailsView.currentIndex >= 0
                         text: "Feature: " + eventsModel.dataIndexed(detailsView.currentIndex,"name") + "\n" + eventsModel.dataIndexed(detailsView.currentIndex,"type")
+                        font.family: mainWindow.defaultFontStyle
+                        font.pixelSize: mainWindow.defaultFontSize
                     }
                     Rectangle {
                         id: minAgeTextInputRect
@@ -304,8 +310,8 @@ Item {
                             id: minAgeTextInput
                             anchors.fill: parent
                             color: "#000000"
-                            font.family: mainWindow.headingFontStyle
-                            font.pixelSize: mainWindow.headingFontSize
+                            font.family: mainWindow.defaultFontStyle
+                            font.pixelSize: mainWindow.defaultFontSize
                             validator: RegExpValidator { regExp : /-?[0-9]+\.[0-9]+/ }
                             maximumLength: 10
                             horizontalAlignment: Text.AlignHCenter
@@ -335,8 +341,8 @@ Item {
                             id: maxAgeTextInput
                             anchors.fill: parent
                             color: "#000000"
-                            font.family: mainWindow.headingFontStyle
-                            font.pixelSize: mainWindow.headingFontSize
+                            font.family: mainWindow.defaultFontStyle
+                            font.pixelSize: mainWindow.defaultFontSize
                             validator: RegExpValidator { regExp : /-?[0-9]+\.[0-9]+/ }
                             maximumLength: 10
                             horizontalAlignment: Text.AlignHCenter

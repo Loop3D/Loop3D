@@ -10,11 +10,13 @@ Item {
     height: 768
     id: mainWindow
     property int myBorders: 6
-    property real version: 0.000001
+    property string version: "1.0 x 10^-9"
     property bool confirmOnQuit: false
     property bool hasFile: false
     property string headingFontStyle: "Arial"
     property int headingFontSize: 14
+    property string defaultFontStyle: "Arial"
+    property int defaultFontSize: 12
     MenuBar {
         id: menu
         height: 40

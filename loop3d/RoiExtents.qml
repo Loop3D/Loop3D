@@ -15,8 +15,8 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         height: 20
         width: 90
-        font.family: mainWindow.headingFontStyle
-        font.pixelSize: mainWindow.headingFontSize
+        font.family: mainWindow.defaultFontStyle
+        font.pixelSize: mainWindow.defaultFontSize
         color: "#000000"
         styleColor: "#aaaaaa"
     }
@@ -33,8 +33,8 @@ Item {
             readOnly: lockRegionOfInterest
             anchors.fill: parent
             color: "#000000"
-            font.family: mainWindow.headingFontStyle
-            font.pixelSize: mainWindow.headingFontSize
+            font.family: mainWindow.defaultFontStyle
+            font.pixelSize: mainWindow.defaultFontSize
             validator: RegExpValidator { regExp : /-?[0-9]+\.[0-9]+/ }
             maximumLength: 10
             horizontalAlignment: Text.AlignHCenter

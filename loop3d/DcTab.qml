@@ -280,6 +280,8 @@ Item {
                         clip: true
                         anchors.left: stateExpanded.right
                         anchors.margins: mainWindow.myBorders
+                        font.family: mainWindow.defaultFontStyle
+                        font.pixelSize: mainWindow.defaultFontSize
                     }
 
                     MouseArea {
