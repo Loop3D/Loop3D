@@ -108,11 +108,13 @@ for i, r in sections.iterrows():
 
 feature = stratigraphy_builder.build(cpw=1,cgw=0.1)
 
+
+# Get resulting model for Loop interface
 xstepsize = (boundary_points[1,0]-boundary_points[0,0]) / xsteps
-xcoords = np.arange(boundary_points[0,0], boundary_points[1,0]+0.1*xstepsize,xstepsize)
 ystepsize = (boundary_points[1,1]-boundary_points[0,1]) / ysteps
-ycoords = np.arange(boundary_points[0,1], boundary_points[1,1]+0.1*ystepsize,ystepsize)
 zstepsize = (boundary_points[1,2]-boundary_points[0,2]) / zsteps
+xcoords = np.arange(boundary_points[0,0], boundary_points[1,0]+0.1*xstepsize,xstepsize)
+ycoords = np.arange(boundary_points[0,1], boundary_points[1,1]+0.1*ystepsize,ystepsize)
 zcoords = np.arange(boundary_points[0,2], boundary_points[1,2]+0.1*zstepsize,zstepsize)
 
 zz,yy,xx = np.meshgrid(zcoords,ycoords,xcoords,indexing='ij')

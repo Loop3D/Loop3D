@@ -9,10 +9,14 @@
 ProjectManagement* ProjectManagement::m_instance = nullptr;
 
 ProjectManagement::ProjectManagement():
+    m_minDepth(1000),
+    m_maxDepth(9000),
     m_utmZone(0),
     m_utmNorthSouth(-1),
-    m_sampleSpacing(100),
-    m_filename("")
+    m_spacingX(100),
+    m_spacingY(100),
+    m_spacingZ(100),
+  m_filename("")
 {
 }
 
@@ -29,13 +33,18 @@ void ProjectManagement::clearProject(void)
     m_maxNorthing = 0;
     m_minEasting = 0;
     m_maxEasting = 0;
-    m_sampleSpacing = 100;
     m_filename = "";
     m_mapCentreLatitude = 0;
     m_mapCentreLongitude = 0;
+    m_minDepth = 1000.0;
+    m_maxDepth = 9000.0;
+    m_spacingX = 100;
+    m_spacingY = 100;
+    m_spacingZ = 100;
     minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
     minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
     utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
+    spacingXChanged(); spacingYChanged(); spacingZChanged();
 }
 
 int ProjectManagement::saveProject(QString filename)
@@ -61,9 +70,13 @@ int ProjectManagement::saveProject(QString filename)
         dataFile.putAtt("maxNorthing",netCDF::ncDouble,m_maxNorthing);
         dataFile.putAtt("minEasting",netCDF::ncDouble,m_minEasting);
         dataFile.putAtt("maxEasting",netCDF::ncDouble,m_maxEasting);
+        dataFile.putAtt("minDepth",netCDF::ncDouble,m_minDepth);
+        dataFile.putAtt("maxDepth",netCDF::ncDouble,m_maxDepth);
         dataFile.putAtt("utmZone",netCDF::ncInt64,m_utmZone);
         dataFile.putAtt("utmNorthSouth",netCDF::ncInt64,m_utmNorthSouth);
-        dataFile.putAtt("sampleSpacing",netCDF::ncInt64,m_sampleSpacing);
+        dataFile.putAtt("spacingX",netCDF::ncInt64,m_spacingX);
+        dataFile.putAtt("spacingY",netCDF::ncInt64,m_spacingY);
+        dataFile.putAtt("spacingZ",netCDF::ncInt64,m_spacingZ);
 
 //        netCDF::NcDim xDim = dataFile.addDim("x", 6);
 //        netCDF::NcDim yDim = dataFile.addDim("y", 12);
@@ -99,7 +112,9 @@ int ProjectManagement::loadProject(QString filename)
         // Load variables to staging area to confirm all loaded in
         double minLatitude, maxLatitude, minLongitude, maxLongitude;
         double minNorthing, maxNorthing, minEasting, maxEasting;
-        int64_t utmZone, utmNorthSouth, sampleSpacing;
+        double minDepth, maxDepth;
+        int64_t utmZone, utmNorthSouth;
+        int64_t spacingX, spacingY, spacingZ;
 
         QStringList list = filename.split(QRegExp("///"));
         QString name = (list.length() > 1 ? list[1] : list[0]);
@@ -116,21 +131,29 @@ int ProjectManagement::loadProject(QString filename)
         dataFile.getAtt("maxEasting").getValues(&maxEasting);
         dataFile.getAtt("utmZone").getValues(&utmZone);
         dataFile.getAtt("utmNorthSouth").getValues(&utmNorthSouth);
-        dataFile.getAtt("sampleSpacing").getValues(&sampleSpacing);
+        dataFile.getAtt("minDepth").getValues(&minDepth);
+        dataFile.getAtt("maxDepth").getValues(&maxDepth);
+        dataFile.getAtt("spacingX").getValues(&spacingX);
+        dataFile.getAtt("spacingY").getValues(&spacingY);
+        dataFile.getAtt("spacingZ").getValues(&spacingZ);
 
         // All loaded to set values into structure
-        m_utmZone = utmZone;
-        m_utmNorthSouth = utmNorthSouth;
+        m_utmZone = static_cast<int>(utmZone);
+        m_utmNorthSouth = static_cast<int>(utmNorthSouth);
         m_utmNorthSouthStr = (utmNorthSouth == -1 ? "-" : (utmNorthSouth == 1 ? "N" : "S"));
         m_minNorthing = minNorthing;
         m_maxNorthing = maxNorthing;
         m_minEasting = minEasting;
         m_maxEasting = maxEasting;
+        m_minDepth = minDepth;
+        m_maxDepth = maxDepth;
+        m_spacingX = static_cast<int>(spacingX);
+        m_spacingY = static_cast<int>(spacingY);
+        m_spacingZ = static_cast<int>(spacingZ);
         updateGeodeticLimits(minLatitude,maxLatitude,minLongitude,maxLongitude);
 
-        m_sampleSpacing = sampleSpacing;
-        sampleSpacingChanged();
-
+        minDepthChanged(); maxDepthChanged();
+        spacingXChanged(); spacingYChanged(); spacingZChanged();
         // Data file all working so save filename
         m_filename = filename;
         filenameChanged();

@@ -47,8 +47,10 @@ Item {
                 text: qsTr("&Save")
                 shortcut: "Ctrl+S"
                 onTriggered: {
-                    if (hasFile) project.saveProject()
-                    else fileDialogSave.open()
+                    if (hasFile) {
+                        project.saveProject()
+                        notifyText.text = "Saved project to " + project.filename
+                    } else fileDialogSave.open()
                 }
             }
             Action {
@@ -180,14 +182,15 @@ Item {
     // Save Project Interaction
     FileDialog {
         id: fileDialogSave
-        title: "Select a Loop3D project to open"
-        defaultSuffix: "txt"
+        title: "Select a Loop project filename to save to"
+        defaultSuffix: "loop3d"
         onRejected: console.log("Save Project Action Cancelled")
         onAccepted: {
             // Save file here
             hasFile = project.saveProject(fileDialogSave.fileUrl)
             notifyText.text = "Saved project to " + fileDialogSave.fileUrl
             console.log("Save Project Action - Save to " + fileDialogSave.fileUrl)
+            notifyText.text = "Saved project to " + fileDialogSave.fileUrl
         }
         nameFilters: [ "Loop3D Project files (*.loop3d *.l3d)","All files(*)" ]
         selectExisting: false

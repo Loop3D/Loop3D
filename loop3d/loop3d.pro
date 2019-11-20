@@ -4,7 +4,8 @@ QT += 3drender gui opengl
 
 QT_OPENGL=desktop
 
-CONFIG += c++11 no_keywords console
+CONFIG += c++11 no_keywords
+#CONFIG += console
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings

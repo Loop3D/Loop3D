@@ -26,6 +26,8 @@ Item {
         roi.updateMinEasting(project.minEasting)
         roi.updateMaxNorthing(project.maxNorthing)
         roi.updateMinNorthing(project.minNorthing)
+        roi.updateMinDepth(project.minDepth)
+        roi.updateMaxDepth(project.maxDepth)
         roi.updateZone()
     }
 
@@ -63,7 +65,7 @@ Item {
             width: parent.width / 2 - mainWindow.myBorders - 1
             height: parent.height / 2 - mainWindow.myBorders - 1
             color: "#dddddd"
-
+            clip: true
             RegionOfInterest {
                 id: roi
                 anchors.fill: parent
