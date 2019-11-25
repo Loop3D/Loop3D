@@ -75,6 +75,7 @@ public:
     void setViewAngle(QQuaternion angle) { m_viewAngle = angle; }
     void setViewDistance(float dist) { m_viewDistance = dist; }
     void setIsovalueMinMax(float min, float max) { m_isovalueMin = min; m_isovalueMax = max; }
+    void setCameraPosition(float northing, float easting, float depth);
 
 public Q_SLOTS:
     void paint();
@@ -93,6 +94,7 @@ private:
     QOpenGLVertexArrayObject* m_vao;
     QQuaternion m_viewAngle;
     float m_viewDistance;
+    float m_camNorthing, m_camEasting, m_camDepth;
 };
 
 class Isosurface : public QQuickItem
@@ -116,6 +118,7 @@ public:
     Q_INVOKABLE void resetViewAngle();
     Q_INVOKABLE void updateNumberOfIsosurfaces(int num);
     Q_INVOKABLE bool updateIsovalue(int index, float isovalue);
+    Q_INVOKABLE void updateCameraPosition(bool up, bool left, bool down, bool right);
 
 Q_SIGNALS:
     void isovaluesChanged();
@@ -138,6 +141,7 @@ private:
     IsosurfaceRenderer *m_renderer;
     QQuaternion m_viewAngle;
     float m_viewDistance;
+    float m_camNorthing, m_camEasting, m_camDepth;
 };
 
 #endif // ISOSURFACE_H

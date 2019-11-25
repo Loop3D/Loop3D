@@ -69,15 +69,12 @@ void PythonText::run(QString code, QString netCDF_Filename)
 
         // Get results back from algorithm (numpy arrays work but don't go past boundaries)
         py::array_t<float> result = locals["result"].cast<py::array_t<float> >();
-//        float valmin = locals["valmin"].cast<float>();
-//        float valmax = locals["valmax"].cast<float>();
-        float valmin = 0.0f;
-        float valmax = 400.0f;
         if (ProjectManagement::instance()) {
             ProjectManagement* proj = ProjectManagement::instance();
-            ProjectManagement::instance()->getStModel()->loadData(result,proj->m_minEasting, proj->m_maxEasting, xsteps,
-                                                                  proj->m_minNorthing, proj->m_maxNorthing, ysteps,
-                                                                  -5000.0f,5000.0f,zsteps,valmin,valmax);
+            ProjectManagement::instance()->getStModel()->loadData(result,
+                        static_cast<float>(proj->m_minEasting), static_cast<float>(proj->m_maxEasting), xsteps,
+                        static_cast<float>(proj->m_minNorthing), static_cast<float>(proj->m_maxNorthing), ysteps,
+                        static_cast<float>(proj->m_minDepth),static_cast<float>(proj->m_maxDepth),zsteps);
         } else {
             qFatal("No global project pointer (NEED TO FIX THIS NOW!)");
         }

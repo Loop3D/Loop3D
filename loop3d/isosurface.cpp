@@ -17,7 +17,8 @@ Isosurface::Isosurface()
 {
     for (int i=0;i<6;i++) m_isovalues[i] = 0.0;
     m_viewDistance = 20000.0f;
-    m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,qDegreesToRadians(90.0f));
+    m_camNorthing = m_camEasting = m_camDepth = 0.0f;
+    m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,90.0f);
     connect(this, &QQuickItem::windowChanged, this, &Isosurface::handleWindowChanged);
 }
 
@@ -43,6 +44,7 @@ void Isosurface::updateViewDistance(float angle)
 
 void Isosurface::resetViewAngle()
 {
+    m_camNorthing = m_camEasting = m_camDepth = 0.0f;
     m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,90.0f);
     if (window()) window()->update();
 }
@@ -63,6 +65,28 @@ bool Isosurface::updateIsovalue(int index, float isovalue)
     m_isovalues[index] = isovalue;
     if (window()) window()->update();
     return true;
+}
+
+void Isosurface::updateCameraPosition(bool up, bool down, bool left, bool right, bool forward, bool back)
+{
+    QVector3D position = QVector3D();
+    // Get Euler of view quaternion matrix
+    float pitch, yaw, roll;
+    m_viewAngle.getEulerAngles(&pitch, &yaw, &roll);
+
+    // Add position vector based on camera angles
+//    position  += (up      ? QVector3D( 1, 0, 0,0)*;
+//    position  += (down    ? QVector3D( 1, 0, 0,0)*;
+//    position  += (left    ? QVector3D( 1, 0, 0,0)*;
+//    position  += (right   ? QVector3D( 1, 0, 0,0)*;
+//    position  += (forward ? QVector3D( 1, 0, 0,0)*;
+//    position  += (back    ? QVector3D( 1, 0, 0,0)*;
+    qDebug() << "input" << up << " " << left << " " << down << " " << right << " " << forward << " " << back;
+
+    // Set position to camera
+//    m_camNorthing = ;
+//    m_camEasting = ;
+//    m_camDepth = ;
 }
 
 void Isosurface::handleWindowChanged(QQuickWindow *win)
@@ -100,6 +124,7 @@ void Isosurface::sync()
     m_renderer->setIsovalues(m_isovalues);
     m_renderer->setViewAngle(m_viewAngle);
     m_renderer->setViewDistance(m_viewDistance);
+    m_renderer->setCameraPosition(m_camNorthing, m_camEasting, m_camDepth);
     m_renderer->setWindow(window());
 
     StructuralModel* stModel = ProjectManagement::instance()->getStModel();
@@ -114,6 +139,13 @@ void Isosurface::sync()
             old_isovalueMax = m_isovalueMax;
         }
     }
+}
+
+void IsosurfaceRenderer::setCameraPosition(float northing, float easting, float depth)
+{
+    m_camNorthing = northing;
+    m_camEasting = easting;
+    m_camDepth = depth;
 }
 
 void IsosurfaceRenderer::paint()
@@ -287,7 +319,6 @@ void IsosurfaceRenderer::paint()
                 "                                tetra.val[0]-tetra.val[1]+tetra.val[2]-tetra.val[3],\n"
                 "                                tetra.val[0]-tetra.val[1]-tetra.val[2]+tetra.val[3])\n"
                 "                           * ((gridPos.x + gridPos.y + gridPos.z) % 2 == 0 ? -1 : 1));\n"
-//                "        normal = vec3(1,0,0);\n"
                 "    }\n"
                 "    coords = texCoord.xy;\n"
                 "    position = newVertex;\n"
@@ -331,8 +362,7 @@ void IsosurfaceRenderer::paint()
                 "    // Add lighting"
                 "    float ambient = 0.1;\n"
                 "    vec3 lightDir = normalize((vec4(position,1.0) * modelViewMatrix).xyz - lightPos);\n"
-                "    colour = colour * max(dot(-normal,-lightDir),0.0);\n"
-//                "    colour = -normal;\n"
+                "    colour = colour * max(abs(dot(-normal,-lightDir)),0.0);\n"
                 "\n"
                 "    FragColour = vec4(colour,1.0);\n"
                 "}\n";
@@ -407,15 +437,19 @@ void IsosurfaceRenderer::paint()
     }
     stModel->bindTextures();
 
+    float xmid = (stModel->m_xmin + stModel->m_xmax) / 2.0f;
+    float ymid = (stModel->m_ymin + stModel->m_ymax) / 2.0f;
+    float zmid = (stModel->m_zmin + stModel->m_zmax) / 2.0f;
+
     m_program->setUniformValueArray("isovalues",m_isovalues,6,1);
     m_program->setUniformValue("textureUnit0",0);
     m_program->setUniformValue("colourScale",10.0f);
     m_program->setUniformValue("xmin",stModel->m_xmin);
     m_program->setUniformValue("ymin",stModel->m_ymin);
     m_program->setUniformValue("zmin",stModel->m_zmin);
-    m_program->setUniformValue("xmid",(stModel->m_xmin + stModel->m_xmax) / 2.0f);
-    m_program->setUniformValue("ymid",(stModel->m_ymin + stModel->m_ymax) / 2.0f);
-    m_program->setUniformValue("zmid",(stModel->m_zmin + stModel->m_zmax) / 2.0f);
+    m_program->setUniformValue("xmid",xmid);
+    m_program->setUniformValue("ymid",ymid);
+    m_program->setUniformValue("zmid",zmid);
     m_program->setUniformValue("xsize",stModel->getWidth());
     m_program->setUniformValue("ysize",stModel->getHeight());
     m_program->setUniformValue("zsize",stModel->getDepth());
@@ -425,9 +459,9 @@ void IsosurfaceRenderer::paint()
     m_program->setUniformValue("ystepsize",(stModel->m_ymax-stModel->m_ymin)/static_cast<float>(stModel->getHeight()-1));
     m_program->setUniformValue("zstepsize",(stModel->m_zmax-stModel->m_zmin)/static_cast<float>(stModel->getDepth()-1));
 
-    m_program->setUniformValue("xmin",-4000.0f);
-    m_program->setUniformValue("ymin",-4000.0f);
-    m_program->setUniformValue("zmin",-4000.0f);
+    m_program->setUniformValue("xmin",-(xmid-stModel->m_xmin));
+    m_program->setUniformValue("ymin",-(ymid-stModel->m_ymin));
+    m_program->setUniformValue("zmin",-(zmid-stModel->m_zmin));
 
     QMatrix4x4 modelView;
     QMatrix4x4 modelMatrix;
@@ -435,10 +469,10 @@ void IsosurfaceRenderer::paint()
     QMatrix4x4 projectionMatrix;
     float aspectRatio = (m_viewportSize.height() == 0 ? 4.0f/3.0f : m_viewportSize.width() / m_viewportSize.height());
     projectionMatrix.perspective(60.0f, aspectRatio, 1.0f, 50000.0f);
-    viewMatrix.translate(0.0f,0.0f,-m_viewDistance);
+    viewMatrix.translate(m_camEasting,m_camNorthing,m_camDepth-m_viewDistance);
     viewMatrix.rotate(m_viewAngle);
     modelView.scale(1.0f,1.0f,1.0f);
-    QVector3D lightPos(0.0,0.0,m_viewDistance);
+    QVector3D lightPos(0.0,0.0,50000.0f);
 
     const QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
     const QMatrix4x4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;

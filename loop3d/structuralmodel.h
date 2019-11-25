@@ -33,8 +33,7 @@ class StructuralModel : protected QOpenGLFunctions
         void loadData(pybind11::array_t<float> values_in,
                                        float xmin, float xmax, int xsteps,
                                        float ymin, float ymax, int ysteps,
-                                       float zmin, float zmax, int zsteps,
-                                       float valmin, float valmax);
+                                       float zmin, float zmax, int zsteps);
 
         QMutex dataMutex;
         float m_xmin, m_xmax, m_ymin, m_ymax, m_zmin, m_zmax;

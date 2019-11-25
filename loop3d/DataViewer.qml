@@ -64,6 +64,7 @@ Item {
             onExited: notifyText.text = ""
         }
     }
+
     Rectangle {
         id: dataViewerControls
         property var isosurfaces: 1
@@ -103,7 +104,7 @@ Item {
 
                 visible: dataViewerControls.isosurfaces - 1 >= index
                 from: surface.isovalueMin
-                value: index / 6 * (surface.isovalueMax - surface.isovalueMin) + surface.isovalueMin
+                value: (index+1) / 7 * (surface.isovalueMax - surface.isovalueMin) + surface.isovalueMin
                 to: surface.isovalueMax
                 pressed: surface.updateIsovalue(index, value)
 
@@ -154,6 +155,7 @@ Item {
                     color: isovalue.pressed ? "#f0f0f0" : "#f6f6f6"
                     border.color: "#bdbebf"
                 }
+                Keys.onPressed: event.reject
             }
         }
 
@@ -199,5 +201,14 @@ Item {
             }
             text: "Reset View"
         }
+    }
+
+    Keys.onPressed: {
+        surface.updateCameraPosition(event.key === Qt.Key_Space,
+                                     event.key === Qt.Key_Shift,
+                                     event.key === Qt.Key_A || (event.key === Qt.Key_4 && (event.modifiers & Qt.KeypadModifier)),
+                                     event.key === Qt.Key_D || (event.key === Qt.Key_6 && (event.modifiers & Qt.KeypadModifier)),
+                                     event.key === Qt.Key_W || (event.key === Qt.Key_8 && (event.modifiers & Qt.KeypadModifier)),
+                                     event.key === Qt.Key_S || (event.key === Qt.Key_2 && (event.modifiers & Qt.KeypadModifier)))
     }
 }
