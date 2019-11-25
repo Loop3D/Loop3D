@@ -118,7 +118,7 @@ public:
     Q_INVOKABLE void resetViewAngle();
     Q_INVOKABLE void updateNumberOfIsosurfaces(int num);
     Q_INVOKABLE bool updateIsovalue(int index, float isovalue);
-    Q_INVOKABLE void updateCameraPosition(bool up, bool left, bool down, bool right);
+    Q_INVOKABLE void updateCameraPosition(bool up, bool down, bool left, bool right, bool forward, bool back);
 
 Q_SIGNALS:
     void isovaluesChanged();
