@@ -78,35 +78,26 @@ int ProjectManagement::saveProject(QString filename)
         dataFile.putAtt("spacingY",netCDF::ncInt64,m_spacingY);
         dataFile.putAtt("spacingZ",netCDF::ncInt64,m_spacingZ);
 
-//        netCDF::NcDim xDim = dataFile.addDim("x", 6);
-//        netCDF::NcDim yDim = dataFile.addDim("y", 12);
-//        std::vector<netCDF::NcDim> dims;
-//        dims.push_back(xDim);
-//        dims.push_back(yDim);
-//        int dataTo[6][12] = {{0,0,0,0,0,0,0,0,0,0,0,0},
-//                             {0,0,0,0,0,0,0,0,0,0,0,0},
-//                             {0,0,0,0,0,0,0,0,0,0,0,0},
-//                             {0,0,0,0,0,0,0,0,0,0,0,0},
-//                             {0,0,0,0,0,0,0,0,0,0,0,0},
-//                             {0,0,0,0,0,0,0,0,0,0,0,0}};
-//        netCDF::NcVar data = dataFile.addVar("data", netCDF::ncInt,dims);
-//        data.putVar(dataTo);
+        dataFile.close();
+
         // Data file opened so save filename
         m_filename = filename;
         filenameChanged();
 
     } catch(netCDF::exceptions::NcException& e) {
-        std::cout << e.what() << std::endl;
-        std::cout << "Error creating file" << std::endl;
-        return 0;
+        qFatal("%s", e.what());
+        qFatal("Error creating file (%s)", filename.toStdString().c_str());
+        return 1;
     }
-    return 1;
+    // Save structural data
+    stModel.saveToFile(filename);
+    return 0;
 }
 
 int ProjectManagement::loadProject(QString filename)
 {
     if (filename == "") {
-        return 0;
+        return 1;
     }
     try {
         // Load variables to staging area to confirm all loaded in
@@ -137,6 +128,8 @@ int ProjectManagement::loadProject(QString filename)
         dataFile.getAtt("spacingY").getValues(&spacingY);
         dataFile.getAtt("spacingZ").getValues(&spacingZ);
 
+        dataFile.close();
+
         // All loaded to set values into structure
         m_utmZone = static_cast<int>(utmZone);
         m_utmNorthSouth = static_cast<int>(utmNorthSouth);
@@ -158,11 +151,14 @@ int ProjectManagement::loadProject(QString filename)
         m_filename = filename;
         filenameChanged();
     } catch(netCDF::exceptions::NcException& e) {
-        std::cout << e.what();
-        std::cout << "Error loading file" << std::endl;
-        return 0;
+        qFatal("%s", e.what());
+        qFatal("Error loading file (%s)", filename.toStdString().c_str());
+        return 1;
     }
-    return 1;
+
+    // Load structural data
+    stModel.loadFromFile(filename);
+    return 0;
 }
 
 void ProjectManagement::updateGeodeticLimits(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude)

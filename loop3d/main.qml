@@ -159,10 +159,13 @@ Item {
     FileDialog {
         id: fileDialogOpen
         title: "Select a Loop3D project to open"
+        nameFilters: [ "Loop3D Project files (*.loop3d *.l3d)","All files(*)"]
+        selectExisting: true
+        selectMultiple: false
         onRejected: console.log("Open Project Action Cancelled")
         onAccepted: {
             // Load file here
-            if (project.loadProject(fileDialogOpen.fileUrl)) {
+            if (!project.loadProject(fileDialogOpen.fileUrl)) {
                 console.log("Open Project Action - Open " + fileDialogOpen.fileUrl)
                 notifyText.text = "Loaded project from " + fileDialogOpen.fileUrl
                 dcTab.inUTM = false
@@ -174,9 +177,6 @@ Item {
                 notifyText.text = "ERROR loading project " + fileDialogOpen.fileUrl
             }
         }
-        nameFilters: [ "Loop3D Project files (*.loop3d *.l3d)","All files(*)"]
-        selectExisting: true
-        selectMultiple: false
     }
 
     // Save Project Interaction
@@ -184,17 +184,18 @@ Item {
         id: fileDialogSave
         title: "Select a Loop project filename to save to"
         defaultSuffix: "loop3d"
-        onRejected: console.log("Save Project Action Cancelled")
-        onAccepted: {
-            // Save file here
-            hasFile = project.saveProject(fileDialogSave.fileUrl)
-            notifyText.text = "Saved project to " + fileDialogSave.fileUrl
-            console.log("Save Project Action - Save to " + fileDialogSave.fileUrl)
-            notifyText.text = "Saved project to " + fileDialogSave.fileUrl
-        }
         nameFilters: [ "Loop3D Project files (*.loop3d *.l3d)","All files(*)" ]
         selectExisting: false
         selectMultiple: false
+        onRejected: console.log("Save Project Action Cancelled")
+        onAccepted: {
+            // Save file here
+            if (!project.saveProject(fileDialogSave.fileUrl)) {
+                hasFile = true
+                console.log("Save Project Action - Save to " + fileDialogSave.fileUrl)
+                notifyText.text = "Saved project to " + fileDialogSave.fileUrl
+            }
+        }
     }
 
     // About interaction
