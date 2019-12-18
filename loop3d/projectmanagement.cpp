@@ -16,7 +16,7 @@ ProjectManagement::ProjectManagement():
     m_spacingX(100),
     m_spacingY(100),
     m_spacingZ(100),
-  m_filename("")
+    m_filename("")
 {
 }
 
@@ -56,8 +56,16 @@ int ProjectManagement::saveProject(QString filename)
 
     try {
         // Find last '/' of the first set of '/'s as in file:/// or url:///
-        QStringList list = filename.split(QRegExp("///"));
-        QString name = (list.length() > 1 ? list[1] : list[0]);
+        QStringList list;
+        QString name;
+
+#ifdef _WIN32
+        list = filename.split(QRegExp("///"));
+        name = (list.length() > 1 ? list[1] : list[0]);
+#elif __linux__
+        list = filename.split(QRegExp("///"));
+        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+#endif
 
         netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::replace);
 
@@ -99,6 +107,7 @@ int ProjectManagement::loadProject(QString filename)
     if (filename == "") {
         return 1;
     }
+
     try {
         // Load variables to staging area to confirm all loaded in
         double minLatitude, maxLatitude, minLongitude, maxLongitude;
@@ -107,8 +116,16 @@ int ProjectManagement::loadProject(QString filename)
         int64_t utmZone, utmNorthSouth;
         int64_t spacingX, spacingY, spacingZ;
 
-        QStringList list = filename.split(QRegExp("///"));
-        QString name = (list.length() > 1 ? list[1] : list[0]);
+        QStringList list;
+        QString name;
+
+#ifdef _WIN32
+        list = filename.split(QRegExp("///"));
+        name = (list.length() > 1 ? list[1] : list[0]);
+#elif __linux__
+        list = filename.split(QRegExp("///"));
+        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+#endif
 
         netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::read);
 
@@ -155,7 +172,6 @@ int ProjectManagement::loadProject(QString filename)
         qFatal("Error loading file (%s)", filename.toStdString().c_str());
         return 1;
     }
-
     // Load structural data
     stModel.loadFromFile(filename);
     return 0;

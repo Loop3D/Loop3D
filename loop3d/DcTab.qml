@@ -205,7 +205,7 @@ Item {
             }
             DataSourceModel {
                 id: dataSourceModel
-                property string dsfilename: "./DataSource.conf"
+                property string dsfilename: (Qt.platform.os === "linux" ? "loop3d/DataSource.conf" : "loop3d\DataSource.conf")
                 dataSources: dataSourceList
                 Component.onCompleted: loadDataSources(dsfilename)
             }

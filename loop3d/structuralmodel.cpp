@@ -95,8 +95,16 @@ int StructuralModel::saveToFile(QString filename)
     dataMutex.lock();
     try {
         // Find last '/' of the first set of '/'s as in file:/// or url:///
-        QStringList list = filename.split(QRegExp("///"));
-        QString name = (list.length() > 1 ? list[1] : list[0]);
+        QStringList list;
+        QString name;
+
+#ifdef _WIN32
+        list = filename.split(QRegExp("///"));
+        name = (list.length() > 1 ? list[1] : list[0]);
+#elif __linux__
+        list = filename.split(QRegExp("///"));
+        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+#endif
 
         netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::write);
         netCDF::NcGroup structuralModels = dataFile.getGroup("StructuralModels");
@@ -111,7 +119,7 @@ int StructuralModel::saveToFile(QString filename)
             index = structuralModels.getDim("index");
             if (northing.getSize() != m_width || easting.getSize() != m_height || depth.getSize() != m_depth) {
                 dataFile.close();
-                throw std::exception("Non matching dimensions between file and structural data");
+                //throw std::exception("Non matching dimensions between file and structural data");
             }
         } else {
             structuralModels = dataFile.addGroup("StructuralModels");
@@ -169,8 +177,16 @@ int StructuralModel::loadFromFile(QString filename)
     dataMutex.lock();
     try {
         // Find last '/' of the first set of '/'s as in file:/// or url:///
-        QStringList list = filename.split(QRegExp("///"));
-        QString name = (list.length() > 1 ? list[1] : list[0]);
+        QStringList list;
+        QString name;
+
+#ifdef _WIN32
+        list = filename.split(QRegExp("///"));
+        name = (list.length() > 1 ? list[1] : list[0]);
+#elif __linux__
+        list = filename.split(QRegExp("///"));
+        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+#endif
 
         netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::read);
 

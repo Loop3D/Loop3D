@@ -19,7 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 linux {
-    INCLUDEPATH += ~/.local/include/python3.6m /usr/include/python3.6m
+    INCLUDEPATH += ~/.local/include/python3.7m /usr/include/python3.7m
 } else :win32 {
     INCLUDEPATH += $$(VCPKGINSTALL)/include
     INCLUDEPATH += $$(PYTHONHOME)/include
@@ -27,7 +27,7 @@ linux {
 }
 
 linux {
-    LIBS += -lpython3.6m -lnetcdf -lnetcdf_c++4
+    LIBS += -lpython3.7m -lnetcdf -lnetcdf_c++4
 } else :win32 {
     CONFIG(debug, debug|release) {
         LIBS += -L$$(VCPKGINSTALL)/debug/lib
