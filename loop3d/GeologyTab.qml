@@ -263,7 +263,7 @@ Item {
                 anchors.right: parent.right
                 height: parent.height - 60
                 width: parent.width
-                currentIndex: detailsBar.currentIndex
+                currentIndex: gtDetailsBar.currentIndex
 
                 Rectangle {
                     id: detailsTab
@@ -398,8 +398,8 @@ Item {
                             // TODO: remove file open when finished testing textures
                             if (!hasFile) fileDialogOpen.open()
                             else {
-                                pythonText.run(textArea.text,project.filename)
-                                detailsBar.currentIndex = 2
+                                pythonText.run(textArea.text,project.filename,true)
+                                gtDetailsBar.currentIndex = 2
                             }
                         }
                     }
@@ -418,7 +418,7 @@ Item {
 
             }
             TabBar {
-                id: detailsBar
+                id: gtDetailsBar
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 anchors.left: parent.left

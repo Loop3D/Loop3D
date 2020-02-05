@@ -2,6 +2,8 @@ import QtQuick 2.12
 import QtLocation 5.12
 import QtPositioning 5.12
 import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.3
+import loop3d.pythontext 1.0
 import loop3d.utmconverter 1.0
 import loop3d.datasourcemodel 1.0
 
@@ -190,130 +192,209 @@ Item {
             anchors.margins: mainWindow.myBorders
             width: parent.width / 2 - mainWindow.myBorders - 1
             color: "#bbbbbb"
-            Text {
-                id: detailsDCHeader
+
+            StackLayout {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.margins: mainWindow.myBorders
-                height: 20
-                text: "Data Sources"
-                font.bold: true
-                font.family: mainWindow.headingFontStyle
-                font.pixelSize: mainWindow.headingFontSize
-                horizontalAlignment: Text.AlignHCenter
-            }
-            DataSourceModel {
-                id: dataSourceModel
-                property string dsfilename: (Qt.platform.os === "linux" ? "loop3d/DataSource.conf" : "loop3d\DataSource.conf")
-                dataSources: dataSourceList
-                Component.onCompleted: loadDataSources(dsfilename)
-            }
-
-            ListView {
-                id: listing
-                anchors.top: detailsDCHeader.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.margins: mainWindow.myBorders
-                model: dataSourceModel
-                clip: true
-
-                delegate: listdelegate
-            }
-
-            Component {
-                id: listdelegate
+                height: parent.height - 60
+                width: parent.width
+                currentIndex: dcDetailsBar.currentIndex
 
                 Rectangle {
-                    id: menuItem
-                    property int itemHeight: 30
-                    width: parent.width
-                    height: isParent ? itemHeight : 0
-                    color: isParent ? "lightblue" : "white"
-                    border.width: 1
-
-                    states: State {
-                        name: "expanded"
-                        when: isExpanded
-                        PropertyChanges {
-                            target: menuItem
-                            height: itemHeight
-                        }
-                    }
-
-                    transitions:[
-                        Transition {
-                            from: ""
-                            to: "expanded"
-                            reversible: true
-                            SequentialAnimation {
-                                PropertyAnimation { property: "height"; duration: 200 }
-                            }
-                        }
-                    ]
-
-                    Image {
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.margins: 5
-                        id: stateCollapsed
-                        visible: !isExpanded && isParent
-                        source: "images/collapsed.png"
-                        width: 20
-                        height: 20
-                    }
-                    Image {
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.margins: 5
-                        id: stateExpanded
-                        visible: isExpanded && isParent
-                        source: "images/expanded.png"
-                        width: 20
-                        height: 20
-                    }
+                    id: sourceTab
+                    color: "#bbbbbb"
                     Text {
-                        id: text
-                        verticalAlignment: Text.AlignVCenter
-                        height: parent.height
-                        text: name
-                        clip: true
-                        anchors.left: stateExpanded.right
+                        id: detailsDCHeader
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
                         anchors.margins: mainWindow.myBorders
-                        font.family: mainWindow.defaultFontStyle
-                        font.pixelSize: mainWindow.defaultFontSize
+                        height: 20
+                        text: "Data Sources"
+                        font.bold: true
+                        font.family: mainWindow.headingFontStyle
+                        font.pixelSize: mainWindow.headingFontSize
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                    DataSourceModel {
+                        id: dataSourceModel
+                        property string dsfilename: "loop3d/DataSource.conf"
+                        dataSources: dataSourceList
+                        Component.onCompleted: loadDataSources(dsfilename)
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        propagateComposedEvents: true
-                        onClicked: {
-                            if (isParent) dataSourceModel.expandGroup(group)
-                            else mouse.accepted = false
-                        }
-                    }
-                    // Ensure button is after MouseArea so that it is layered above the mouse capture event
-                    Button {
-                        id: statusButton
-                        visible: !isParent
-                        height: parent.height
-                        text: (dlState == "" ? "Download": dlState)
+                    ListView {
+                        id: listing
+                        anchors.top: detailsDCHeader.bottom
+                        anchors.left: parent.left
                         anchors.right: parent.right
-                        anchors.margins: 2
-                        anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                        width: 150
-                        onClicked: {
-                            if (dlState == "") {
-                                dlState = "downloading"
-                            } else {
-                                dlState = ""
+                        anchors.margins: mainWindow.myBorders
+                        model: dataSourceModel
+                        clip: true
+
+                        delegate: listdelegate
+                    }
+
+                    Component {
+                        id: listdelegate
+
+                        Rectangle {
+                            id: menuItem
+                            property int itemHeight: 30
+                            width: parent.width
+                            height: isParent ? itemHeight : 0
+                            color: isParent ? "lightblue" : "white"
+                            border.width: 1
+
+                            states: State {
+                                name: "expanded"
+                                when: isExpanded
+                                PropertyChanges {
+                                    target: menuItem
+                                    height: itemHeight
+                                }
+                            }
+
+                            transitions:[
+                                Transition {
+                                    from: ""
+                                    to: "expanded"
+                                    reversible: true
+                                    SequentialAnimation {
+                                        PropertyAnimation { property: "height"; duration: 200 }
+                                    }
+                                }
+                            ]
+
+                            Image {
+                                anchors.left: parent.left
+                                anchors.top: parent.top
+                                anchors.margins: 5
+                                id: stateCollapsed
+                                visible: !isExpanded && isParent
+                                source: "images/collapsed.png"
+                                width: 20
+                                height: 20
+                            }
+                            Image {
+                                anchors.left: parent.left
+                                anchors.top: parent.top
+                                anchors.margins: 5
+                                id: stateExpanded
+                                visible: isExpanded && isParent
+                                source: "images/expanded.png"
+                                width: 20
+                                height: 20
+                            }
+                            Text {
+                                id: text
+                                verticalAlignment: Text.AlignVCenter
+                                height: parent.height
+                                text: name
+                                clip: true
+                                anchors.left: stateExpanded.right
+                                anchors.margins: mainWindow.myBorders
+                                font.family: mainWindow.defaultFontStyle
+                                font.pixelSize: mainWindow.defaultFontSize
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                propagateComposedEvents: true
+                                onClicked: {
+                                    if (isParent) dataSourceModel.expandGroup(group)
+                                    else mouse.accepted = false
+                                }
+                            }
+                            // Ensure button is after MouseArea so that it is layered above the mouse capture event
+                            Button {
+                                id: statusButton
+                                visible: !isParent
+                                height: parent.height
+                                text: (dlState == "" ? "Download": dlState)
+                                anchors.right: parent.right
+                                anchors.margins: 2
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                width: 150
+                                onClicked: {
+                                    if (dlState == "") {
+                                        dlState = "downloading"
+                                    } else {
+                                        dlState = ""
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                Rectangle {
+                    id: dcCodeTab
+                    color: "#bbbbbb"
+
+                    ScrollView {
+                        id: sv
+                        anchors.fill: parent
+                        anchors.margins: 4
+                        clip: true
+                        TextEdit {
+                            anchors.fill: parent
+                            id: dcTextArea
+                            text: dcPythonText.pythonCode
+                            selectByMouse: true
+                            PythonText {
+                                id: dcPythonText
+                                filename: "map2loopTemplate.py"
+                                Component.onCompleted: {
+                                    textDocToHighlight = dcTextArea.textDocument
+                                    // Use select all and text addition to trigger immediate highlighting
+                                    dcTextArea.selectAll()
+                                    dcTextArea.text += " "
+                                }
+                            }
+                        }
+                    }
+                    Button {
+                        id: dcRunCode
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        height: 80
+                        width: 140
+                        text: "Run Code"
+                        onPressed: {
+                            // TODO: remove file open when finished testing textures
+                            if (!hasFile) fileDialogOpen.open()
+                            else {
+                                dcPythonText.run(dcTextArea.text,project.filename)
+                                dcDetailsBar.currentIndex = 2
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    id: observationsTab
+                    color: "#bbbbbb"
+                    Text {
+                        anchors.fill: parent
+                        text: "Once run list of observations extracted from geology model"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+
+            }
+            TabBar {
+                id: dcDetailsBar
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.left: parent.left
+                padding: 4
+                TabButton { text: 'Sources' }
+                TabButton { text: 'Python Code' }
+                TabButton { text: 'Observations' }
             }
         }
     }

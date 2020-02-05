@@ -29,7 +29,7 @@ class PythonText : public QObject
         QString filename() { return m_filename; }
         void setFilename(QString in);
 
-        Q_INVOKABLE void run(QString code, QString netCDF_Filename="");
+        Q_INVOKABLE void run(QString code, QString loopFilename="", bool useResult=false);
 
     Q_SIGNALS:
         void pythonCodeChanged();

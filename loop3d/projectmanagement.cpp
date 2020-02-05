@@ -70,6 +70,9 @@ int ProjectManagement::saveProject(QString filename)
         netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::replace);
 
         // Save global information
+        dataFile.putAtt("loopMajorVersion",netCDF::ncInt64,0);
+        dataFile.putAtt("loopMinorVersion",netCDF::ncInt64,0);
+        dataFile.putAtt("loopSubVersion",netCDF::ncInt64,1);
         dataFile.putAtt("minLatitude",netCDF::ncDouble,m_minLatitude);
         dataFile.putAtt("maxLatitude",netCDF::ncDouble,m_maxLatitude);
         dataFile.putAtt("minLongitude",netCDF::ncDouble,m_minLongitude);
