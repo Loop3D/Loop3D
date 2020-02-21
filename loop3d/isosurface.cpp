@@ -18,6 +18,7 @@ Isosurface::Isosurface()
     for (int i=0;i<6;i++) m_isovalues[i] = 0.0;
     m_viewDistance = 20000.0f;
     m_camNorthing = m_camEasting = m_camDepth = 0.0f;
+    m_miscToggle1 = m_miscToggle2 = m_miscToggle3 = m_miscToggle4 = m_miscToggle5 = 0;
     m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,90.0f);
     connect(this, &QQuickItem::windowChanged, this, &Isosurface::handleWindowChanged);
 }
@@ -89,6 +90,31 @@ void Isosurface::updateCameraPosition(bool up, bool down, bool left, bool right,
 //    m_camDepth = ;
 }
 
+void Isosurface::updateMiscToggle1(int val)
+{
+    m_miscToggle1 = val;
+}
+
+void Isosurface::updateMiscToggle2(int val)
+{
+    m_miscToggle2 = val;
+}
+
+void Isosurface::updateMiscToggle3(int val)
+{
+    m_miscToggle3 = val;
+}
+
+void Isosurface::updateMiscToggle4(int val)
+{
+    m_miscToggle4 = val;
+}
+
+void Isosurface::updateMiscToggle5(int val)
+{
+    m_miscToggle5 = val;
+}
+
 void Isosurface::handleWindowChanged(QQuickWindow *win)
 {
     if (win) {
@@ -121,6 +147,7 @@ void Isosurface::sync()
         m_renderer->setViewportLocation(QPointF(pt.x(),window()->height() - height() - pt.y()));
     }
     m_renderer->setNumberOfIsosurfaces(m_numOfIsosurfaces);
+    m_renderer->setMiscToggles(m_miscToggle1,m_miscToggle2,m_miscToggle3,m_miscToggle4,m_miscToggle5);
     m_renderer->setIsovalues(m_isovalues);
     m_renderer->setViewAngle(m_viewAngle);
     m_renderer->setViewDistance(m_viewDistance);
@@ -148,6 +175,15 @@ void IsosurfaceRenderer::setCameraPosition(float northing, float easting, float 
     m_camDepth = depth;
 }
 
+void IsosurfaceRenderer::setMiscToggles(int one, int two, int three, int four, int five)
+{
+    m_miscToggle1 = one;
+    m_miscToggle2 = two;
+    m_miscToggle3 = three;
+    m_miscToggle4 = four;
+    m_miscToggle5 = five;
+}
+
 void IsosurfaceRenderer::paint()
 {
     if (!m_program) {
@@ -172,6 +208,11 @@ void IsosurfaceRenderer::paint()
                 "out float instanceID;\n"
                 "out float vsubcubeTetraID;\n"
                 "uniform float isovalues[6];\n"
+                "uniform int miscToggle1;\n"
+                "uniform int miscToggle2;\n"
+                "uniform int miscToggle3;\n"
+                "uniform int miscToggle4;\n"
+                "uniform int miscToggle5;\n"
                 "out float isovalue;\n"
                 "out vec3 position;\n"
                 "out vec3 normal;\n"
@@ -228,9 +269,9 @@ void IsosurfaceRenderer::paint()
                 "                            ivec3(1,1,1)};\n"
                 "    Tetra tetra;\n"
                 "    ivec3 indexToPoint[4];\n"
+                "    int orientation = int((referenceIndex.x + referenceIndex.y + referenceIndex.z) % 2 == 0);\n"
                 "    for (int i=0;i<4;i++) {\n"
-                "        int orientation = int((referenceIndex.x + referenceIndex.y + referenceIndex.z) % 2 == 0);\n"
-                "           indexToPoint[i] = referenceIndex + cubeOffsets[tetraReference[orientation][subcubeTetraID][i]];\n"
+                "        indexToPoint[i] = referenceIndex + cubeOffsets[tetraReference[orientation][subcubeTetraID][i]];\n"
                 "        tetra.geometryPoint[i] = vec3(xmin + indexToPoint[i].x * xstepsize,\n"
                 "                                    ymin + indexToPoint[i].y * ystepsize,\n"
                 "                                    zmin + indexToPoint[i].z * zstepsize);\n"
@@ -248,6 +289,7 @@ void IsosurfaceRenderer::paint()
                 "    int gridIndex = int(floor(instanceID / 5));\n"
                 "    ivec3 gridPos = ivec3(gridIndex % (xsize-1), int(floor(gridIndex/(xsize-1))) % (ysize-1), int(floor(gridIndex/(xsize-1)/(ysize-1))) % (zsize-1));\n"
                 "    if (gridPos.x >= xsize - 1 || gridPos.y >= ysize - 1 || gridPos.z >= zsize - 1) return;"
+                "    bool orientation = ((gridPos.x + gridPos.y + gridPos.z) % 2 == 0);\n"
                 "    Tetra tetra = getTetra(subcubeTetraID, gridPos);\n"
                 "\n"
                 "\n"
@@ -308,17 +350,42 @@ void IsosurfaceRenderer::paint()
                 "    }\n"
                 "\n"
                 "\n"
+                "//    if (!orientation) { gl_Position = vec4(0.0f); return; }\n"
                 "    // Calculate normals (easy for subcubes 0-3 as each vector is perpendicular along cardinal axes)\n"
                 "    if (subcubeTetraID != 4) {\n"
-                "        normal = normalize((tetra.geometryPoint[1] - tetra.geometryPoint[0]) * (tetra.val[1] - tetra.val[0])\n"
-                "                         + (tetra.geometryPoint[2] - tetra.geometryPoint[0]) * (tetra.val[2] - tetra.val[0])\n"
-                "                         + (tetra.geometryPoint[3] - tetra.geometryPoint[0]) * (tetra.val[3] - tetra.val[0]));\n"
+                "        ivec3 order;\n"
+                "        ivec3 sign;\n"
+                "        if (subcubeTetraID == 0) order = ivec3(1,2,3);\n"
+                "        if (subcubeTetraID == 1) order = ivec3(2,1,3);\n"
+                "        if (subcubeTetraID == 2) order = ivec3(2,3,1);\n"
+                "        if (subcubeTetraID == 3) order = ivec3(3,2,1);\n"
+                "        if (orientation) {\n"
+                "            if (subcubeTetraID == 0) sign = ivec3(-1,1,1);\n"
+                "            if (subcubeTetraID == 1) sign = ivec3(1,-1,1);\n"
+                "            if (subcubeTetraID == 2) sign = ivec3(1,1,-1);\n"
+                "            if (subcubeTetraID == 3) sign = ivec3(-1,-1,-1);\n"
+                "        } else {\n"
+                "            sign = ivec3(1,1,1);\n"
+                "            if (subcubeTetraID == 0) sign = ivec3(-1,-1,-1);\n"
+                "            if (subcubeTetraID == 1) sign = ivec3(1,1,-1);\n"
+                "            if (subcubeTetraID == 2) sign = ivec3(1,-1,1);\n"
+                "            if (subcubeTetraID == 3) sign = ivec3(-1,1,1);\n"
+                "        }\n"
+                "        normal = normalize(vec3(sign.x * (tetra.val[order.x] - tetra.val[0]),\n"
+                "                                sign.y * (tetra.val[order.y] - tetra.val[0]),\n"
+                "                                sign.z * (tetra.val[order.z] - tetra.val[0])));\n"
+                "        normal *= ((orientation) ? 1.0 : -1.0 );\n"
                 "    } else {\n"
-                "        // harder for a regular tetrahedron\n"
-                "        normal = normalize(vec3(tetra.val[0]+tetra.val[1]-tetra.val[2]-tetra.val[3],\n"
-                "                                tetra.val[0]-tetra.val[1]+tetra.val[2]-tetra.val[3],\n"
-                "                                tetra.val[0]-tetra.val[1]-tetra.val[2]+tetra.val[3])\n"
-                "                           * ((gridPos.x + gridPos.y + gridPos.z) % 2 == 0 ? -1 : 1));\n"
+                "        // Harder for a regular non-axis aligned tetrahedron\n"
+                "        if (!orientation) {\n"
+                "            normal = normalize(vec3(tetra.val[0]+tetra.val[1]-tetra.val[2]-tetra.val[3],\n"
+                "                                    tetra.val[0]-tetra.val[1]+tetra.val[2]-tetra.val[3],\n"
+                "                                    tetra.val[0]-tetra.val[1]-tetra.val[2]+tetra.val[3]));\n"
+                "        } else {\n"
+                "            normal = normalize(vec3(-tetra.val[0]-tetra.val[1]+tetra.val[2]+tetra.val[3],\n"
+                "                                    -tetra.val[0]+tetra.val[1]-tetra.val[2]+tetra.val[3],\n"
+                "                                    -tetra.val[0]+tetra.val[1]+tetra.val[2]-tetra.val[3]));\n"
+                "        }\n"
                 "    }\n"
                 "    coords = texCoord.xy;\n"
                 "    position = newVertex;\n"
@@ -336,7 +403,7 @@ void IsosurfaceRenderer::paint()
                 "uniform float valmin;\n"
                 "uniform float valmax;\n"
                 "uniform vec3 lightPos;\n"
-                "uniform mat4 modelViewMatrix;\n"
+                "uniform mat4 modelMatrix;\n"
                 "\n"
                 "vec3 getSpectrumColour(float val)\n"
                 "{\n"
@@ -358,10 +425,10 @@ void IsosurfaceRenderer::paint()
                 "    if (valmax == valmin) normalisedVal = 0.5;\n"
                 "    vec3 colour = getSpectrumColour(normalisedVal) * 0.7 + 0.1;\n"
                 "    // Add contour lines with 5.0 stepped at 200\n"
-//                "    colour = mix(vec3(0.0,0.0,0.0),colour,step(5.0,abs(int(position.z)%200)));\n"
+                "    colour = mix(vec3(0.0,0.0,0.0),colour,step(5.0,abs(int(position.z)%2000)));\n"
                 "    // Add lighting"
                 "    float ambient = 0.1;\n"
-                "    vec3 lightDir = normalize((vec4(position,1.0) * modelViewMatrix).xyz - lightPos);\n"
+                "    vec3 lightDir = normalize((vec4(position,1.0) * modelMatrix).xyz - lightPos);\n"
                 "    colour = colour * max(abs(dot(-normal,-lightDir)),0.0);\n"
                 "\n"
                 "    FragColour = vec4(colour,1.0);\n"
@@ -420,6 +487,7 @@ void IsosurfaceRenderer::paint()
         m_vao->release();
     }
 
+    if (ProjectManagement::instance()->m_mainIndex != 2) return;
     glEnable(GL_DEPTH_TEST);
 
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
@@ -458,6 +526,11 @@ void IsosurfaceRenderer::paint()
     m_program->setUniformValue("xstepsize",(stModel->m_xmax-stModel->m_xmin)/static_cast<float>(stModel->getWidth()-1));
     m_program->setUniformValue("ystepsize",(stModel->m_ymax-stModel->m_ymin)/static_cast<float>(stModel->getHeight()-1));
     m_program->setUniformValue("zstepsize",(stModel->m_zmax-stModel->m_zmin)/static_cast<float>(stModel->getDepth()-1));
+    m_program->setUniformValue("miscToggle1",m_miscToggle1);
+    m_program->setUniformValue("miscToggle2",m_miscToggle2);
+    m_program->setUniformValue("miscToggle3",m_miscToggle3);
+    m_program->setUniformValue("miscToggle4",m_miscToggle4);
+    m_program->setUniformValue("miscToggle5",m_miscToggle5);
 
     m_program->setUniformValue("xmin",-(xmid-stModel->m_xmin));
     m_program->setUniformValue("ymin",-(ymid-stModel->m_ymin));
@@ -468,15 +541,16 @@ void IsosurfaceRenderer::paint()
     QMatrix4x4 viewMatrix;
     QMatrix4x4 projectionMatrix;
     float aspectRatio = (m_viewportSize.height() == 0 ? 4.0f/3.0f : m_viewportSize.width() / m_viewportSize.height());
-    projectionMatrix.perspective(60.0f, aspectRatio, 1.0f, 50000.0f);
+    projectionMatrix.perspective(60.0f, aspectRatio, 1.0f, 500000.0f);
     viewMatrix.translate(m_camEasting,m_camNorthing,m_camDepth-m_viewDistance);
     viewMatrix.rotate(m_viewAngle);
     modelView.scale(1.0f,1.0f,1.0f);
-    QVector3D lightPos(0.0,0.0,50000.0f);
+    QVector3D lightPos(0.0,0.0,500000.0f);
 
     const QMatrix4x4 modelViewMatrix = viewMatrix * modelMatrix;
     const QMatrix4x4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
 
+    m_program->setUniformValue("modelMatrix", modelMatrix);
     m_program->setUniformValue("modelViewMatrix", modelViewMatrix);
     m_program->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
     m_program->setUniformValue("projectionMatrix", projectionMatrix);
@@ -504,5 +578,3 @@ void IsosurfaceRenderer::paint()
     m_program->release();
     m_window->resetOpenGLState();
 }
-
-

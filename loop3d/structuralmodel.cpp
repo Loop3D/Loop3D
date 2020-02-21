@@ -28,6 +28,7 @@ StructuralModel::StructuralModel()
     dataChanged = false;
     valueTexture = new QOpenGLTexture(QOpenGLTexture::Target3D);
     texturesValid = false;
+    modelCreated = false;
     createBasicTestStructure(TEST_GRID_SIZE);
 }
 
@@ -56,9 +57,9 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
         m_valmin = std::numeric_limits<float>::max();
         m_valmax = -std::numeric_limits<float>::max();
         // Texture sizes
-        m_width = static_cast<unsigned int>(xsteps)+1;
-        m_height = static_cast<unsigned int>(ysteps)+1;
-        m_depth = static_cast<unsigned int>(zsteps)+1;
+        m_width = static_cast<unsigned int>(xsteps);
+        m_height = static_cast<unsigned int>(ysteps);
+        m_depth = static_cast<unsigned int>(zsteps);
 
         qDebug() << "Clearing data strutures";
         // Clear data structures
@@ -84,6 +85,7 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
             qDebug() << "Loaded structures";
             texturesValid = false;
             dataChanged = true;
+            modelCreated = true;
         }
     }
     dataMutex.unlock();
@@ -92,7 +94,9 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
 int StructuralModel::saveToFile(QString filename)
 {
     int result = 0;
+    if (!modelCreated) return result;
     dataMutex.lock();
+    netCDF::NcFile dataFile;
     try {
         // Find last '/' of the first set of '/'s as in file:/// or url:///
         QStringList list;
@@ -106,7 +110,7 @@ int StructuralModel::saveToFile(QString filename)
         name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-        netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::write);
+        dataFile.open(name.toStdString().c_str(), netCDF::NcFile::write);
         netCDF::NcGroup structuralModels = dataFile.getGroup("StructuralModels");
         netCDF::NcDim northing;
         netCDF::NcDim easting;
@@ -133,8 +137,11 @@ int StructuralModel::saveToFile(QString filename)
         dims.push_back(easting);
         dims.push_back(depth);
         dims.push_back(index);
-        netCDF::NcVar data = structuralModels.addVar("data",netCDF::ncFloat,dims);
-        data.setCompression(true, true, 9);
+        netCDF::NcVar data = structuralModels.getVar("data");
+        if (data.isNull()) {
+            data = structuralModels.addVar("data",netCDF::ncFloat,dims);
+            data.setCompression(true, true, 9);
+        }
         std::vector<size_t> start, count;
         start.push_back(0);
         start.push_back(0);
@@ -151,18 +158,22 @@ int StructuralModel::saveToFile(QString filename)
         start.push_back(0);
         count.clear();
         count.push_back(1);
-        netCDF::NcVar minValData = structuralModels.addVar("minVal",netCDF::ncFloat,indexDims);
+        netCDF::NcVar minValData = structuralModels.getVar("minVal");
+        if (minValData.isNull()) minValData = structuralModels.addVar("minVal",netCDF::ncFloat,indexDims);
         minValData.putVar(start,count,&m_valmin);
-        netCDF::NcVar maxValData = structuralModels.addVar("maxVal",netCDF::ncFloat,indexDims);
+        netCDF::NcVar maxValData = structuralModels.getVar("maxVal");
+        if (maxValData.isNull()) maxValData = structuralModels.addVar("maxVal",netCDF::ncFloat,indexDims);
         maxValData.putVar(start,count,&m_valmax);
         dataFile.close();
     } catch(netCDF::exceptions::NcException& e) {
-        qFatal("%s", e.what());
-        qFatal("Error creating file (%s)", filename.toStdString().c_str());
+        qDebug("%s", e.what());
+        qDebug("Error creating file (%s)", filename.toStdString().c_str());
+        if (!dataFile.isNull()) dataFile.close();
         result = 1;
     } catch(std::exception& e) {
-        qFatal("%s", e.what());
-        qFatal("Error creating file (%s)", filename.toStdString().c_str());
+        qDebug("%s", e.what());
+        qDebug("Error creating file (%s)", filename.toStdString().c_str());
+        if (!dataFile.isNull()) dataFile.close();
         result = 1;
     }
 
@@ -175,6 +186,7 @@ int StructuralModel::loadFromFile(QString filename)
 
     int result = 0;
     dataMutex.lock();
+    netCDF::NcFile dataFile;
     try {
         // Find last '/' of the first set of '/'s as in file:/// or url:///
         QStringList list;
@@ -188,11 +200,12 @@ int StructuralModel::loadFromFile(QString filename)
         name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-        netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::read);
+        dataFile.open(name.toStdString().c_str(), netCDF::NcFile::read);
 
         netCDF::NcGroup structuralModels = dataFile.getGroup("StructuralModels");
         if (structuralModels.isNull()) {
             qDebug() << "No Structural Models Group in netCDF file";
+            modelCreated = false;
         } else {
             netCDF::NcDim northing = structuralModels.getDim("northing");
             netCDF::NcDim easting = structuralModels.getDim("easting");
@@ -231,12 +244,21 @@ int StructuralModel::loadFromFile(QString filename)
             dataFile.close();
             texturesValid = false;
             dataChanged = true;
+            modelCreated = true;
         }
     } catch(netCDF::exceptions::NcException& e) {
         qFatal("%s", e.what());
         qFatal("Error creating file (%s)", filename.toStdString().c_str());
+        if (!dataFile.isNull()) dataFile.close();
         result = 1;
     }
+    ProjectManagement* project =  ProjectManagement::instance();
+    m_xmin = project->m_minEasting;
+    m_xmax = project->m_maxEasting;
+    m_ymin = project->m_minNorthing;
+    m_ymax = project->m_maxNorthing;
+    m_zmin = project->m_minDepth;
+    m_zmax = project->m_maxDepth;
     dataMutex.unlock();
     return result;
 }
@@ -244,7 +266,7 @@ int StructuralModel::loadFromFile(QString filename)
 void StructuralModel::createBasicTestStructure(unsigned int size)
 {
     if (size < 1) size = 1;
-
+    modelCreated = false;
     dataMutex.lock();
     {
         m_xmin = m_ymin = m_zmin = -4000.0f;
@@ -276,7 +298,6 @@ void StructuralModel::createBasicTestStructure(unsigned int size)
 
 void StructuralModel::loadTextures()
 {
-
     if (dataChanged) {
         qDebug() << "Setting up textures for displays";
         dataMutex.lock();

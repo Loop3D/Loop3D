@@ -377,7 +377,7 @@ Item {
                             selectByMouse: true
                             PythonText {
                                 id: pythonText
-                                filename: "pickle_data.py"
+                                filename: "loopStructuralTemplate.py"
                                 Component.onCompleted: {
                                     textDocToHighlight = textArea.textDocument
                                     // Use select all and text addition to trigger immediate highlighting

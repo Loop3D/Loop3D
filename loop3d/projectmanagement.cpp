@@ -4,6 +4,7 @@
 
 #include <exception>
 #include <netcdf>
+#include <sys/types.h>
 
 
 ProjectManagement* ProjectManagement::m_instance = nullptr;
@@ -11,11 +12,13 @@ ProjectManagement* ProjectManagement::m_instance = nullptr;
 ProjectManagement::ProjectManagement():
     m_minDepth(1000),
     m_maxDepth(9000),
-    m_utmZone(0),
-    m_utmNorthSouth(-1),
     m_spacingX(100),
     m_spacingY(100),
     m_spacingZ(100),
+    m_inUtm(false),
+    m_extentsChanged(true),
+    m_utmZone(0),
+    m_utmNorthSouth(-1),
     m_filename("")
 {
 }
@@ -41,10 +44,12 @@ void ProjectManagement::clearProject(void)
     m_spacingX = 100;
     m_spacingY = 100;
     m_spacingZ = 100;
+    m_inUtm = false;
+    m_extentsChanged = true;
     minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
     minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
     utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
-    spacingXChanged(); spacingYChanged(); spacingZChanged();
+    spacingXChanged(); spacingYChanged(); spacingZChanged(); extentsChangedChanged();
 }
 
 int ProjectManagement::saveProject(QString filename)
@@ -54,10 +59,12 @@ int ProjectManagement::saveProject(QString filename)
     }
     checkUTMLimits();
 
+    netCDF::NcFile dataFile;
     try {
         // Find last '/' of the first set of '/'s as in file:/// or url:///
         QStringList list;
         QString name;
+        int64_t inUtm = m_inUtm;
 
 #ifdef _WIN32
         list = filename.split(QRegExp("///"));
@@ -66,8 +73,15 @@ int ProjectManagement::saveProject(QString filename)
         list = filename.split(QRegExp("///"));
         name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
-
-        netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::replace);
+        struct stat bf;
+        // Check whether file exists
+        bool loopFileExists = stat(name.toStdString().c_str(), &bf) == 0;
+        // If extents have changed or file doesn't exist replace entire file
+        if (m_extentsChanged || !loopFileExists) {
+            dataFile.open(name.toStdString().c_str(), netCDF::NcFile::replace);
+        } else {
+            dataFile.open(name.toStdString().c_str(), netCDF::NcFile::write);
+        }
 
         // Save global information
         dataFile.putAtt("loopMajorVersion",netCDF::ncInt64,0);
@@ -88,8 +102,12 @@ int ProjectManagement::saveProject(QString filename)
         dataFile.putAtt("spacingX",netCDF::ncInt64,m_spacingX);
         dataFile.putAtt("spacingY",netCDF::ncInt64,m_spacingY);
         dataFile.putAtt("spacingZ",netCDF::ncInt64,m_spacingZ);
+        dataFile.putAtt("workingFormat",netCDF::ncInt64,inUtm);
 
         dataFile.close();
+
+        // Save structural data
+        stModel.saveToFile(filename);
 
         // Data file opened so save filename
         m_filename = filename;
@@ -98,10 +116,11 @@ int ProjectManagement::saveProject(QString filename)
     } catch(netCDF::exceptions::NcException& e) {
         qFatal("%s", e.what());
         qFatal("Error creating file (%s)", filename.toStdString().c_str());
+        if (!dataFile.isNull()) dataFile.close();
         return 1;
     }
-    // Save structural data
-    stModel.saveToFile(filename);
+
+    m_extentsChanged = false;
     return 0;
 }
 
@@ -110,7 +129,7 @@ int ProjectManagement::loadProject(QString filename)
     if (filename == "") {
         return 1;
     }
-
+    netCDF::NcFile dataFile;
     try {
         // Load variables to staging area to confirm all loaded in
         double minLatitude, maxLatitude, minLongitude, maxLongitude;
@@ -118,6 +137,7 @@ int ProjectManagement::loadProject(QString filename)
         double minDepth, maxDepth;
         int64_t utmZone, utmNorthSouth;
         int64_t spacingX, spacingY, spacingZ;
+        int64_t inUtm;
 
         QStringList list;
         QString name;
@@ -130,7 +150,7 @@ int ProjectManagement::loadProject(QString filename)
         name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-        netCDF::NcFile dataFile(name.toStdString().c_str(), netCDF::NcFile::read);
+        dataFile.open(name.toStdString().c_str(), netCDF::NcFile::read);
 
         dataFile.getAtt("minLatitude").getValues(&minLatitude);
         dataFile.getAtt("maxLatitude").getValues(&maxLatitude);
@@ -147,6 +167,7 @@ int ProjectManagement::loadProject(QString filename)
         dataFile.getAtt("spacingX").getValues(&spacingX);
         dataFile.getAtt("spacingY").getValues(&spacingY);
         dataFile.getAtt("spacingZ").getValues(&spacingZ);
+        dataFile.getAtt("workingFormat").getValues(&inUtm);
 
         dataFile.close();
 
@@ -163,20 +184,26 @@ int ProjectManagement::loadProject(QString filename)
         m_spacingX = static_cast<int>(spacingX);
         m_spacingY = static_cast<int>(spacingY);
         m_spacingZ = static_cast<int>(spacingZ);
+        m_inUtm = static_cast<bool>(inUtm);
         updateGeodeticLimits(minLatitude,maxLatitude,minLongitude,maxLongitude);
 
         minDepthChanged(); maxDepthChanged();
         spacingXChanged(); spacingYChanged(); spacingZChanged();
+        inUtmChanged();
         // Data file all working so save filename
         m_filename = filename;
         filenameChanged();
+
+        // Load structural data
+        stModel.loadFromFile(filename);
+
     } catch(netCDF::exceptions::NcException& e) {
         qFatal("%s", e.what());
         qFatal("Error loading file (%s)", filename.toStdString().c_str());
+        if (!dataFile.isNull()) dataFile.close();
         return 1;
     }
-    // Load structural data
-    stModel.loadFromFile(filename);
+    m_extentsChanged = false;
     return 0;
 }
 

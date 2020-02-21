@@ -28,6 +28,9 @@ class ProjectManagement : public QObject
     Q_PROPERTY (int spacingZ MEMBER m_spacingZ NOTIFY spacingZChanged)
     Q_PROPERTY (double minDepth MEMBER m_minDepth NOTIFY minDepthChanged)
     Q_PROPERTY (double maxDepth MEMBER m_maxDepth NOTIFY maxDepthChanged)
+    Q_PROPERTY (bool inUtm MEMBER m_inUtm NOTIFY inUtmChanged)
+    Q_PROPERTY (int mainIndex MEMBER m_mainIndex NOTIFY mainIndexChanged)
+    Q_PROPERTY (bool extentsChanged MEMBER m_extentsChanged NOTIFY extentsChangedChanged)
 
     Q_SIGNALS:
         void filenameChanged();
@@ -49,6 +52,9 @@ class ProjectManagement : public QObject
         void spacingZChanged();
         void minDepthChanged();
         void maxDepthChanged();
+        void inUtmChanged();
+        void mainIndexChanged();
+        void extentsChangedChanged();
 
     public:
         Q_INVOKABLE void clearProject(void);
@@ -81,6 +87,12 @@ class ProjectManagement : public QObject
         double m_maxEasting;
         double m_minDepth;
         double m_maxDepth;
+        int m_spacingX;
+        int m_spacingY;
+        int m_spacingZ;
+        boolean m_inUtm;
+        int m_mainIndex;
+        bool m_extentsChanged;
     private:
         ProjectManagement();
         static ProjectManagement* m_instance;
@@ -90,9 +102,7 @@ class ProjectManagement : public QObject
         int m_utmZone;
         int m_utmNorthSouth;
         QString m_utmNorthSouthStr;
-        int m_spacingX;
-        int m_spacingY;
-        int m_spacingZ;
+
         QString m_filename;
 
         StructuralModel stModel;

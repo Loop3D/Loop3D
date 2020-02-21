@@ -495,6 +495,7 @@ Item {
                     reCentreMap()
                 }
                 inUTM = !inUTM
+                project.inUtm = inUTM
             }
         }
         Rectangle {

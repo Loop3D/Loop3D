@@ -64,7 +64,8 @@ class IsosurfaceRenderer : public QObject, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    IsosurfaceRenderer() : m_numOfIsosurfaces(1), m_program(nullptr) { }
+    IsosurfaceRenderer() : m_numOfIsosurfaces(1), m_program(nullptr), m_miscToggle1(0), m_miscToggle2(0), m_miscToggle3(0),
+                            m_miscToggle4(0), m_miscToggle5(0){ }
     ~IsosurfaceRenderer() { delete m_program; }
 
     void setIsovalues(float* isovalues) { for (int i=0;i<6;i++) m_isovalues[i] = isovalues[i]; }
@@ -76,6 +77,7 @@ public:
     void setViewDistance(float dist) { m_viewDistance = dist; }
     void setIsovalueMinMax(float min, float max) { m_isovalueMin = min; m_isovalueMax = max; }
     void setCameraPosition(float northing, float easting, float depth);
+    void setMiscToggles(int one, int two, int three, int four, int five);
 
 public Q_SLOTS:
     void paint();
@@ -95,6 +97,11 @@ private:
     QQuaternion m_viewAngle;
     float m_viewDistance;
     float m_camNorthing, m_camEasting, m_camDepth;
+    int m_miscToggle1;
+    int m_miscToggle2;
+    int m_miscToggle3;
+    int m_miscToggle4;
+    int m_miscToggle5;
 };
 
 class Isosurface : public QQuickItem
@@ -119,6 +126,11 @@ public:
     Q_INVOKABLE void updateNumberOfIsosurfaces(int num);
     Q_INVOKABLE bool updateIsovalue(int index, float isovalue);
     Q_INVOKABLE void updateCameraPosition(bool up, bool down, bool left, bool right, bool forward, bool back);
+    Q_INVOKABLE void updateMiscToggle1(int val);
+    Q_INVOKABLE void updateMiscToggle2(int val);
+    Q_INVOKABLE void updateMiscToggle3(int val);
+    Q_INVOKABLE void updateMiscToggle4(int val);
+    Q_INVOKABLE void updateMiscToggle5(int val);
 
 Q_SIGNALS:
     void isovaluesChanged();
@@ -142,6 +154,7 @@ private:
     QQuaternion m_viewAngle;
     float m_viewDistance;
     float m_camNorthing, m_camEasting, m_camDepth;
+    int m_miscToggle1, m_miscToggle2, m_miscToggle3, m_miscToggle4, m_miscToggle5;
 };
 
 #endif // ISOSURFACE_H

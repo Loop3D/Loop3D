@@ -101,6 +101,7 @@ Item {
 //            TabButton { text: 'Geophysical Modelling' }
 //            TabButton { text: 'Post Processing' }
             TabButton { text: 'Data Viewer' }
+            onCurrentIndexChanged: project.mainIndex = currentIndex
         }
     }
 
@@ -168,7 +169,7 @@ Item {
             if (!project.loadProject(fileDialogOpen.fileUrl)) {
                 console.log("Open Project Action - Open " + fileDialogOpen.fileUrl)
                 notifyText.text = "Loaded project from " + fileDialogOpen.fileUrl
-                dcTab.inUTM = false
+                dcTab.inUTM = project.inUtm
                 dcTab.lockRegionOfInterest = true
                 hasFile = true
                 dcTab.roiReproject()

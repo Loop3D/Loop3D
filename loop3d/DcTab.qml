@@ -170,7 +170,7 @@ Item {
                 }
 
                 llLoc.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
-                if (inUTM) {
+                if (project.inUtm) {
                     llPos.latitude = llLoc.coordinate.latitude
                     llPos.longitude = llLoc.coordinate.longitude
                     llConvert.fromLL(llPos)

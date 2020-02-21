@@ -50,6 +50,7 @@ class StructuralModel : protected QOpenGLFunctions
 
         float* m_valueData;
 
+        bool modelCreated;
         bool dataChanged;
 
        // Graphics Thread

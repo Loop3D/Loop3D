@@ -14,13 +14,13 @@ import numpy as np
 
 if ('loopFilename' not in vars() and 'loopFilename' not in globals()):
     loopFilename = "small.loop3d"
-print(loopFilename)
+#print(loopFilename)
 
-boundaries = []
+boundaries = [500057,603028,7455348,7567953,-1200,8200]
 resp = LoopProjectFile.Get(loopFilename,"extents")
 if resp["errorFlag"]: print(resp["errorString"])
 else: boundaries = resp["value"]["utm"][2:] + resp["value"]["depth"]
-print(boundaries)
+#print(boundaries)
 
 # Input to geoserver is in GDA94 Zone 50 (48-58 srs=epsg:28348-28358) (Mark uses geopandas.GeoDataFrame.to_crs
 # for conversions) I need to look into options for geometry extents to these geodataframes currently
@@ -28,10 +28,10 @@ print(boundaries)
 # GDA94(lat/long) is epsg:4283)
 # WGS84/UTM zone 1N-60N  32601-32660, 1S-60S  32701-32760
 # X is Eastings, Y is Northings in 'All in one Hamersley-LoopStructural.ipynb
-minEasting = 500057
-maxEasting = 603028
-minNorthing = 7455348
-maxNorthing = 7567953
+minEasting = boundaries[0]
+maxEasting = boundaries[1]
+minNorthing = boundaries[2]
+maxNorthing = boundaries[3]
 
 zoneStr = 'epsg:28350'
 zone = {'init':zoneStr}
@@ -61,7 +61,7 @@ fault_file='fault.shp'
 fault_file_csv=data_dir+fault_file.replace(".shp",".txt")
 fault_file=data_dir_shp+fault_file
 
-print(geology_file)
+#print(geology_file)
 c_l = {
     #Orientations
       "d": "dip",                 #field that contains dip information
@@ -93,7 +93,7 @@ c_l = {
       "gi": 'geopnt_id'           #field that contains unique id of structure point    
 }
 
-#input("About to try servers for data collection ... Press to continue!!!")
+# About to try servers for data collection ...
 try:
     geology = gpd.read_file(geology_url,bbox=bboxGDAZ50)
     geology.to_file(geology_file)
@@ -137,8 +137,7 @@ try:
 except:
     print("DTM service down proceeding with stored data")
 
-#input("About to run map2model-cpp code. Press to continue")
-# Do Vitaliy's map2model-cpp magic here
+# About to run map2model-cpp code
 m2l_topology.save_Parfile("./",c_l,
     data_dir+"/graph",
     data_dir+"/geology.txt",
@@ -148,7 +147,7 @@ m2l_topology.save_Parfile("./",c_l,
 # This subprocess creates a lot of files in <data_dir>/graph directory
 subprocess.run(["C:\workspace\map2model\m2m_cpp\map2model.exe","Parfile"])
 
-#input("Clipping data to region of interest. Press to continue")
+# Clipping data to region of interest
 geology = gpd.read_file(geology_file,bbox=bboxGDAZ50)
 geology.columns = geology.columns.str.lower()
 geology.crs = zone
@@ -184,19 +183,19 @@ print("Elements with 'Fault' in feature",faultsList.size)
 faultsClip = m2l_utils.clip_shp(faultsList,geoframe)
 faultsClip.to_file(data_dir+"/tmp/faults_clip.shp")
 
-#input("Parsing stratigraphy network for data. Press to continue")
+# Parsing stratigraphy network for data
 groups, glabels, G = m2l_topology.get_series(data_dir+"/graph/graph_strat.gml",'id')
 m2l_topology.save_units(G,data_dir+"/tmp/",glabels,showPlot=False)
 m2l_topology.save_group(G,data_dir+"/tmp/",glabels,geologyExpClip,c_l,showPlot=False)
 
-#input("Saving orientation data to output. Press to continue")
+# Saving orientation data to output
 # important for loopStructural as save_orientations makes (orientations.csv)
 dtm = rasterio.open(data_dir+"/dtm_reprojected.tif")
 m2l_geometry.save_orientations(structureJoined,data_dir+"/output",c_l,orientation_decimate,dtm)
 m2l_geometry.create_orientations(data_dir+"/tmp/",data_dir+"/output",
   dtm,geologyExpClip,beddingClip,c_l)
 
-#input("Examining fault network. Press to continue")
+# Examining fault network
 # 0 is intrusion_mode
 ls_dict, ls_dict_decimate= m2l_geometry.save_basal_contacts(data_dir+"/tmp/",dtm,
   geologyExpClip,contact_decimate,c_l,0)
@@ -229,11 +228,8 @@ m2l_interpolation.process_fault_throw_and_near_orientations(data_dir+"/tmp/",
 m2l_geometry.process_plutons(data_dir+"/tmp/",data_dir+"/output/",geologyExpClip,True,
   dtm,'domes',str(45),contact_decimate,c_l)
 
-#input("Prepare for spam. Press to continue")
-#Note this spams with pyplots ...17 of them
 m2l_interpolation.interpolate_orientations(data_dir+"/tmp/structure_clip.shp",
   data_dir+"/tmp/",bboxGDAZ50,c_l,use_gcode,scheme,50,50,False,showPlot=False)
-# and another 4 more
 m2l_interpolation.interpolate_contacts(data_dir+"/tmp/basal_contacts.shp",
   data_dir+"/tmp/",dtm,bboxGDAZ50,c_l,use_gcode2,scheme,50,50,False,showPlot=False)
 
@@ -285,7 +281,7 @@ m2l_geometry.normalise_thickness(data_dir+"/output/")
 
 # Send outputs to loop Project File
 orientations = pd.read_csv(data_dir+"/output/orientations.csv")
-orientations['layer'] = "S0"
+orientations['layer'] = "s0"
 orientationsData = list(zip(list(zip(orientations['X'],orientations['Y'],orientations['Z'])),
   orientations['azimuth'],orientations['dip'],orientations['polarity'],orientations['formation'],
   orientations['layer']))
@@ -306,12 +302,6 @@ for f in stratigraphicLayers['formation'].unique():
 stratigraphicLogData = list(zip(thickness.keys(),thickness.values()))
 resp = LoopProjectFile.Set(loopFilename,"stratigraphicLog",data=stratigraphicLogData,verbose=True)
 if resp["errorFlag"]: print(resp["errorString"])
-
-#input("About to do Lachie's bit. Press to continue")
-#m2l_export.loop2LoopStructural(data_dir+"/output/formation_thicknesses.csv",
-#  data_dir+"/output/orientations.csv",
-#  data_dir+"/output/contacts4.csv",
-#  bboxGDAZ50)
 
 import winsound
 duration = 700  # milliseconds

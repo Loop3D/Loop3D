@@ -60,16 +60,29 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
         int xsteps = 50;
         int ysteps = 50;
         int zsteps = 50;
+        if (ProjectManagement::instance()) {
+            ProjectManagement* proj = ProjectManagement::instance();
+            xsteps = static_cast<int>((proj->m_maxEasting - proj->m_minEasting) / proj->m_spacingX)+1;
+            ysteps = static_cast<int>((proj->m_maxNorthing - proj->m_minNorthing) / proj->m_spacingY)+1;
+            zsteps = static_cast<int>((proj->m_maxDepth - proj->m_minDepth) / proj->m_spacingZ)+1;
+        }
         qDebug() << "Trying to load file " << name;
         auto locals = py::dict("loopFilename"_a = name.toStdString().c_str());
         locals["xsteps"] = xsteps;
         locals["ysteps"] = ysteps;
         locals["zsteps"] = zsteps;
+        qDebug() << xsteps << " " << ysteps << " " << zsteps;
         py::exec(code.toStdString().c_str(),py::globals(),locals);
 
         if (useResult) {
             // Get results back from algorithm (numpy arrays work but don't go past boundaries)
             py::array_t<float> result = locals["result"].cast<py::array_t<float> >();
+            py::array_t<float> stepsizes = locals["stepsizes"].cast<py::array_t<float> >();
+            xsteps = locals["xsteps"].cast<float>();
+            ysteps = locals["ysteps"].cast<float>();
+            zsteps = locals["zsteps"].cast<float>();
+            qDebug() << stepsizes.at(0) << " " << stepsizes.at(1) << " " << stepsizes.at(2);
+            qDebug() << xsteps << " " << ysteps << " " << zsteps;
             if (ProjectManagement::instance()) {
                 ProjectManagement* proj = ProjectManagement::instance();
                 ProjectManagement::instance()->getStModel()->loadData(result,
