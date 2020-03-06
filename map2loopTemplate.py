@@ -11,6 +11,7 @@ from shapely.geometry import Polygon
 import urllib
 import rasterio
 import numpy as np
+import re
 
 if ('loopFilename' not in vars() and 'loopFilename' not in globals()):
     loopFilename = "small.loop3d"
@@ -301,6 +302,41 @@ for f in stratigraphicLayers['formation'].unique():
     thickness[f] = np.mean(stratigraphicLayers[stratigraphicLayers['formation']==f]['thickness'])
 stratigraphicLogData = list(zip(thickness.keys(),thickness.values()))
 resp = LoopProjectFile.Set(loopFilename,"stratigraphicLog",data=stratigraphicLogData,verbose=True)
+if resp["errorFlag"]: print(resp["errorString"])
+
+faults = pd.read_csv(data_dir+"/output/fault_orientations.csv")
+faultsData = list(zip(list(zip(faults['X'],faults['Y'],faults['Z'])),faults['DipDirection'],
+                faults['dip'],faults['DipPolarity'],faults['formation'],faults['formation']))
+resp = LoopProjectFile.Set(loopFilename,"orientationsAmend",data=faultsData,verbose=True)
+if resp["errorFlag"]: print(resp["errorString"])
+
+#faultEvents = pd.read_csv(data_dir+"/output/fault_orientations.csv")
+faultEvents = np.zeros(faults.shape[0],LoopProjectFile.faultEventType)
+faultEvents['name'] = faults['formation']
+faultEvents['enabled'] = 0
+faultEvents['minAge'] = np.arange(1.0,7.0, 6.0/faults.shape[0])
+faultEvents['maxAge'] = faultEvents['minAge']
+tmp = faults['formation']
+for i in range(faultEvents.size):
+    tmp[i] = re.sub('.*_','',faults['formation'][i])
+faultEvents['eventId'] = tmp 
+
+tmp = faultsClip[~faultsClip['fname'].isnull()]
+lookup = dict(zip(np.array(tmp['objectid']),np.array(tmp['fname'])))
+
+def replaceName(row,lookup):
+    key = int(row['eventId'])
+    if key in lookup:
+        val = lookup[key]
+        row['name'] = val
+        row['enabled'] = 1
+    else:
+        pass
+
+for row in faultEvents:
+    replaceName(row,lookup)
+
+resp = LoopProjectFile.Set(loopFilename,"faultLog",data=faultEvents,verbose=False)
 if resp["errorFlag"]: print(resp["errorString"])
 
 import winsound

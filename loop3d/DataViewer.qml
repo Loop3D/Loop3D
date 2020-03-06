@@ -124,6 +124,10 @@ Item {
                         color: "#21be2b"
                         radius: 2
                     }
+//                    Text {
+//                        anchors.fill: parent
+//                        text: value
+//                    }
                 }
 
                 handle: Rectangle {
@@ -132,8 +136,8 @@ Item {
                     implicitWidth: 26
                     implicitHeight: 26
                     radius: 13
-                    color: isovalue.pressed ? "#f0f0f0" : "#f6f6f6"
-                    border.color: "#bdbebf"
+                    color: isovalue.pressed ? "#a0f0f0f0" : "#a0f6f6f6"
+                    border.color: "#a0bdbebf"
                 }
                 Keys.onPressed: event.reject
             }
@@ -182,85 +186,86 @@ Item {
             text: "Reset View"
         }
     }
-    Rectangle {
-        id: miscControls
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: 4
-        width: 80
-        color: "#00000000"
-        Button {
-            id: miscButton1
-            property var misc1: 0
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.margins: 4
-            width: parent.width
-            height: 40
-            onPressed: {
-                misc1 = !misc1
-                surface.updateMiscToggle1(misc1)
-            }
-            text: "Misc1"
-        }
-        Button {
-            id: miscButton2
-            property var misc2: 0
-            anchors.top: miscButton1.bottom
-            anchors.left: parent.left
-            anchors.margins: 4
-            width: parent.width
-            height: 40
-            onPressed: {
-                misc2 = !misc2
-                surface.updateMiscToggle2(misc2)
-            }
-            text: "Misc2"
-        }
-        Button {
-            id: miscButton3
-            property var misc3: 0
-            anchors.top: miscButton2.bottom
-            anchors.left: parent.left
-            anchors.margins: 4
-            width: parent.width
-            height: 40
-            onPressed: {
-                misc3 = !misc3
-                surface.updateMiscToggle3(misc3)
-            }
-            text: "Misc3"
-        }
-        Button {
-            id: miscButton4
-            property var misc4: 0
-            anchors.top: miscButton3.bottom
-            anchors.left: parent.left
-            anchors.margins: 4
-            width: parent.width
-            height: 40
-            onPressed: {
-                misc4 = !misc4
-                surface.updateMiscToggle4(misc4)
-            }
-            text: "Misc4"
-        }
-        Button {
-            id: miscButton5
-            property var misc5: 0
-            anchors.top: miscButton4.bottom
-            anchors.left: parent.left
-            anchors.margins: 4
-            width: parent.width
-            height: 40
-            onPressed: {
-                misc5 = !misc5
-                surface.updateMiscToggle5(misc5)
-            }
-            text: "Misc5"
-        }
-    }
+
+//    Rectangle {
+//        id: miscControls
+//        anchors.bottom: parent.bottom
+//        anchors.right: parent.right
+//        anchors.top: parent.top
+//        anchors.margins: 4
+//        width: 80
+//        color: "#00000000"
+//        Button {
+//            id: miscButton1
+//            property var misc1: 0
+//            anchors.top: parent.top
+//            anchors.left: parent.left
+//            anchors.margins: 4
+//            width: parent.width
+//            height: 40
+//            onPressed: {
+//                misc1 = !misc1
+//                surface.updateMiscToggle1(misc1)
+//            }
+//            text: "Misc1"
+//        }
+//        Button {
+//            id: miscButton2
+//            property var misc2: 0
+//            anchors.top: miscButton1.bottom
+//            anchors.left: parent.left
+//            anchors.margins: 4
+//            width: parent.width
+//            height: 40
+//            onPressed: {
+//                misc2 = !misc2
+//                surface.updateMiscToggle2(misc2)
+//            }
+//            text: "Misc2"
+//        }
+//        Button {
+//            id: miscButton3
+//            property var misc3: 0
+//            anchors.top: miscButton2.bottom
+//            anchors.left: parent.left
+//            anchors.margins: 4
+//            width: parent.width
+//            height: 40
+//            onPressed: {
+//                misc3 = !misc3
+//                surface.updateMiscToggle3(misc3)
+//            }
+//            text: "Misc3"
+//        }
+//        Button {
+//            id: miscButton4
+//            property var misc4: 0
+//            anchors.top: miscButton3.bottom
+//            anchors.left: parent.left
+//            anchors.margins: 4
+//            width: parent.width
+//            height: 40
+//            onPressed: {
+//                misc4 = !misc4
+//                surface.updateMiscToggle4(misc4)
+//            }
+//            text: "Misc4"
+//        }
+//        Button {
+//            id: miscButton5
+//            property var misc5: 0
+//            anchors.top: miscButton4.bottom
+//            anchors.left: parent.left
+//            anchors.margins: 4
+//            width: parent.width
+//            height: 40
+//            onPressed: {
+//                misc5 = !misc5
+//                surface.updateMiscToggle5(misc5)
+//            }
+//            text: "Misc5"
+//        }
+//    }
 
     Keys.onPressed: {
         surface.updateCameraPosition(event.key === Qt.Key_Space,

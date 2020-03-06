@@ -58,14 +58,14 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("loop3d.org");
 
     DataSourceList dataSourceList;
-    EventList eventList;
+
     qmlRegisterType<Isosurface>("OpenGLUnderQML", 1, 0, "Isosurface");
 
     ProjectManagement* project = ProjectManagement::instance();
-    project->m_minLatitude = -35.0;
-    project->m_maxLatitude = -34.5;
-    project->m_minLongitude = 135.5;
-    project->m_maxLongitude = 136.0;
+    project->m_minLatitude = -33.6;
+    project->m_maxLatitude = -33.8;
+    project->m_minLongitude = 115.2;
+    project->m_maxLongitude = 115.5;
     qmlRegisterUncreatableType<ProjectManagement>("loop3d.projectmanagement",1,0,"Project",
                                                QStringLiteral("ProjectManagement shoudl not be created in QML"));
 
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 
     QQuickView view;
     view.rootContext()->setContextProperty(QStringLiteral("dataSourceList"), &dataSourceList);
-    view.rootContext()->setContextProperty(QStringLiteral("eventList"), &eventList);
+    view.rootContext()->setContextProperty(QStringLiteral("eventList"), project->getEventList());
     view.rootContext()->setContextProperty(QStringLiteral("project"), project);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:///main.qml"));

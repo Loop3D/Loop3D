@@ -196,6 +196,7 @@ int ProjectManagement::loadProject(QString filename)
 
         // Load structural data
         stModel.loadFromFile(filename);
+        eventList.loadFromFile(filename);
 
     } catch(netCDF::exceptions::NcException& e) {
         qFatal("%s", e.what());
@@ -205,6 +206,11 @@ int ProjectManagement::loadProject(QString filename)
     }
     m_extentsChanged = false;
     return 0;
+}
+
+int ProjectManagement::reloadProject()
+{
+    return loadProject(m_filename);
 }
 
 void ProjectManagement::updateGeodeticLimits(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude)

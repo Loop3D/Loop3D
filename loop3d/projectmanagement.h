@@ -4,6 +4,7 @@
 #include <QObject>
 #include "utmconverter.h"
 #include "structuralmodel.h"
+#include "eventlist.h"
 
 class ProjectManagement : public QObject
 {
@@ -60,6 +61,7 @@ class ProjectManagement : public QObject
         Q_INVOKABLE void clearProject(void);
         Q_INVOKABLE int saveProject(QString filename = "");
         Q_INVOKABLE int loadProject(QString filename = "");
+        Q_INVOKABLE int reloadProject(void);
         Q_INVOKABLE void updateGeodeticLimits(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude);
         Q_INVOKABLE void updateUTMLimits(double minNorthing, double maxNorthing, double minEasting, double maxEasting, int zone, int northSouth);
         Q_INVOKABLE void checkGeodeticLimits(void);
@@ -76,6 +78,7 @@ class ProjectManagement : public QObject
                 return m_instance;
         }
         StructuralModel* getStModel() { return &stModel; }
+        EventList* getEventList() { return &eventList; }
 
         double m_minLatitude;
         double m_maxLatitude;
@@ -106,6 +109,7 @@ class ProjectManagement : public QObject
         QString m_filename;
 
         StructuralModel stModel;
+        EventList eventList;
 };
 
 #endif // PROJECTMANAGEMENT_H

@@ -16,7 +16,7 @@ Isosurface::Isosurface()
       m_renderer(nullptr)
 {
     for (int i=0;i<6;i++) m_isovalues[i] = 0.0;
-    m_viewDistance = 20000.0f;
+    m_viewDistance = 150000.0f;
     m_camNorthing = m_camEasting = m_camDepth = 0.0f;
     m_miscToggle1 = m_miscToggle2 = m_miscToggle3 = m_miscToggle4 = m_miscToggle5 = 0;
     m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,90.0f);
@@ -39,6 +39,7 @@ void Isosurface::setViewDistance(float distance)
 void Isosurface::updateViewDistance(float angle)
 {
     m_viewDistance *= 1.0f+angle/10.0f;
+//    qDebug() << m_viewDistance << " " << m_viewAngle;
     viewDistanceChanged();
     if (window()) window()->update();
 }
@@ -47,6 +48,7 @@ void Isosurface::resetViewAngle()
 {
     m_camNorthing = m_camEasting = m_camDepth = 0.0f;
     m_viewAngle = QQuaternion::fromAxisAndAngle(-1.0f,0.0f,0.0f,90.0f);
+    m_viewAngle = QQuaternion(0.836301f,-0.55f,0.0f,0.0f);
     if (window()) window()->update();
 }
 

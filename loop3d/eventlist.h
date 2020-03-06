@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QVector>
+#include <netcdf>
 
 struct EventItem {
         QString name;
@@ -20,6 +21,7 @@ class EventList : public QObject {
         EventList(QObject* parent=nullptr);
         ~EventList() { events.clear(); }
 
+        int loadFromFile(QString filename);
         bool setEventAt(int index, const EventItem& event);
         QVector<EventItem> getEvents() const { return events; }
         Q_INVOKABLE void sort(void);
@@ -37,10 +39,13 @@ class EventList : public QObject {
     private:
         QVector<EventItem> events;
         static bool order(const EventItem& a, const EventItem& b) {
-            if (abs(a.minAge - b.minAge) < 0.0001f) {
-                if (abs(a.maxAge - b.maxAge) < 0.0001f) return a.eventID < b.eventID;
-                else return a.maxAge < b.maxAge;
-            } else return a.minAge < b.minAge;
+            if (a.isActive == b.isActive) {
+                if (abs(a.minAge - b.minAge) < 0.0001f) {
+                    if (abs(a.maxAge - b.maxAge) < 0.0001f) return a.eventID < b.eventID;
+                    else return a.maxAge < b.maxAge;
+                } else return a.minAge < b.minAge;
+            } else if (a.isActive) return true;
+            return false;
         }
 };
 

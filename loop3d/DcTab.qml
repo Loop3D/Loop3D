@@ -7,6 +7,10 @@ import loop3d.pythontext 1.0
 import loop3d.utmconverter 1.0
 import loop3d.datasourcemodel 1.0
 
+//import Qt3D.Core 2.12
+//import Qt3D.Render 2.12
+//import QtQuick.Scene3D 2.12
+
 Item {
     id: dcTab
 
@@ -329,6 +333,23 @@ Item {
                             }
                         }
                     }
+                    Button {
+                        id: dcExtractDataButton
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        height: 80
+                        width: 140
+                        text: "Extract Data"
+                        onPressed: {
+                            // TODO: remove file open when finished testing textures
+                            if (!hasFile) fileDialogOpen.open()
+                            else {
+                                dcPythonText.run(dcTextArea.text,project.filename)
+                                project.reloadProject()
+                                bar.currentIndex = 1
+                            }
+                        }
+                    }
                 }
                 Rectangle {
                     id: dcCodeTab
@@ -368,13 +389,16 @@ Item {
                             if (!hasFile) fileDialogOpen.open()
                             else {
                                 dcPythonText.run(dcTextArea.text,project.filename)
-                                dcDetailsBar.currentIndex = 2
+                                project.reloadProject()
+                                bar.currentIndex = 1
+//                                dcDetailsBar.currentIndex = 2
                             }
                         }
                     }
                 }
 
                 Rectangle {
+//                    anchors.fill: parent
                     id: observationsTab
                     color: "#bbbbbb"
                     Text {
@@ -383,6 +407,26 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
+                    // Needs Qt 5.14 for embedding Scene3D into QQuickViews
+//                    Scene3D {
+////                        compositingMode: Scene3D.FBO
+//                        Entity {
+//                            RenderSettings {
+//                                activeFrameGraph: RenderSurfaceSelector {
+//                                    Viewport {
+//                                        id: mainViewport
+//                                        normalizedRect: Qt.rect(0.5, 0.5, 1, 1)
+//                                        CameraSelector { id: cameraViewport }
+
+//                                        ClearBuffers {
+//                                            buffers: ClearBuffers.ColorDepthBuffer
+//                                            clearColor: Qt.rgba(0.6, 0.6, 1.0, 0.1)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                 }
 
             }
@@ -392,9 +436,9 @@ Item {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 padding: 4
-                TabButton { text: 'Sources' }
+                TabButton { text: 'Data Sources' }
                 TabButton { text: 'Python Code' }
-                TabButton { text: 'Observations' }
+//                TabButton { text: 'Observations' }
             }
         }
     }

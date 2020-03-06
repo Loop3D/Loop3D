@@ -25,21 +25,6 @@ Item {
         EventModel {
             id: eventsModel
             events: eventList
-            Component.onCompleted: {
-                eventList.appendItem(0,"Alpha",5.1,5.2,"Fold");
-                eventList.appendItem(1,"Bravo",3.1,3.2,"Fault");
-                eventList.appendItem(2,"Charlie",4.1,4.2,"Fold");
-                eventList.appendItem(3,"Delta",1.1,2.2,"Fault");
-                eventList.appendItem(4,"Echo",1.1,3.2,"Fold");
-                eventList.appendItem(5,"Foxtrot",2.1,2.2,"Fold", 1);
-                eventList.appendItem(6,"Golf",2.1,2.2,"Fault", 0, false);
-                eventList.appendItem(7,"Hotel",2.1,2.2,"Fault", 2);
-                eventList.appendItem(8,"India",2.1,2.2,"Fault", 0, false);
-                eventList.appendItem(9,"Juliette",2.1,2.2,"Fold", 3);
-                eventList.appendItem(900,"Kilo",6.1,6.2,"Fold");
-                eventList.appendItem(901,"Lima",2.1,2.2,"Strata", 4);
-                eventList.sort();
-            }
         }
 
         Rectangle {
@@ -98,7 +83,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         color: isActive ? "#000000" : "#555555"
                         font.italic: isActive ? false : true
-                        text: "Event ID " + eventID + ": \t" + type + "\t Age: " + minAge.toFixed(1) + " - " + maxAge.toFixed(1) + "\t\t" + name
+                        text: "Event " + eventID + "\t" + type + "\t Age: " + minAge.toFixed(1) + " - " + maxAge.toFixed(1) + "  \t" + name
                         font.family: mainWindow.defaultFontStyle
                         font.pixelSize: mainWindow.defaultFontSize
                     }
@@ -124,7 +109,8 @@ Item {
 
                         onClicked: {
                             isActive = !isActive
-                            eventList.sort()
+//                            eventList.sort()
+                            eventsModel.sortEvents()
                             mycanvas.clearCanvas()
                             mycanvas.requestPaint()
                         }
@@ -151,9 +137,24 @@ Item {
                 property var eventWidth: 20.0;
                 property var rankWidth: 45;
                 onPaint: {
+                    clearCanvas();
                     var ctx = getContext("2d");
+                    var globalMinAge = 1000.0;
+                    var globalMaxAge = -1000.0;
+                    var i = 0;
+                    for (i = 0; i < eventsModel.rowCount(); i++) {
+                        if (eventsModel.dataIndexed(i,"isActive")) {
+                            var tmp = eventsModel.dataIndexed(i,"minAge");
+                            if (tmp < globalMinAge) globalMinAge = tmp;
+                            tmp = eventsModel.dataIndexed(i,"minAge");
+                            if (tmp > globalMaxAge) globalMaxAge = tmp;
+                        }
+                    }
+                    globalMinAge = Math.floor(globalMinAge);
+                    globalMaxAge = Math.ceil(globalMaxAge);
+                    var globalAgeRange = globalMaxAge - globalMinAge;
 
-                    for (var i = 0; i < eventsModel.rowCount(); i++) {
+                    for (i = 0; i < eventsModel.rowCount(); i++) {
                         ctx.save();
                         if (eventsModel.dataIndexed(i,"isActive")) {
                             var isSelected = (i === detailsView.currentIndex);
@@ -164,7 +165,7 @@ Item {
                             var maxAge = eventsModel.dataIndexed(i,"maxAge");
                             var minAge = eventsModel.dataIndexed(i,"minAge");
                             var avgAge = (minAge+maxAge)/2;
-                            ctx.translate(100+eventsModel.dataIndexed(i,"rank")*rankWidth,avgAge*ageScale);
+                            ctx.translate(100+eventsModel.dataIndexed(i,"rank")*rankWidth,(1+avgAge-globalMinAge)*ageScale);
                             ctx.beginPath();
                             ctx.moveTo(          0,(minAge-avgAge)*ageScale);
                             ctx.lineTo(-(ageWidth+eventWidth/2),(minAge-avgAge)*ageScale);
@@ -185,9 +186,9 @@ Item {
                         }
                         ctx.restore();
                     }
-                    drawTimelineScale(ctx);
+                    drawTimelineScale(ctx,globalMinAge,globalMaxAge);
                 }
-                function drawTimelineScale(ctx) {
+                function drawTimelineScale(ctx,globalMinAge,globalMaxAge) {
                     ctx.save();
                     ctx.lineWidth = 2;
                     ctx.beginPath();
@@ -201,23 +202,44 @@ Item {
                     ctx.fillStyle = "#000000";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
-                    for (var j=1;j<8;j++) {
-                        ctx.fillText(j+" Ma",30,j*ageScale);
+                    for (var j=0;j<7;j++) {
+//                        ctx.fillText(j+" Ma",30,j*ageScale);
+                        ctx.fillText((j+globalMinAge)+" -",30,(j+1)*ageScale);
                     }
                     ctx.restore();
                 }
                 function whichSelected(x,y) {
-                    for (var i=0;i<eventsModel.rowCount();i++) {
-                        var age = y / ageScale;
+                    var globalMinAge = 1000.0;
+                    var globalMaxAge = -1000.0;
+                    var i = 0;
+                    for (i = 0; i < eventsModel.rowCount(); i++) {
+                        if (eventsModel.dataIndexed(i,"isActive")) {
+                            var tmp = eventsModel.dataIndexed(i,"minAge");
+                            if (tmp < globalMinAge) globalMinAge = tmp;
+                            tmp = eventsModel.dataIndexed(i,"minAge");
+                            if (tmp > globalMaxAge) globalMaxAge = tmp;
+                        }
+                    }
+                    globalMinAge = Math.floor(globalMinAge);
+                    globalMaxAge = Math.ceil(globalMaxAge);
+                    var globalAgeRange = globalMaxAge - globalMinAge;
+                    var dist = 1000.0;
+                    var index = -1;
+                    for (i=0;i<eventsModel.rowCount();i++) {
+                        var age = y/ ageScale + globalMinAge - 1;
                         var rank = ((x - 100) / rankWidth);
                         var avgAge = (eventsModel.dataIndexed(i,"minAge") + eventsModel.dataIndexed(i,"maxAge")) / 2.0;
-                        if (age > avgAge - eventWidth / ageScale / 2
+                        if (eventsModel.dataIndexed(i,"isActive")
+                                && age > avgAge - eventWidth / ageScale / 2
                                 && age < avgAge + eventWidth / ageScale / 2
                                 && rank > eventsModel.dataIndexed(i,"rank") - 0.5
-                                && rank < eventsModel.dataIndexed(i,"rank") + 0.5)
-                            return i;
+                                && rank < eventsModel.dataIndexed(i,"rank") + 0.5
+                                && Math.abs(age-avgAge) <dist) {
+                            dist = Math.abs(age - avgAge);
+                            index = i;
+                        }
                     }
-                    return -1;
+                    return index;
                 }
                 function clearCanvas() {
                     var ctx = getContext("2d");
@@ -358,7 +380,22 @@ Item {
                             text: detailsView.currentIndex >= 0 ? eventsModel.dataIndexed(detailsView.currentIndex,"maxAge").toPrecision(5) : ""
                         }
                     }
-
+                    Button {
+                        id: createBedding
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        height: 80
+                        width: 140
+                        text: "Create Model"
+                        onPressed: {
+                            // TODO: remove file open when finished testing textures
+                            if (!hasFile) fileDialogOpen.open()
+                            else {
+                                pythonText.run(textArea.text,project.filename,true)
+                                bar.currentIndex = 2
+                            }
+                        }
+                    }
                 }
 
                 Rectangle {
@@ -399,7 +436,8 @@ Item {
                             if (!hasFile) fileDialogOpen.open()
                             else {
                                 pythonText.run(textArea.text,project.filename,true)
-                                gtDetailsBar.currentIndex = 2
+                                bar.currentIndex = 2
+//                                gtDetailsBar.currentIndex = 2
                             }
                         }
                     }
@@ -425,7 +463,7 @@ Item {
                 padding: 4
                 TabButton { text: 'Details' }
                 TabButton { text: 'Python Code' }
-                TabButton { text: 'Results' }
+//                TabButton { text: 'Results' }
             }
         }
     }
