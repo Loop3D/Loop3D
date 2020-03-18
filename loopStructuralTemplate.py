@@ -116,6 +116,15 @@ strati = model.create_and_add_foliation('s0', #identifier in data frame
 xcoords = np.linspace(model.bounding_box[0, 0], model.bounding_box[1, 0], model.nsteps[0])
 ycoords = np.linspace(model.bounding_box[0, 1], model.bounding_box[1, 1], model.nsteps[1])
 zcoords = np.linspace(model.bounding_box[1, 2], model.bounding_box[0, 2], model.nsteps[2])
-zz,yy,xx = np.meshgrid(zcoords,ycoords,xcoords,indexing='ij')
+zz,xx,yy = np.meshgrid(zcoords,xcoords,ycoords,indexing='ij')
 locs = np.transpose([xx.flatten(),yy.flatten(),zz.flatten()])
 result = strati['feature'].evaluate_value(locs)
+
+LoopProjectFile.Set(loopFilename,"strModel",data=np.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
+
+import winsound
+duration = 200  # milliseconds
+freq = 1100  # Hz
+winsound.Beep(freq, duration)
+winsound.Beep(freq, duration)
+winsound.Beep(freq, duration)

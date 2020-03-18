@@ -44,6 +44,11 @@ Item {
                 onTriggered: fileDialogOpen.open()
             }
             Action {
+                text: qsTr("&Reload...")
+                shortcut: "Ctrl+R"
+                onTriggered: if (hasFile) project.reloadProject()
+            }
+            Action {
                 text: qsTr("&Save")
                 shortcut: "Ctrl+S"
                 onTriggered: {

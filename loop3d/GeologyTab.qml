@@ -391,7 +391,9 @@ Item {
                             // TODO: remove file open when finished testing textures
                             if (!hasFile) fileDialogOpen.open()
                             else {
-                                pythonText.run(textArea.text,project.filename,true)
+//                                pythonText.run(textArea.text,project.filename,true)
+                                pythonText.run(textArea.text,project.filename,false)
+                                project.reloadProject()
                                 bar.currentIndex = 2
                             }
                         }
@@ -435,8 +437,10 @@ Item {
                             // TODO: remove file open when finished testing textures
                             if (!hasFile) fileDialogOpen.open()
                             else {
-                                pythonText.run(textArea.text,project.filename,true)
+//                                pythonText.run(textArea.text,project.filename,true)
+                                pythonText.run(textArea.text,project.filename,false)
                                 bar.currentIndex = 2
+                                project.reloadProject()
 //                                gtDetailsBar.currentIndex = 2
                             }
                         }
