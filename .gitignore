@@ -1,4 +1,6 @@
 build-loop3d-Desktop-*
+build-*
+deploy
 *.exe
 *.so
 *.a
@@ -8,3 +10,6 @@ build-loop3d-Desktop-*
 __pycache__
 *.xlsx
 loop3d.pro.user
+Parfile*
+tmp_data*
+.vscode*

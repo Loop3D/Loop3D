@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shaders/isosurface.frag</file>
+        <file>shaders/isosurface.vert</file>
+        <file>shaders/water.frag</file>
+        <file>shaders/water.vert</file>
+    </qresource>
+</RCC>

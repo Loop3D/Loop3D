@@ -1,0 +1,12 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>images/collapsed.png</file>
+        <file>images/expanded.png</file>
+        <file>images/locked.png</file>
+        <file>images/unlocked.png</file>
+        <file>images/curvedArrow.png</file>
+        <file>images/doubleCurvedArrow.png</file>
+        <file>images/straightArrow.png</file>
+    </qresource>
+</RCC>

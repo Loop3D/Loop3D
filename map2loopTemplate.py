@@ -5,12 +5,12 @@ from map2loop import m2l_geometry
 from map2loop import m2l_interpolation
 from map2loop import m2l_export
 import LoopProjectFile
-import geopandas as gpd
-import pandas as pd
+import geopandas
+import pandas
 from shapely.geometry import Polygon
 import urllib
 import rasterio
-import numpy as np
+import numpy
 import re
 
 if ('loopFilename' not in vars() and 'loopFilename' not in globals()):
@@ -96,18 +96,18 @@ c_l = {
 
 # About to try servers for data collection ...
 try:
-    geology = gpd.read_file(geology_url,bbox=bboxGDAZ50)
+    geology = geopandas.read_file(geology_url,bbox=bboxGDAZ50)
     geology.to_file(geology_file)
     sub_geol = geology[['geometry', c_l['o'], c_l['c'], c_l['g'], c_l['u'],
         c_l['min'], c_l['max'], c_l['ds'], c_l['r1'], c_l['r2']]]
     m2l_topology.save_geol_wkt(sub_geol,geology_file_csv,c_l)
 
-    structure = gpd.read_file(structure_url,bbox=bboxGDAZ50)
+    structure = geopandas.read_file(structure_url,bbox=bboxGDAZ50)
     structure.to_file(structure_file)
     sub_structure = structure[['geometry',c_l['gi'],c_l['d'],c_l['dd']]]
     m2l_topology.save_structure_wkt(sub_structure,structure_file_csv,c_l)
 
-    faults = gpd.read_file(fault_url,bbox=bboxGDAZ50)
+    faults = geopandas.read_file(fault_url,bbox=bboxGDAZ50)
     faults.to_file(fault_file)
     sub_faults = faults[['geometry',c_l['o'],c_l['f']]]
     m2l_topology.save_faults_wkt(sub_faults,fault_file_csv,c_l)
@@ -121,7 +121,7 @@ except urllib.error.HTTPError as err:
 eastingList=[minEasting,maxEasting,maxEasting,minEasting,minEasting]
 northingList=[minNorthing,minNorthing,maxNorthing,maxNorthing,minNorthing]
 geomBounds = Polygon(zip(eastingList,northingList))
-geoframe = gpd.GeoDataFrame(index=[0], crs=zone,geometry=[geomBounds])
+geoframe = geopandas.GeoDataFrame(index=[0], crs=zone,geometry=[geomBounds])
 geoframeLL = geoframe.to_crs({'init':'epsg:4326'})
 
 # get DEM from hawaii source via map2loop functions reproject to MGA Zone 50
@@ -149,13 +149,13 @@ m2l_topology.save_Parfile("./",c_l,
 subprocess.run(["C:\workspace\map2model\m2m_cpp\map2model.exe","Parfile"])
 
 # Clipping data to region of interest
-geology = gpd.read_file(geology_file,bbox=bboxGDAZ50)
+geology = geopandas.read_file(geology_file,bbox=bboxGDAZ50)
 geology.columns = geology.columns.str.lower()
 geology.crs = zone
-structure = gpd.read_file(structure_file,bbox=bboxGDAZ50)
+structure = geopandas.read_file(structure_file,bbox=bboxGDAZ50)
 structure.columns = structure.columns.str.lower()
 structure.crs = zone
-faults = gpd.read_file(fault_file,bbox=bboxGDAZ50)
+faults = geopandas.read_file(fault_file,bbox=bboxGDAZ50)
 faults.columns = faults.columns.str.lower()
 faults.crs = zone
 
@@ -166,7 +166,7 @@ geologyExpClip.to_file(data_dir+"/tmp/geol_clip.shp")
 
 sub_structure = structure[['geometry',"dip","dip_dir","feature"]]
 print(sub_structure)
-structureJoined = gpd.sjoin(sub_structure,geologyExp,how="left", op="within")
+structureJoined = geopandas.sjoin(sub_structure,geologyExp,how="left", op="within")
 
 is_bed = structureJoined["feature"].str.contains("Bedding")
 bedding = structureJoined[is_bed]
@@ -202,7 +202,7 @@ ls_dict, ls_dict_decimate= m2l_geometry.save_basal_contacts(data_dir+"/tmp/",dtm
   geologyExpClip,contact_decimate,c_l,0)
 m2l_geometry.save_basal_no_faults(data_dir+"/tmp/basal_contacts.shp",
   data_dir+"/tmp/faults_clip.shp",ls_dict,10,c_l,zone)
-contacts = gpd.read_file(data_dir+"/tmp/basal_contacts.shp")
+contacts = geopandas.read_file(data_dir+"/tmp/basal_contacts.shp")
 m2l_geometry.save_basal_contacts_csv(contacts,data_dir+"/output/",dtm,contact_decimate,c_l)
 
 # 5 is fault_decimate, 20 is min_fault_length, 90.0 is fault_dip
@@ -234,12 +234,12 @@ m2l_interpolation.interpolate_orientations(data_dir+"/tmp/structure_clip.shp",
 m2l_interpolation.interpolate_contacts(data_dir+"/tmp/basal_contacts.shp",
   data_dir+"/tmp/",dtm,bboxGDAZ50,c_l,use_gcode2,scheme,50,50,False,showPlot=False)
 
-lc=np.loadtxt(data_dir+"/tmp/interpolation_contacts_l.csv",skiprows=1,delimiter=',',dtype=float)
-mc=np.loadtxt(data_dir+"/tmp/interpolation_contacts_m.csv",skiprows=1,delimiter=',',dtype=float)
-lo=np.loadtxt(data_dir+"/tmp/interpolation_l.csv",skiprows=1,delimiter=',',dtype=float)
-mo=np.loadtxt(data_dir+"/tmp/interpolation_m.csv",skiprows=1,delimiter=',',dtype=float)
-no=np.loadtxt(data_dir+"/tmp/interpolation_n.csv",skiprows=1,delimiter=',',dtype=float)
-xy=np.loadtxt(data_dir+"/tmp/interpolation_"+scheme+".csv",skiprows=1,delimiter=',',dtype=float)
+lc=numpy.loadtxt(data_dir+"/tmp/interpolation_contacts_l.csv",skiprows=1,delimiter=',',dtype=float)
+mc=numpy.loadtxt(data_dir+"/tmp/interpolation_contacts_m.csv",skiprows=1,delimiter=',',dtype=float)
+lo=numpy.loadtxt(data_dir+"/tmp/interpolation_l.csv",skiprows=1,delimiter=',',dtype=float)
+mo=numpy.loadtxt(data_dir+"/tmp/interpolation_m.csv",skiprows=1,delimiter=',',dtype=float)
+no=numpy.loadtxt(data_dir+"/tmp/interpolation_n.csv",skiprows=1,delimiter=',',dtype=float)
+xy=numpy.loadtxt(data_dir+"/tmp/interpolation_"+scheme+".csv",skiprows=1,delimiter=',',dtype=float)
 
 m2l_interpolation.join_contacts_and_orientations(data_dir+"/tmp/combo.csv",
   data_dir+"/tmp/geol_clip.shp",data_dir+"/tmp/",data_dir+"/dtm_reprojected.tif",
@@ -281,7 +281,7 @@ m2l_geometry.calc_thickness(data_dir+"/tmp/",data_dir+"/output/",5000,10000,c_l)
 m2l_geometry.normalise_thickness(data_dir+"/output/")
 
 # Send outputs to loop Project File
-orientations = pd.read_csv(data_dir+"/output/orientations.csv")
+orientations = pandas.read_csv(data_dir+"/output/orientations.csv")
 orientations['layer'] = "s0"
 orientationsData = list(zip(list(zip(orientations['X'],orientations['Y'],orientations['Z'])),
   orientations['azimuth'],orientations['dip'],orientations['polarity'],orientations['formation'],
@@ -290,31 +290,31 @@ resp = LoopProjectFile.Set(loopFilename,"orientations",data=orientationsData,ver
 if resp["errorFlag"]: print(resp["errorString"])
 
 # contacts are a location and which formation it is on
-contacts = pd.read_csv(data_dir+"/output/contacts4.csv")
+contacts = pandas.read_csv(data_dir+"/output/contacts4.csv")
 contactsData = list(zip(list(zip(contacts['X'],contacts['Y'],contacts['Z'])),contacts['formation']))
 resp = LoopProjectFile.Set(loopFilename,"contacts",data=contactsData,verbose=True)
 if resp["errorFlag"]: print(resp["errorString"])
 
 # used to give a mean width of each formation
-stratigraphicLayers = pd.read_csv(data_dir+"/output/formation_thicknesses.csv")
+stratigraphicLayers = pandas.read_csv(data_dir+"/output/formation_thicknesses.csv")
 thickness = {}
 for f in stratigraphicLayers['formation'].unique():
-    thickness[f] = np.mean(stratigraphicLayers[stratigraphicLayers['formation']==f]['thickness'])
+    thickness[f] = numpy.mean(stratigraphicLayers[stratigraphicLayers['formation']==f]['thickness'])
 stratigraphicLogData = list(zip(thickness.keys(),thickness.values()))
 resp = LoopProjectFile.Set(loopFilename,"stratigraphicLog",data=stratigraphicLogData,verbose=True)
 if resp["errorFlag"]: print(resp["errorString"])
 
-faults = pd.read_csv(data_dir+"/output/fault_orientations.csv")
+faults = pandas.read_csv(data_dir+"/output/fault_orientations.csv")
 faultsData = list(zip(list(zip(faults['X'],faults['Y'],faults['Z'])),faults['DipDirection'],
                 faults['dip'],faults['DipPolarity'],faults['formation'],faults['formation']))
 resp = LoopProjectFile.Set(loopFilename,"orientationsAmend",data=faultsData,verbose=True)
 if resp["errorFlag"]: print(resp["errorString"])
 
-#faultEvents = pd.read_csv(data_dir+"/output/fault_orientations.csv")
-faultEvents = np.zeros(faults.shape[0],LoopProjectFile.faultEventType)
+#faultEvents = pandas.read_csv(data_dir+"/output/fault_orientations.csv")
+faultEvents = numpy.zeros(faults.shape[0],LoopProjectFile.faultEventType)
 faultEvents['name'] = faults['formation']
 faultEvents['enabled'] = 0
-faultEvents['minAge'] = np.arange(1.0,7.0, 6.0/faults.shape[0])
+faultEvents['minAge'] = numpy.arange(1.0,7.0, 6.0/faults.shape[0])
 faultEvents['maxAge'] = faultEvents['minAge']
 tmp = faults['formation']
 for i in range(faultEvents.size):
@@ -322,7 +322,7 @@ for i in range(faultEvents.size):
 faultEvents['eventId'] = tmp 
 
 tmp = faultsClip[~faultsClip['fname'].isnull()]
-lookup = dict(zip(np.array(tmp['objectid']),np.array(tmp['fname'])))
+lookup = dict(zip(numpy.array(tmp['objectid']),numpy.array(tmp['fname'])))
 
 def replaceName(row,lookup):
     key = int(row['eventId'])

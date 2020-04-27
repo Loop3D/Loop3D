@@ -2,11 +2,13 @@
 #define PROJECTMANAGEMENT_H
 
 #include <QObject>
+#include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickView>
 #include "utmconverter.h"
 #include "structuralmodel.h"
 #include "eventlist.h"
 
-class ProjectManagement : public QObject
+class ProjectManagement : public QQuickItem
 {
     Q_OBJECT
 
@@ -24,14 +26,21 @@ class ProjectManagement : public QObject
     Q_PROPERTY (int utmZone MEMBER m_utmZone NOTIFY utmZoneChanged)
     Q_PROPERTY (int utmNorthSouth MEMBER m_utmNorthSouth NOTIFY utmNorthSouthChanged)
     Q_PROPERTY (QString utmNorthSouthStr MEMBER m_utmNorthSouthStr NOTIFY utmNorthSouthStrChanged)
-    Q_PROPERTY (int spacingX MEMBER m_spacingX NOTIFY spacingXChanged)
-    Q_PROPERTY (int spacingY MEMBER m_spacingY NOTIFY spacingYChanged)
-    Q_PROPERTY (int spacingZ MEMBER m_spacingZ NOTIFY spacingZChanged)
+    Q_PROPERTY (unsigned int spacingX MEMBER m_spacingX NOTIFY spacingXChanged)
+    Q_PROPERTY (unsigned int spacingY MEMBER m_spacingY NOTIFY spacingYChanged)
+    Q_PROPERTY (unsigned int spacingZ MEMBER m_spacingZ NOTIFY spacingZChanged)
     Q_PROPERTY (double minDepth MEMBER m_minDepth NOTIFY minDepthChanged)
     Q_PROPERTY (double maxDepth MEMBER m_maxDepth NOTIFY maxDepthChanged)
     Q_PROPERTY (bool inUtm MEMBER m_inUtm NOTIFY inUtmChanged)
     Q_PROPERTY (int mainIndex MEMBER m_mainIndex NOTIFY mainIndexChanged)
     Q_PROPERTY (bool extentsChanged MEMBER m_extentsChanged NOTIFY extentsChangedChanged)
+    Q_PROPERTY (bool flowChoiceMade MEMBER m_flowChoiceMade NOTIFY flowChoiceMadeChanged)
+    Q_PROPERTY (int flowChoice MEMBER m_flowChoice NOTIFY flowChoiceChanged)
+    Q_PROPERTY (int loopStructuralFlowOption MEMBER m_loopStructuralFlowOption NOTIFY loopStructuralFlowOptionChanged)
+    Q_PROPERTY (int sharedTextureId MEMBER m_sharedTextureId NOTIFY sharedTextureIdChanged)
+    Q_PROPERTY (unsigned int xsize MEMBER m_xsize NOTIFY xsizeChanged)
+    Q_PROPERTY (unsigned int ysize MEMBER m_ysize NOTIFY ysizeChanged)
+    Q_PROPERTY (unsigned int zsize MEMBER m_zsize NOTIFY zsizeChanged)
 
     Q_SIGNALS:
         void filenameChanged();
@@ -56,6 +65,13 @@ class ProjectManagement : public QObject
         void inUtmChanged();
         void mainIndexChanged();
         void extentsChangedChanged();
+        void flowChoiceMadeChanged();
+        void flowChoiceChanged();
+        void loopStructuralFlowOptionChanged();
+        void sharedTextureIdChanged();
+        void xsizeChanged();
+        void ysizeChanged();
+        void zsizeChanged();
 
     public:
         Q_INVOKABLE void clearProject(void);
@@ -69,16 +85,21 @@ class ProjectManagement : public QObject
         Q_INVOKABLE void convertGeodeticToUTM(void);
         Q_INVOKABLE void convertUTMToGeodetic(void);
 
+        Q_INVOKABLE Qt3DRender::QSharedGLTexture* getStructuralModelData(void);
         Q_INVOKABLE void downloadData(QString url = "", QString datatype = "netCDF");
-
+        Q_INVOKABLE void loadTextures();
 
         static ProjectManagement* instance() {
-            if (!m_instance)
-                m_instance = new ProjectManagement;
-                return m_instance;
+            if (!m_instance) m_instance = new ProjectManagement;
+            return m_instance;
         }
         StructuralModel* getStModel() { return &stModel; }
         EventList* getEventList() { return &eventList; }
+        QQuickView* getQmlQuickView() { return m_qmlView; }
+        void setQmlQuickView(QQuickView* view) {
+            m_qmlView = view;
+            connect(view,&QQuickWindow::beforeRendering,this, &ProjectManagement::loadTextures, Qt::DirectConnection);
+        }
 
         double m_minLatitude;
         double m_maxLatitude;
@@ -90,12 +111,19 @@ class ProjectManagement : public QObject
         double m_maxEasting;
         double m_minDepth;
         double m_maxDepth;
-        int m_spacingX;
-        int m_spacingY;
-        int m_spacingZ;
-        boolean m_inUtm;
+        unsigned int m_spacingX;
+        unsigned int m_spacingY;
+        unsigned int m_spacingZ;
+        unsigned int m_xsize;
+        unsigned int m_ysize;
+        unsigned int m_zsize;
+        bool m_inUtm;
         int m_mainIndex;
         bool m_extentsChanged;
+        bool m_flowChoiceMade;
+        int m_flowChoice;
+        int m_loopStructuralFlowOption;
+        int m_sharedTextureId;
     private:
         ProjectManagement();
         static ProjectManagement* m_instance;
@@ -107,6 +135,7 @@ class ProjectManagement : public QObject
         QString m_utmNorthSouthStr;
 
         QString m_filename;
+        QQuickView *m_qmlView;
 
         StructuralModel stModel;
         EventList eventList;

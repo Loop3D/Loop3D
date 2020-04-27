@@ -1,6 +1,7 @@
 #include "projectmanagement.h"
 #include <iostream>
 #include <QtDebug>
+#include <QtQuick/qquickwindow.h>
 
 #include <exception>
 #include <netcdf>
@@ -15,12 +16,20 @@ ProjectManagement::ProjectManagement():
     m_spacingX(100),
     m_spacingY(100),
     m_spacingZ(100),
+    m_xsize(51),
+    m_ysize(51),
+    m_zsize(51),
     m_inUtm(false),
     m_extentsChanged(true),
+    m_flowChoiceMade(false),
+    m_flowChoice(0),
+    m_loopStructuralFlowOption(2),
+    m_sharedTextureId(0),
     m_utmZone(0),
     m_utmNorthSouth(-1),
     m_filename("")
 {
+
 }
 
 void ProjectManagement::clearProject(void)
@@ -44,12 +53,20 @@ void ProjectManagement::clearProject(void)
     m_spacingX = 100;
     m_spacingY = 100;
     m_spacingZ = 100;
+    m_xsize = 51;
+    m_ysize = 51;
+    m_zsize = 51;
     m_inUtm = false;
     m_extentsChanged = true;
+    m_flowChoiceMade = false;
+    m_flowChoice = 0;
+    m_loopStructuralFlowOption = 2;
+    m_sharedTextureId = 0;
     minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
     minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
     utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
     spacingXChanged(); spacingYChanged(); spacingZChanged(); extentsChangedChanged();
+    flowChoiceChanged(); flowChoiceMadeChanged(); loopStructuralFlowOptionChanged();
 }
 
 int ProjectManagement::saveProject(QString filename)
@@ -181,9 +198,9 @@ int ProjectManagement::loadProject(QString filename)
         m_maxEasting = maxEasting;
         m_minDepth = minDepth;
         m_maxDepth = maxDepth;
-        m_spacingX = static_cast<int>(spacingX);
-        m_spacingY = static_cast<int>(spacingY);
-        m_spacingZ = static_cast<int>(spacingZ);
+        m_spacingX = static_cast<unsigned int>(spacingX);
+        m_spacingY = static_cast<unsigned int>(spacingY);
+        m_spacingZ = static_cast<unsigned int>(spacingZ);
         m_inUtm = static_cast<bool>(inUtm);
         updateGeodeticLimits(minLatitude,maxLatitude,minLongitude,maxLongitude);
 
@@ -270,6 +287,17 @@ void ProjectManagement::convertUTMToGeodetic(void)
     m_mapCentreLatitude = (m_minLatitude + m_maxLatitude )/2.0;
     m_mapCentreLongitude = (m_minLongitude + m_maxLongitude )/2.0;
     minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
+}
+
+void ProjectManagement::loadTextures()
+{
+    if (getStModel()->loadTextures()) sharedTextureIdChanged();
+}
+
+//Qt3DRender::QTexture3D *ProjectManagement::getStructuralModelData()
+Qt3DRender::QSharedGLTexture *ProjectManagement::getStructuralModelData()
+{
+    return getStModel()->getStructuralData();
 }
 
 void ProjectManagement::checkGeodeticLimits()

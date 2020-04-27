@@ -1,7 +1,7 @@
 QT += quick qml
 QT += positioning
 QT += 3drender gui opengl
-#QT += 3dcore 3drender 3dinput 3dquick 3dquickextras
+QT += 3dcore 3drender 3dinput 3dquick 3dquickextras
 
 QT_OPENGL=desktop
 
@@ -44,11 +44,11 @@ linux {
 }
 
 SOURCES += \
+        3dviewer.cpp \
         datasourcelist.cpp \
         datasourcemodel.cpp \
         eventlist.cpp \
         eventmodel.cpp \
-        isosurface.cpp \
         main.cpp \
         projectmanagement.cpp \
         pythonhighlighter.cpp \
@@ -56,7 +56,9 @@ SOURCES += \
         structuralmodel.cpp \
         utmconverter.cpp
 
-RESOURCES += qml.qrc qtquickcontrols2.conf
+RESOURCES += qml.qrc qtquickcontrols2.conf \
+    images.qrc \
+    shaders.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -70,11 +72,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    3dviewer.h \
     datasourcelist.h \
     datasourcemodel.h \
     eventlist.h \
     eventmodel.h \
-    isosurface.h \
     projectmanagement.h \
     pythonhighlighter.h \
     pythontext.h \
@@ -85,4 +87,6 @@ HEADERS += \
 DISTFILES += \
     ../test.py \
     DataSource.conf \
+    isosurface.frag \
+    isosurface.vert \
     qtquickcontrols2.conf

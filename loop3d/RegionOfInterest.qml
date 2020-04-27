@@ -1,8 +1,8 @@
-import QtQuick 2.0
-import QtLocation 5.12
-import QtPositioning 5.12
-import QtQuick.Controls 2.12
-import QtQuick.Shapes 1.12
+import QtQuick 2.14
+import QtLocation 5.14
+import QtPositioning 5.14
+import QtQuick.Controls 2.14
+import QtQuick.Shapes 1.14
 
 Item {
     id: element

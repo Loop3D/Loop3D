@@ -7,7 +7,7 @@
 #from LoopStructural.visualisation.model_visualisation import LavaVuModelViewer
 #from LoopStructural.modelling.features.structural_frame import StructuralFrameBuilder
 #from LoopStructural.modelling.fault.fault_segment import FaultSegment
-import numpy as np
+import numpy
 import timeit
 import gc
 #import lavavu

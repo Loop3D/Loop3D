@@ -6,15 +6,7 @@
 #include <QOpenGLTexture>
 #include <QOpenGLFunctions>
 #include <QMutex>
-
-struct Tetra {
-    float nodeIndex[4];
-};
-
-struct Nodes {
-    double point[3];
-    Nodes(double x, double y, double z) { point[0] = x; point[1] = y; point[2] = z; }
-};
+#include <QTexture>
 
 class StructuralModel : protected QOpenGLFunctions
 {
@@ -29,6 +21,7 @@ class StructuralModel : protected QOpenGLFunctions
         unsigned int getHeightUI() { return m_height; }
         unsigned int getDepthUI() { return m_depth; }
         bool getDataChanged() { return dataChanged; }
+        Qt3DRender::QSharedGLTexture* getStructuralData(void) { return m_sharedTexture; }
 
         void loadData(pybind11::array_t<float> values_in,
                                        float xmin, float xmax, int xsteps,
@@ -37,15 +30,19 @@ class StructuralModel : protected QOpenGLFunctions
 
         int saveToFile(QString filename);
         int loadFromFile(QString filename);
+        void resetView(void);
 
         QMutex dataMutex;
         float m_xmin, m_xmax, m_ymin, m_ymax, m_zmin, m_zmax;
         float m_valmin, m_valmax;
     private:
         void createBasicTestStructure(unsigned int size);
+        void updateStructureDataInViewer(void);
         unsigned int m_width;
         unsigned int m_height;
         unsigned int m_depth;
+        unsigned int m_totalPoints;
+        unsigned int m_totalTetra;
         std::vector<float> m_values;
 
         float* m_valueData;
@@ -55,11 +52,11 @@ class StructuralModel : protected QOpenGLFunctions
 
        // Graphics Thread
     public:
-        void loadTextures();
-        void bindTextures();
+        int loadTextures();
     private:
         QOpenGLTexture *valueTexture;
-        bool texturesValid;
+        Qt3DRender::QSharedGLTexture *m_sharedTexture;
+        QOpenGLContext *openGLContext;
 };
 
 #endif // STRUCTURALMODEL_H

@@ -1,10 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>images/collapsed.png</file>
-        <file>images/expanded.png</file>
-        <file>images/locked.png</file>
-        <file>images/unlocked.png</file>
         <file>DcTab.qml</file>
         <file>GeologyTab.qml</file>
         <file>GeophysTab.qml</file>
@@ -13,5 +9,6 @@
         <file>RegionOfInterest.qml</file>
         <file>RoiExtents.qml</file>
         <file>DataViewer.qml</file>
+        <file>Isosurface.qml</file>
     </qresource>
 </RCC>

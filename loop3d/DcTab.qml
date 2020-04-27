@@ -1,15 +1,11 @@
-import QtQuick 2.12
-import QtLocation 5.12
-import QtPositioning 5.12
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.3
+import QtQuick 2.14
+import QtLocation 5.14
+import QtPositioning 5.14
+import QtQuick.Controls 2.14
+import QtQuick.Layouts 1.14
 import loop3d.pythontext 1.0
 import loop3d.utmconverter 1.0
 import loop3d.datasourcemodel 1.0
-
-//import Qt3D.Core 2.12
-//import Qt3D.Render 2.12
-//import QtQuick.Scene3D 2.12
 
 Item {
     id: dcTab
@@ -407,28 +403,7 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    // Needs Qt 5.14 for embedding Scene3D into QQuickViews
-//                    Scene3D {
-////                        compositingMode: Scene3D.FBO
-//                        Entity {
-//                            RenderSettings {
-//                                activeFrameGraph: RenderSurfaceSelector {
-//                                    Viewport {
-//                                        id: mainViewport
-//                                        normalizedRect: Qt.rect(0.5, 0.5, 1, 1)
-//                                        CameraSelector { id: cameraViewport }
-
-//                                        ClearBuffers {
-//                                            buffers: ClearBuffers.ColorDepthBuffer
-//                                            clearColor: Qt.rgba(0.6, 0.6, 1.0, 0.1)
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
                 }
-
             }
             TabBar {
                 id: dcDetailsBar

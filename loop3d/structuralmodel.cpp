@@ -1,6 +1,9 @@
 #include "structuralmodel.h"
 #include "projectmanagement.h"
+#include "3dviewer.h"
 #include <limits>
+#include <Qt3DRender/QTexture>
+#include <QOffscreenSurface>
 
 #include <QDebug>
 #include <netcdf>
@@ -12,6 +15,8 @@ StructuralModel::StructuralModel()
     m_width  = 0;
     m_height = 0;
     m_depth  = 0;
+    m_totalPoints = 0;
+    m_totalTetra = 0;
 
     m_xmin = -1.0;
     m_xmax =  1.0;
@@ -27,7 +32,7 @@ StructuralModel::StructuralModel()
     m_valueData = nullptr;
     dataChanged = false;
     valueTexture = new QOpenGLTexture(QOpenGLTexture::Target3D);
-    texturesValid = false;
+    m_sharedTexture = new Qt3DRender::QSharedGLTexture();
     modelCreated = false;
     createBasicTestStructure(TEST_GRID_SIZE);
 }
@@ -36,7 +41,7 @@ StructuralModel::~StructuralModel()
 {
     if (m_valueData) free(m_valueData);
     if (valueTexture) delete valueTexture;
-    texturesValid = false;
+    if (m_sharedTexture) delete m_sharedTexture;
 
 }
 
@@ -60,6 +65,8 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
         m_width = static_cast<unsigned int>(xsteps);
         m_height = static_cast<unsigned int>(ysteps);
         m_depth = static_cast<unsigned int>(zsteps);
+        m_totalPoints = m_width * m_height * m_depth;
+        m_totalTetra = (m_width-1) * (m_height-1) * (m_depth-1) * 5;
 
         qDebug() << "Clearing data strutures";
         // Clear data structures
@@ -68,7 +75,7 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
         qDebug() << "Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
         // Allocate memory for textures
         if (m_valueData) free(m_valueData);
-        m_valueData = static_cast<float*>(malloc(sizeof(float)*m_height*m_width*m_depth));
+        m_valueData = static_cast<float*>(malloc(sizeof(float)*m_totalPoints));
         if (!m_valueData) {
             qDebug() << "Failed to allocate memory for value texture";
         } else {
@@ -83,7 +90,6 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
                 if (val > m_valmax) m_valmax = val;
             }
             qDebug() << "Loaded structures";
-            texturesValid = false;
             dataChanged = true;
             modelCreated = true;
         }
@@ -186,81 +192,99 @@ int StructuralModel::loadFromFile(QString filename)
 
     int result = 0;
     dataMutex.lock();
-    netCDF::NcFile dataFile;
-    try {
-        // Find last '/' of the first set of '/'s as in file:/// or url:///
-        QStringList list;
-        QString name;
+    {
+        netCDF::NcFile dataFile;
+        try {
+            // Find last '/' of the first set of '/'s as in file:/// or url:///
+            QStringList list;
+            QString name;
 
 #ifdef _WIN32
-        list = filename.split(QRegExp("///"));
-        name = (list.length() > 1 ? list[1] : list[0]);
+            list = filename.split(QRegExp("///"));
+            name = (list.length() > 1 ? list[1] : list[0]);
 #elif __linux__
-        list = filename.split(QRegExp("///"));
-        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+            list = filename.split(QRegExp("///"));
+            name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-        dataFile.open(name.toStdString().c_str(), netCDF::NcFile::read);
+            dataFile.open(name.toStdString().c_str(), netCDF::NcFile::read);
 
-        netCDF::NcGroup structuralModels = dataFile.getGroup("StructuralModels");
-        if (structuralModels.isNull()) {
-            qDebug() << "No Structural Models Group in netCDF file";
-            modelCreated = false;
-        } else {
-            netCDF::NcDim northing = structuralModels.getDim("northing");
-            netCDF::NcDim easting = structuralModels.getDim("easting");
-            netCDF::NcDim depth = structuralModels.getDim("depth");
-            m_width = static_cast<unsigned int>(northing.getSize());
-            m_height= static_cast<unsigned int>(easting.getSize());
-            m_depth = static_cast<unsigned int>(depth.getSize());
+            netCDF::NcGroup structuralModels = dataFile.getGroup("StructuralModels");
+            if (structuralModels.isNull()) {
+                qDebug() << "No Structural Models Group in netCDF file";
+                modelCreated = false;
+            } else {
+                netCDF::NcDim northing = structuralModels.getDim("northing");
+                netCDF::NcDim easting = structuralModels.getDim("easting");
+                netCDF::NcDim depth = structuralModels.getDim("depth");
+                m_width = static_cast<unsigned int>(northing.getSize());
+                m_height= static_cast<unsigned int>(easting.getSize());
+                m_depth = static_cast<unsigned int>(depth.getSize());
+                m_totalPoints = m_width * m_height * m_depth;
+                m_totalTetra = (m_width-1) * (m_height-1) * (m_depth-1) * 5;
 
-            netCDF::NcDim index = structuralModels.getDim("index");
-            netCDF::NcVar data = structuralModels.getVar("data");
-            std::vector<size_t> start;
-            start.push_back(0);
-            start.push_back(0);
-            start.push_back(0);
-            start.push_back(0);
-            std::vector<size_t> count;
-            count.push_back(m_width);
-            count.push_back(m_height);
-            count.push_back(m_depth);
-            count.push_back(1);
-            if (m_valueData) free(m_valueData);
-            m_valueData = static_cast<float*>(malloc(sizeof(float)*m_height*m_width*m_depth));
-            data.getVar(start,count,m_valueData);
+                netCDF::NcDim index = structuralModels.getDim("index");
+                netCDF::NcVar data = structuralModels.getVar("data");
+                std::vector<size_t> start;
+                start.push_back(0);
+                start.push_back(0);
+                start.push_back(0);
+                start.push_back(0);
+                std::vector<size_t> count;
+                count.push_back(m_width);
+                count.push_back(m_height);
+                count.push_back(m_depth);
+                count.push_back(1);
+                if (m_valueData) free(m_valueData);
+                m_valueData = static_cast<float*>(malloc(sizeof(float)*m_totalPoints));
+                data.getVar(start,count,m_valueData);
 
-            std::vector<netCDF::NcDim> indexDims;
-            start.clear();
-            start.push_back(0);
-            count.clear();
-            count.push_back(1);
-            netCDF::NcVar minValData = structuralModels.getVar("minVal");
-            minValData.getVar(start,count,&m_valmin);
-            netCDF::NcVar maxValData = structuralModels.getVar("maxVal");
-            maxValData.getVar(start,count,&m_valmax);
+                std::vector<netCDF::NcDim> indexDims;
+                start.clear();
+                start.push_back(0);
+                count.clear();
+                count.push_back(1);
+                netCDF::NcVar minValData = structuralModels.getVar("minVal");
+                minValData.getVar(start,count,&m_valmin);
+                netCDF::NcVar maxValData = structuralModels.getVar("maxVal");
+                maxValData.getVar(start,count,&m_valmax);
 
-            // Clean up
-            dataFile.close();
-            texturesValid = false;
-            dataChanged = true;
-            modelCreated = true;
+                // Clean up
+                dataFile.close();
+                dataChanged = true;
+                modelCreated = true;
+            }
+        } catch(netCDF::exceptions::NcException& e) {
+            qFatal("%s", e.what());
+            qFatal("Error creating file (%s)", filename.toStdString().c_str());
+            if (!dataFile.isNull()) dataFile.close();
+            result = 1;
         }
-    } catch(netCDF::exceptions::NcException& e) {
-        qFatal("%s", e.what());
-        qFatal("Error creating file (%s)", filename.toStdString().c_str());
-        if (!dataFile.isNull()) dataFile.close();
-        result = 1;
+        ProjectManagement* project =  ProjectManagement::instance();
+        m_xmin = (float)project->m_minEasting;
+        m_xmax = (float)project->m_maxEasting;
+        m_ymin = (float)project->m_minNorthing;
+        m_ymax = (float)project->m_maxNorthing;
+        m_zmin = (float)project->m_minDepth;
+        m_zmax = (float)project->m_maxDepth;
+        project->m_xsize = m_width;
+        project->m_ysize = m_height;
+        project->m_zsize = m_depth;
+        project->xsizeChanged();
+        project->ysizeChanged();
+        project->zsizeChanged();
+
+        updateStructureDataInViewer();
     }
-    ProjectManagement* project =  ProjectManagement::instance();
-    m_xmin = project->m_minEasting;
-    m_xmax = project->m_maxEasting;
-    m_ymin = project->m_minNorthing;
-    m_ymax = project->m_maxNorthing;
-    m_zmin = project->m_minDepth;
-    m_zmax = project->m_maxDepth;
     dataMutex.unlock();
     return result;
+}
+
+void StructuralModel::resetView()
+{
+    L3DViewer* viewer =  L3DViewer::instance();
+    viewer->setLookAtPosition(QVector3D((m_xmax-m_xmin)/2.0f,(m_ymax-m_ymin)/2.0f,(m_zmax-m_zmin)/2.0f));
+    viewer->setCameraOffsetCP(QVector3D(0.0f,10.0f,3.0f*(m_ymax-m_ymin)/2.0f));
 }
 
 void StructuralModel::createBasicTestStructure(unsigned int size)
@@ -269,9 +293,11 @@ void StructuralModel::createBasicTestStructure(unsigned int size)
     modelCreated = false;
     dataMutex.lock();
     {
-        m_xmin = m_ymin = m_zmin = -4000.0f;
+        m_xmin = m_ymin = m_zmin = 0.0f;
         m_xmax = m_ymax = m_zmax =  4000.0f;
         m_width = m_height = m_depth = size+1;
+        m_totalPoints = m_width * m_height * m_depth;
+        m_totalTetra = (m_width-1) * (m_height-1) * (m_depth-1) * 5;
 
         qDebug() << "Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
         // Allocate memory for textures
@@ -289,19 +315,48 @@ void StructuralModel::createBasicTestStructure(unsigned int size)
                         m_values.push_back(val);
                         m_valueData[i*getHeightUI()*getDepthUI() + j*getDepthUI() + k] = val;
                     }
-            texturesValid = false;
             dataChanged = true;
         }
+        updateStructureDataInViewer();
     }
     dataMutex.unlock();
 }
 
-void StructuralModel::loadTextures()
+void StructuralModel::updateStructureDataInViewer()
+{
+    L3DViewer* viewer =  L3DViewer::instance();
+    viewer->m_structureXMin = m_xmin;
+    viewer->m_structureXMax = m_xmax;
+    viewer->m_structureYMin = m_ymin;
+    viewer->m_structureYMax = m_ymax;
+    viewer->m_structureZMin = m_zmin;
+    viewer->m_structureZMax = m_zmax;
+    viewer->m_structureXSize = m_width;
+    viewer->m_structureYSize = m_height;
+    viewer->m_structureZSize = m_depth;
+    viewer->m_structureXStepSize = (m_xmax - m_xmin) / m_width;
+    viewer->m_structureYStepSize = (m_ymax - m_ymin) / m_height;
+    viewer->m_structureZStepSize = (m_zmax - m_zmin) / m_depth;
+    viewer->m_structureNumberTetraPerIsosurface = m_totalTetra;
+    viewer->allStructureChanged();
+    viewer->m_minScalarValue = m_valmin;
+    viewer->m_maxScalarValue = m_valmax;
+    viewer->minScalarValueChanged();
+    viewer->maxScalarValueChanged();
+    resetView();
+}
+
+int StructuralModel::loadTextures()
 {
     if (dataChanged) {
         qDebug() << "Setting up textures for displays";
+        ProjectManagement* project =  ProjectManagement::instance();
+        openGLContext = project->getQmlQuickView()->openglContext();
+        if (openGLContext == nullptr) return 0;
+
         dataMutex.lock();
         {
+            // QOpenGLTexture style
             if (valueTexture->isCreated()) {
                 valueTexture->destroy();
                 valueTexture->create();
@@ -314,16 +369,13 @@ void StructuralModel::loadTextures()
             valueTexture->allocateStorage(QOpenGLTexture::Red,QOpenGLTexture::Float32);
             valueTexture->setData(QOpenGLTexture::Red,QOpenGLTexture::Float32,static_cast<const void*>(m_valueData));
 
-            texturesValid = true;
+            QByteArray data((char*)(m_valueData),sizeof(float)*m_totalPoints);
+            m_sharedTexture->setTextureId(static_cast<int>(valueTexture->textureId()));
+
             dataChanged = false;
         }
         dataMutex.unlock();
+        return 1;
     }
-}
-
-void StructuralModel::bindTextures()
-{
-    if (texturesValid) {
-        valueTexture->bind(0);
-    }
+    return 0;
 }

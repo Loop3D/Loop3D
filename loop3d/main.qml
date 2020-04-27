@@ -1,22 +1,31 @@
-import QtQuick 2.12
-//import QtQuick.Window 2.13
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.12
+import QtQuick 2.14
+//import QtQuick.Window 2.14
+import QtQuick.Controls 2.14
+import QtQuick.Layouts 1.14
 import QtQuick.Dialogs 1.2
 import loop3d.projectmanagement 1.0
+import QtQuick.Scene3D 2.14
+//import Qt3D.Input 2.14
 
 Item {
     width: 1024
     height: 768
     id: mainWindow
     property int myBorders: 6
-    property string version: "1.0 x 10^-9"
+    property string version: "1.0 x 10^-8"
     property bool confirmOnQuit: false
     property bool hasFile: false
     property string headingFontStyle: "Arial"
     property int headingFontSize: 14
     property string defaultFontStyle: "Arial"
     property int defaultFontSize: 12
+    Scene3D {
+        id: mainScene3D
+        anchors.fill: parent
+        compositingMode: Scene3D.FBO
+    }
+    Isosurface { id: isosurface }
+
     MenuBar {
         id: menu
         height: 40
@@ -66,7 +75,7 @@ Item {
             MenuSeparator { }
             Action {
                 text: qsTr("&Close")
-                shortcut: "Ctrl+R"
+                shortcut: "Ctrl+W"
                 onTriggered: {
                     console.log("Extents currently are " + project.minLatitude + " " + project.maxLatitude + " " + project.minLongitude + " " + project.maxLongitude)
                 }
@@ -106,7 +115,10 @@ Item {
 //            TabButton { text: 'Geophysical Modelling' }
 //            TabButton { text: 'Post Processing' }
             TabButton { text: 'Data Viewer' }
-            onCurrentIndexChanged: project.mainIndex = currentIndex
+            onCurrentIndexChanged: {
+                project.mainIndex = currentIndex
+                if (currentIndex == 2) dataViewTab.forceActiveFocus()
+            }
         }
     }
 
@@ -126,6 +138,7 @@ Item {
 
     Rectangle {
         id: footer
+        visible: project.flowChoiceMade
         height: 30
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -140,6 +153,235 @@ Item {
                 text: "Loading..."
                 font.pointSize: 11
                 padding: 4
+            }
+        }
+    }
+
+    Rectangle {
+        id: flowChoiceArea
+        visible: !project.flowChoiceMade
+        anchors.top: menu.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        color: "#dddddd"
+        Rectangle {
+            id: flowArea
+            width: parent.width * 2/3
+            height: parent.height * 2/3
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "transparent"
+            Button {
+                width: 50
+                height: 100
+                anchors.right: flowArea.left
+                anchors.verticalCenter: loopStructuralFlow.verticalCenter
+                anchors.margins: 10
+                text: "<"
+                onClicked: {
+                    project.loopStructuralFlowOption = (project.loopStructuralFlowOption - 1) % 4
+                }
+            }
+            Button {
+                width: 50
+                height: 100
+                anchors.left: flowArea.right
+                anchors.verticalCenter: loopStructuralFlow.verticalCenter
+                anchors.margins: 10
+                text: ">"
+                onClicked: {
+                    project.loopStructuralFlowOption = (project.loopStructuralFlowOption + 1) % 4
+                }
+            }
+            Button {
+                width: 200
+                height: 100
+                enabled: project.flowChoice
+                text: "Confirm Selection"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                onClicked: project.flowChoiceMade = true
+            }
+
+            Rectangle {
+                id: loopStructuralFlow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                height: parent.height / 3
+                color: project.flowChoice === 1 ? "lightblue" : "white"
+                radius: 5
+                border.width: 2
+                border.color: "black"
+                clip: true
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: project.flowChoice = 1
+                }
+                Image {
+                    id: curvedArrow
+                    anchors.top: project.loopStructuralFlowOption === 0 ? parent.top : parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.margins: 5
+                    width: parent.width
+                    height: project.loopStructuralFlowOption < 2 ? parent.height : 0
+                    source: "qrc:images/curvedArrow.png"
+                    transform: Scale { yScale: project.loopStructuralFlowOption === 0? 1 : -1 }
+                }
+                Image {
+                    id: doubleCurvedArrow
+                    anchors.top: project.loopStructuralFlowOption === 2 ? parent.top : parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.margins: 5
+                    height: project.loopStructuralFlowOption < 2 ? 0 : parent.height
+                    source: "qrc:images/doubleCurvedArrow.png"
+                    transform: Scale { yScale: project.loopStructuralFlowOption === 2 ? 1 : -1 }
+                }
+
+                Text {
+                    text: "LoopStructural Flow"
+                    anchors.top: parent.top
+                    anchors.topMargin: 8
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Rectangle {
+                    width: parent.width / 4
+                    height: parent.height / 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.margins: 10
+                    color: "pink"
+                    border.width: 1
+                    border.color: "black"
+                    Text {
+                        text: "Data Collection"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                Rectangle {
+                    width: parent.width / 4
+                    height: parent.height / 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.margins: 10
+                    color: "lightgreen"
+                    border.width: 1
+                    border.color: "black"
+                    Text {
+                        text: "Uncertainty Analysis"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                Rectangle {
+                    width: parent.width / 4
+                    height: parent.height / 4
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.margins: 30
+                    color: "deepskyblue"
+                    border.width: 1
+                    border.color: "black"
+                    Text {
+                        text: "Loop Structural Modelling"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                Rectangle {
+                    width: parent.width / 4
+                    height: parent.height / 4
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 30
+                    color: "yellow"
+                    border.width: 1
+                    border.color: "black"
+                    Text {
+                        text: "Geophysical Modelling"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
+            Rectangle {
+                id: gempyFlow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: parent.height / 3
+                color: project.flowChoice === 2 ? "lightblue" : "white"
+                radius: 5
+                border.width: 2
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: project.flowChoice = 2
+                }
+                Text {
+                    text: "Gempy Flow"
+                    anchors.top: parent.top
+                    anchors.topMargin: 8
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Image {
+                    id: straightArrow
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    width: parent.width
+                    height: parent.height
+                    source: "qrc:images/straightArrow.png"
+                    smooth: true
+                }
+                Rectangle {
+                    width: parent.width / 4
+                    height: parent.height / 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.margins: 10
+                    color: "pink"
+                    border.width: 1
+                    border.color: "black"
+                    Text {
+                        text: "Data Collection"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                Rectangle {
+                    width: parent.width / 4
+                    height: parent.height / 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.margins: 10
+                    color: "lightgreen"
+                    border.width: 1
+                    border.color: "black"
+                    Text {
+                        text: "Uncertainty Analysis"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                Rectangle {
+                    width: parent.width / 4
+                    height: parent.height / 4
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: "yellow"
+                    border.width: 1
+                    border.color: "black"
+                    Text {
+                        text: "Gempy Modelling"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
             }
         }
     }

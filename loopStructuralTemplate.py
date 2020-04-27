@@ -1,8 +1,8 @@
 import LoopProjectFile
 from LoopStructural import GeologicalModel
 from LoopStructural.visualisation import LavaVuModelViewer
-import pandas as pd
-import numpy as np
+import pandas
+import numpy
 from pyamg import solve
 
 if ('loopFilename' not in vars() and 'loopFilename' not in globals()):
@@ -23,15 +23,15 @@ else:
 resp = LoopProjectFile.Get(loopFilename,"orientations")
 if resp["errorFlag"]: print(resp["errorString"])
 else: orientations = resp["value"]
-orientationsPd = pd.DataFrame(list(orientations),columns=["point","dipdir","dip","polarity","formation","layer"])
-points=pd.DataFrame(orientationsPd['point'].tolist(),columns=["X","Y","Z"])
-orientationsPd = pd.concat([points,orientationsPd.drop('point',1)],axis=1)
+orientationsPd = pandas.DataFrame(list(orientations),columns=["point","dipdir","dip","polarity","formation","layer"])
+points=pandas.DataFrame(orientationsPd['point'].tolist(),columns=["X","Y","Z"])
+orientationsPd = pandas.concat([points,orientationsPd.drop('point',1)],axis=1)
 # print(orientationsPd)
 
 resp = LoopProjectFile.Get(loopFilename,"stratigraphicLog")
 if resp["errorFlag"]: print(resp["errorString"])
 else: thickness = resp["value"]
-thicknessPd = pd.DataFrame(list(thickness),columns=["formation","thickness"])
+thicknessPd = pandas.DataFrame(list(thickness),columns=["formation","thickness"])
 thicknessDict = dict(thickness)
 # print(thicknessPd)
 # print(dict(thickness))
@@ -39,9 +39,9 @@ thicknessDict = dict(thickness)
 resp = LoopProjectFile.Get(loopFilename,"contacts")
 if resp["errorFlag"]: print(resp["errorString"])
 else: contacts = resp["value"]
-contactsPd = pd.DataFrame(list(contacts),columns=["point","formation"])
-points=pd.DataFrame(contactsPd['point'].tolist(),columns=["X","Y","Z"])
-contactsPd = pd.concat([points,contactsPd.drop('point',1)],axis=1)
+contactsPd = pandas.DataFrame(list(contacts),columns=["point","formation"])
+points=pandas.DataFrame(contactsPd['point'].tolist(),columns=["X","Y","Z"])
+contactsPd = pandas.concat([points,contactsPd.drop('point',1)],axis=1)
 # print(contactsPd)
 # print("\n\n\n",contactsPd["formation"][1])
 
@@ -58,22 +58,22 @@ for o in order:
         val+=thicknessDict[o]
 # print(strat_val)
 
-contactsPd['val'] = np.nan
+contactsPd['val'] = numpy.nan
 
 for o in strat_val:
     contactsPd.loc[contactsPd['formation']==o,'val'] = strat_val[o]
 # print(contactsPd)
-data = pd.concat([orientationsPd,contactsPd],sort=False)
-data['type'] = np.nan
+data = pandas.concat([orientationsPd,contactsPd],sort=False)
+data['type'] = numpy.nan
 for o in order:
     data.loc[data['formation']==o,'type'] = 's0'
 # print(data)
 
-# points=pd.DataFrame(data['point'].tolist(),columns=["X","Y","Z"])
+# points=pandas.DataFrame(data['point'].tolist(),columns=["X","Y","Z"])
 # print(points.shape)
 # print(data.drop('point',1).shape)
-# print(pd.concat([points,data.drop('point',1)],axis=0))
-boundary_points = np.zeros((2,3))
+# print(pandas.concat([points,data.drop('point',1)],axis=0))
+boundary_points = numpy.zeros((2,3))
 boundary_points[0,0] = boundaries[0]
 boundary_points[0,1] = boundaries[2]
 boundary_points[0,2] = boundaries[4]
@@ -113,14 +113,14 @@ strati = model.create_and_add_foliation('s0', #identifier in data frame
 #viewer.save("fdi_surfaces.png")
 #viewer.interactive()
 
-xcoords = np.linspace(model.bounding_box[0, 0], model.bounding_box[1, 0], model.nsteps[0])
-ycoords = np.linspace(model.bounding_box[0, 1], model.bounding_box[1, 1], model.nsteps[1])
-zcoords = np.linspace(model.bounding_box[1, 2], model.bounding_box[0, 2], model.nsteps[2])
-zz,xx,yy = np.meshgrid(zcoords,xcoords,ycoords,indexing='ij')
-locs = np.transpose([xx.flatten(),yy.flatten(),zz.flatten()])
+xcoords = numpy.linspace(model.bounding_box[0, 0], model.bounding_box[1, 0], model.nsteps[0])
+ycoords = numpy.linspace(model.bounding_box[0, 1], model.bounding_box[1, 1], model.nsteps[1])
+zcoords = numpy.linspace(model.bounding_box[1, 2], model.bounding_box[0, 2], model.nsteps[2])
+zz,xx,yy = numpy.meshgrid(zcoords,xcoords,ycoords,indexing='ij')
+locs = numpy.transpose([xx.flatten(),yy.flatten(),zz.flatten()])
 result = strati['feature'].evaluate_value(locs)
 
-LoopProjectFile.Set(loopFilename,"strModel",data=np.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
+LoopProjectFile.Set(loopFilename,"strModel",data=numpy.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
 
 import winsound
 duration = 200  # milliseconds

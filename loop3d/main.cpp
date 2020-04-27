@@ -4,8 +4,7 @@
 
 #include <pybind11/embed.h>
 
-#include "isosurface.h"
-
+#include "3dviewer.h"
 #include "pythontext.h"
 #include "utmconverter.h"
 #include "projectmanagement.h"
@@ -58,35 +57,37 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("loop3d.org");
 
     DataSourceList dataSourceList;
-
-    qmlRegisterType<Isosurface>("OpenGLUnderQML", 1, 0, "Isosurface");
+    L3DViewer* viewer = L3DViewer::instance();
 
     ProjectManagement* project = ProjectManagement::instance();
-    project->m_minLatitude = -33.6;
-    project->m_maxLatitude = -33.8;
+    project->m_minLatitude = -33.8;
+    project->m_maxLatitude = -33.6;
     project->m_minLongitude = 115.2;
     project->m_maxLongitude = 115.5;
+
     qmlRegisterUncreatableType<ProjectManagement>("loop3d.projectmanagement",1,0,"Project",
-                                               QStringLiteral("ProjectManagement shoudl not be created in QML"));
+                                               QStringLiteral("ProjectManagement should not be created in QML"));
+    qmlRegisterUncreatableType<L3DViewer>("loop3d.projectmanagement",1,0,"L3DViewer",
+                                               QStringLiteral("3DViewer should not be created in QML"));
+    qmlRegisterUncreatableType<DataSourceList>("loop3d.datasourcemodel",1,0,"DataSourceList",
+                                               QStringLiteral("DataSourceList should not be created in QML"));
+    qmlRegisterUncreatableType<EventList>("loop3d.eventmodel",1,0,"EventList",
+                                               QStringLiteral("EventList should not be created in QML"));
 
     qmlRegisterType<PythonText>("loop3d.pythontext",1,0,"PythonText");
-
     qmlRegisterType<LL>("loop3d.utmconverter",1,0,"LL");
     qmlRegisterType<UTM>("loop3d.utmconverter",1,0,"UTM");
     qmlRegisterType<LLExtents>("loop3d.utmconverter",1,0,"LLExtents");
     qmlRegisterType<UTMExtents>("loop3d.utmconverter",1,0,"UTMExtents");
-
     qmlRegisterType<DataSourceModel>("loop3d.datasourcemodel",1,0,"DataSourceModel");
-    qmlRegisterUncreatableType<DataSourceList>("loop3d.datasourcemodel",1,0,"DataSourceList",
-                                               QStringLiteral("DataSourceList should not be created in QML"));
     qmlRegisterType<EventModel>("loop3d.eventmodel",1,0,"EventModel");
-    qmlRegisterUncreatableType<EventList>("loop3d.eventmodel",1,0,"EventList",
-                                               QStringLiteral("EventList should not be created in QML"));
 
     QQuickView view;
+    project->setQmlQuickView(&view);
     view.rootContext()->setContextProperty(QStringLiteral("dataSourceList"), &dataSourceList);
     view.rootContext()->setContextProperty(QStringLiteral("eventList"), project->getEventList());
     view.rootContext()->setContextProperty(QStringLiteral("project"), project);
+    view.rootContext()->setContextProperty(QStringLiteral("viewer"), viewer);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:///main.qml"));
     view.show();
