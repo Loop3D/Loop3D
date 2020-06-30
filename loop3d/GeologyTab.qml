@@ -6,6 +6,10 @@ import loop3d.eventmodel 1.0
 
 Item {
     id: geologyTab
+    property int totalPermutations: 0
+    function calcPerms() { totalPermutations = eventList.calcPermutations() }
+
+    function repaint() { mycanvas.requestPaint() }
 
     Rectangle {
         border.color: "#ffffff"
@@ -109,8 +113,8 @@ Item {
 
                         onClicked: {
                             isActive = !isActive
-//                            eventList.sort()
                             eventsModel.sortEvents()
+                            calcPerms()
                             mycanvas.clearCanvas()
                             mycanvas.requestPaint()
                         }
@@ -153,6 +157,24 @@ Item {
                     globalMinAge = Math.floor(globalMinAge);
                     globalMaxAge = Math.ceil(globalMaxAge);
                     var globalAgeRange = globalMaxAge - globalMinAge;
+                    drawTimelineScale(ctx,globalMinAge,globalMaxAge);
+
+                    for (i = 0; i < eventsModel.countPBlocks();i++) {
+                        var perms = eventsModel.pBlockDataIndexed(i,"permutations");
+                        if (perms > 1) {
+                            ctx.save();
+                            var pBlockMinAge = eventsModel.pBlockDataIndexed(i,"minAge");
+                            var pBlockMaxAge = eventsModel.pBlockDataIndexed(i,"maxAge");
+                            var maxRank = eventsModel.pBlockDataIndexed(i,"maxRank");
+                            ctx.fillStyle = perms > 50 ? "#ef0000" :
+                                            perms > 20 ? "#aa3333" :
+                                            perms > 5  ? "#00efef" :
+                                            "#00aa00";
+                            ctx.translate(100-eventWidth,(1+pBlockMinAge-globalMinAge)*ageScale);
+                            ctx.fillRect(0,0,rankWidth*maxRank+2*eventWidth,(pBlockMaxAge - pBlockMinAge) * ageScale);
+                            ctx.restore();
+                        }
+                    }
 
                     for (i = 0; i < eventsModel.rowCount(); i++) {
                         ctx.save();
@@ -186,7 +208,6 @@ Item {
                         }
                         ctx.restore();
                     }
-                    drawTimelineScale(ctx,globalMinAge,globalMaxAge);
                 }
                 function drawTimelineScale(ctx,globalMinAge,globalMaxAge) {
                     ctx.save();
@@ -251,7 +272,6 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         detailsView.currentIndex = parent.whichSelected(mouseX,mouseY)
-                        notifyText.text =  parent.whichSelected(mouseX,mouseY)
                         mycanvas.requestPaint()
                     }
                 }
@@ -266,6 +286,13 @@ Item {
                 font.pixelSize: mainWindow.headingFontSize
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignTop
+            }
+            Text {
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.left: parent.left
+                height: 20
+                text: "Total Permutations: " + totalPermutations
             }
         }
 
@@ -342,6 +369,7 @@ Item {
                                 var eventID = eventsModel.dataIndexed(detailsView.currentIndex,"eventID")
                                 eventsModel.setDataIndexed(detailsView.currentIndex,text,"minAge")
                                 eventsModel.sortEvents()
+                                calcPerms()
                                 mycanvas.clearCanvas()
                                 detailsView.currentIndex = eventsModel.findEventByID(eventID)
                             }
@@ -373,6 +401,7 @@ Item {
                                 var eventID = eventsModel.dataIndexed(detailsView.currentIndex,"eventID")
                                 eventsModel.setDataIndexed(detailsView.currentIndex,text,"maxAge")
                                 eventsModel.sortEvents()
+                                calcPerms()
                                 mycanvas.clearCanvas()
                                 detailsView.currentIndex = eventsModel.findEventByID(eventID)
                             }
@@ -391,7 +420,6 @@ Item {
                             // TODO: remove file open when finished testing textures
                             if (!hasFile) fileDialogOpen.open()
                             else {
-//                                pythonText.run(textArea.text,project.filename,true)
                                 pythonText.run(textArea.text,project.filename,false)
                                 project.reloadProject()
                                 bar.currentIndex = 2
@@ -437,11 +465,9 @@ Item {
                             // TODO: remove file open when finished testing textures
                             if (!hasFile) fileDialogOpen.open()
                             else {
-//                                pythonText.run(textArea.text,project.filename,true)
                                 pythonText.run(textArea.text,project.filename,false)
                                 bar.currentIndex = 2
                                 project.reloadProject()
-//                                gtDetailsBar.currentIndex = 2
                             }
                         }
                     }

@@ -6,7 +6,11 @@
 #include <QtQuick/QQuickView>
 #include "utmconverter.h"
 #include "structuralmodel.h"
+#include "eventpermutation.h"
 #include "eventlist.h"
+
+#include "LoopProjectFileUtils.h"
+#include "LoopProjectFile.h"
 
 class ProjectManagement : public QQuickItem
 {
@@ -138,6 +142,8 @@ class ProjectManagement : public QQuickItem
         QQuickView *m_qmlView;
 
         StructuralModel stModel;
+        std::map<int,StructuralModel*> structuralModelMap;
+        std::map<int,EventPermutation*> permutationMap;
         EventList eventList;
 };
 

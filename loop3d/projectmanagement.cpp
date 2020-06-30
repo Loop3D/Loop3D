@@ -74,68 +74,61 @@ int ProjectManagement::saveProject(QString filename)
     if (filename == "") {
         filename = m_filename;
     }
+    qDebug() << "Saving to file " << filename;
     checkUTMLimits();
+//    int64_t inUtm = m_inUtm;
 
-    netCDF::NcFile dataFile;
-    try {
-        // Find last '/' of the first set of '/'s as in file:/// or url:///
-        QStringList list;
-        QString name;
-        int64_t inUtm = m_inUtm;
-
+    QStringList list;
+    QString name;
+    // Find last '/' of the first set of '/'s as in file:/// or url:///
 #ifdef _WIN32
-        list = filename.split(QRegExp("///"));
-        name = (list.length() > 1 ? list[1] : list[0]);
+    list = filename.split(QRegExp("///"));
+    name = (list.length() > 1 ? list[1] : list[0]);
 #elif __linux__
-        list = filename.split(QRegExp("///"));
-        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+    list = filename.split(QRegExp("///"));
+    name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
-        struct stat bf;
-        // Check whether file exists
-        bool loopFileExists = stat(name.toStdString().c_str(), &bf) == 0;
-        // If extents have changed or file doesn't exist replace entire file
-        if (m_extentsChanged || !loopFileExists) {
-            dataFile.open(name.toStdString().c_str(), netCDF::NcFile::replace);
-        } else {
-            dataFile.open(name.toStdString().c_str(), netCDF::NcFile::write);
+
+    struct stat bf;
+    // Check whether file exists
+    bool loopFileExists = stat(name.toStdString().c_str(), &bf) == 0;
+
+    LoopProjectFileResponse resp = {0,""};
+    if (!loopFileExists) {
+        resp = LoopProjectFile::CreateBasicFile(name.toStdString());
+        if (resp.errorCode) {
+            std::cout << resp.errorMessage << std::endl;
+            return 1;
         }
-
-        // Save global information
-        dataFile.putAtt("loopMajorVersion",netCDF::ncInt64,0);
-        dataFile.putAtt("loopMinorVersion",netCDF::ncInt64,0);
-        dataFile.putAtt("loopSubVersion",netCDF::ncInt64,1);
-        dataFile.putAtt("minLatitude",netCDF::ncDouble,m_minLatitude);
-        dataFile.putAtt("maxLatitude",netCDF::ncDouble,m_maxLatitude);
-        dataFile.putAtt("minLongitude",netCDF::ncDouble,m_minLongitude);
-        dataFile.putAtt("maxLongitude",netCDF::ncDouble,m_maxLongitude);
-        dataFile.putAtt("minNorthing",netCDF::ncDouble,m_minNorthing);
-        dataFile.putAtt("maxNorthing",netCDF::ncDouble,m_maxNorthing);
-        dataFile.putAtt("minEasting",netCDF::ncDouble,m_minEasting);
-        dataFile.putAtt("maxEasting",netCDF::ncDouble,m_maxEasting);
-        dataFile.putAtt("minDepth",netCDF::ncDouble,m_minDepth);
-        dataFile.putAtt("maxDepth",netCDF::ncDouble,m_maxDepth);
-        dataFile.putAtt("utmZone",netCDF::ncInt64,m_utmZone);
-        dataFile.putAtt("utmNorthSouth",netCDF::ncInt64,m_utmNorthSouth);
-        dataFile.putAtt("spacingX",netCDF::ncInt64,m_spacingX);
-        dataFile.putAtt("spacingY",netCDF::ncInt64,m_spacingY);
-        dataFile.putAtt("spacingZ",netCDF::ncInt64,m_spacingZ);
-        dataFile.putAtt("workingFormat",netCDF::ncInt64,inUtm);
-
-        dataFile.close();
-
-        // Save structural data
-        stModel.saveToFile(filename);
-
-        // Data file opened so save filename
-        m_filename = filename;
-        filenameChanged();
-
-    } catch(netCDF::exceptions::NcException& e) {
-        qFatal("%s", e.what());
-        qFatal("Error creating file (%s)", filename.toStdString().c_str());
-        if (!dataFile.isNull()) dataFile.close();
+    }
+    LoopProjectFile::LoopExtents extents;
+    extents.minLatitude = m_minLatitude;
+    extents.maxLatitude = m_maxLatitude;
+    extents.minLongitude = m_minLongitude;
+    extents.maxLongitude = m_maxLongitude;
+    extents.minEasting = m_minEasting;
+    extents.maxEasting = m_maxEasting;
+    extents.minNorthing = m_minNorthing;
+    extents.maxNorthing = m_maxNorthing;
+    extents.minDepth = m_minDepth;
+    extents.maxDepth = m_maxDepth;
+    extents.utmZone = m_utmZone;
+    extents.utmNorthSouth = m_utmNorthSouth;
+    extents.spacingX = m_spacingX;
+    extents.spacingY = m_spacingY;
+    extents.spacingZ = m_spacingZ;
+    extents.workingFormat = m_inUtm;
+    resp = LoopProjectFile::SetExtents(name.toStdString(),extents,true);
+    if (resp.errorCode) {
+        qDebug() << resp.errorMessage.c_str();
         return 1;
     }
+
+    m_filename = filename;
+    filenameChanged();
+
+    stModel.saveToFile(filename);
+    eventList.saveToFile(filename);
 
     m_extentsChanged = false;
     return 0;
@@ -146,81 +139,62 @@ int ProjectManagement::loadProject(QString filename)
     if (filename == "") {
         return 1;
     }
-    netCDF::NcFile dataFile;
-    try {
-        // Load variables to staging area to confirm all loaded in
-        double minLatitude, maxLatitude, minLongitude, maxLongitude;
-        double minNorthing, maxNorthing, minEasting, maxEasting;
-        double minDepth, maxDepth;
-        int64_t utmZone, utmNorthSouth;
-        int64_t spacingX, spacingY, spacingZ;
-        int64_t inUtm;
 
-        QStringList list;
-        QString name;
+    QStringList list;
+    QString name;
 
 #ifdef _WIN32
-        list = filename.split(QRegExp("///"));
-        name = (list.length() > 1 ? list[1] : list[0]);
+    list = filename.split(QRegExp("///"));
+    name = (list.length() > 1 ? list[1] : list[0]);
 #elif __linux__
-        list = filename.split(QRegExp("///"));
-        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+    list = filename.split(QRegExp("///"));
+    name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-        dataFile.open(name.toStdString().c_str(), netCDF::NcFile::read);
-
-        dataFile.getAtt("minLatitude").getValues(&minLatitude);
-        dataFile.getAtt("maxLatitude").getValues(&maxLatitude);
-        dataFile.getAtt("minLongitude").getValues(&minLongitude);
-        dataFile.getAtt("maxLongitude").getValues(&maxLongitude);
-        dataFile.getAtt("minNorthing").getValues(&minNorthing);
-        dataFile.getAtt("maxNorthing").getValues(&maxNorthing);
-        dataFile.getAtt("minEasting").getValues(&minEasting);
-        dataFile.getAtt("maxEasting").getValues(&maxEasting);
-        dataFile.getAtt("utmZone").getValues(&utmZone);
-        dataFile.getAtt("utmNorthSouth").getValues(&utmNorthSouth);
-        dataFile.getAtt("minDepth").getValues(&minDepth);
-        dataFile.getAtt("maxDepth").getValues(&maxDepth);
-        dataFile.getAtt("spacingX").getValues(&spacingX);
-        dataFile.getAtt("spacingY").getValues(&spacingY);
-        dataFile.getAtt("spacingZ").getValues(&spacingZ);
-        dataFile.getAtt("workingFormat").getValues(&inUtm);
-
-        dataFile.close();
-
-        // All loaded to set values into structure
-        m_utmZone = static_cast<int>(utmZone);
-        m_utmNorthSouth = static_cast<int>(utmNorthSouth);
-        m_utmNorthSouthStr = (utmNorthSouth == -1 ? "-" : (utmNorthSouth == 1 ? "N" : "S"));
-        m_minNorthing = minNorthing;
-        m_maxNorthing = maxNorthing;
-        m_minEasting = minEasting;
-        m_maxEasting = maxEasting;
-        m_minDepth = minDepth;
-        m_maxDepth = maxDepth;
-        m_spacingX = static_cast<unsigned int>(spacingX);
-        m_spacingY = static_cast<unsigned int>(spacingY);
-        m_spacingZ = static_cast<unsigned int>(spacingZ);
-        m_inUtm = static_cast<bool>(inUtm);
-        updateGeodeticLimits(minLatitude,maxLatitude,minLongitude,maxLongitude);
-
-        minDepthChanged(); maxDepthChanged();
-        spacingXChanged(); spacingYChanged(); spacingZChanged();
-        inUtmChanged();
-        // Data file all working so save filename
-        m_filename = filename;
-        filenameChanged();
-
-        // Load structural data
-        stModel.loadFromFile(filename);
-        eventList.loadFromFile(filename);
-
-    } catch(netCDF::exceptions::NcException& e) {
-        qFatal("%s", e.what());
-        qFatal("Error loading file (%s)", filename.toStdString().c_str());
-        if (!dataFile.isNull()) dataFile.close();
+    struct stat bf;
+    // Check whether file exists
+    bool loopFileExists = stat(name.toStdString().c_str(), &bf) == 0;
+    if (!loopFileExists) {
+        std::cout << "Loop Project file " << name.toStdString() << " does not exist!" << std::endl;
         return 1;
     }
+
+    LoopProjectFileResponse resp = {0,""};
+    LoopProjectFile::LoopExtents extents;
+    resp = LoopProjectFile::GetExtents(name.toStdString(),extents,true);
+    if (resp.errorCode) {
+        qDebug() << resp.errorMessage.c_str();
+        return 1;
+    }
+    m_minLatitude = extents.minLatitude;
+    m_maxLatitude = extents.maxLatitude;
+    m_minLongitude = extents.minLongitude;
+    m_maxLongitude = extents.maxLongitude;
+    m_minEasting = extents.minEasting;
+    m_maxEasting = extents.maxEasting;
+    m_minNorthing = extents.minNorthing;
+    m_maxNorthing = extents.maxNorthing;
+    m_minDepth = extents.minDepth;
+    m_maxDepth = extents.maxDepth;
+    m_spacingX = static_cast<unsigned int>(extents.spacingX);
+    m_spacingY = static_cast<unsigned int>(extents.spacingY);
+    m_spacingZ = static_cast<unsigned int>(extents.spacingZ);
+    m_utmZone = extents.utmZone;
+    m_utmNorthSouth = extents.utmNorthSouth;
+    m_inUtm = extents.workingFormat;
+
+    updateGeodeticLimits(m_minLatitude,m_maxLatitude,m_minLongitude,m_maxLongitude);
+    minDepthChanged(); maxDepthChanged();
+    spacingXChanged(); spacingYChanged(); spacingZChanged();
+    inUtmChanged();
+    // Data file all working so save filename
+    m_filename = filename;
+    filenameChanged();
+
+    // Load structural data
+    stModel.loadFromFile(filename);
+    eventList.loadFromFile(filename);
+
     m_extentsChanged = false;
     return 0;
 }
@@ -291,13 +265,13 @@ void ProjectManagement::convertUTMToGeodetic(void)
 
 void ProjectManagement::loadTextures()
 {
-    if (getStModel()->loadTextures()) sharedTextureIdChanged();
+    if (getStModel() && getStModel()->loadTextures()) sharedTextureIdChanged();
 }
 
-//Qt3DRender::QTexture3D *ProjectManagement::getStructuralModelData()
 Qt3DRender::QSharedGLTexture *ProjectManagement::getStructuralModelData()
 {
-    return getStModel()->getStructuralData();
+    if (getStModel()) return getStModel()->getStructuralData();
+    else return nullptr;
 }
 
 void ProjectManagement::checkGeodeticLimits()
@@ -332,6 +306,8 @@ void ProjectManagement::checkUTMLimits()
     }
 }
 
+
+// Not implemented
 void ProjectManagement::downloadData(QString url, QString datatype)
 {
     if (datatype == "netCDF") {

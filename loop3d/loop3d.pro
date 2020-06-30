@@ -25,16 +25,20 @@ linux {
     INCLUDEPATH += $$(VCPKGINSTALL)/include
     INCLUDEPATH += $$(PYTHONHOME)/include
     INCLUDEPATH += $$(PYTHONHOME)/Library/include
+    INCLUDEPATH += $$(LOOPPROJECTFILECPP)
 }
 
 linux {
     LIBS += -lpython3.7m -lnetcdf -lnetcdf_c++4
 } else :win32 {
+    LIBS += -L$$(LOOPPROJECTFILECPP)
     CONFIG(debug, debug|release) {
         LIBS += -L$$(VCPKGINSTALL)/debug/lib
+        LIBS += -lLoopProjectFileCppD
     }
     CONFIG(release, debug|release) {
         LIBS += -L$$(VCPKGINSTALL)/lib
+        LIBS += -lLoopProjectFileCpp
     }
     LIBS += -L$$(PYTHONHOME)/libs
     LIBS += -L$$(PYTHONHOME)/Lib
@@ -49,6 +53,7 @@ SOURCES += \
         datasourcemodel.cpp \
         eventlist.cpp \
         eventmodel.cpp \
+        eventpermutation.cpp \
         main.cpp \
         projectmanagement.cpp \
         pythonhighlighter.cpp \
@@ -77,6 +82,7 @@ HEADERS += \
     datasourcemodel.h \
     eventlist.h \
     eventmodel.h \
+    eventpermutation.h \
     projectmanagement.h \
     pythonhighlighter.h \
     pythontext.h \

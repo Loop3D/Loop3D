@@ -12,7 +12,7 @@ Item {
     height: 768
     id: mainWindow
     property int myBorders: 6
-    property string version: "1.0 x 10^-8"
+    property string version: "0.0.3"
     property bool confirmOnQuit: false
     property bool hasFile: false
     property string headingFontStyle: "Arial"
@@ -421,6 +421,9 @@ Item {
                 hasFile = true
                 dcTab.roiReproject()
                 dcTab.reCentreMap()
+                project.flowChoiceMade = true
+                geologyTab.repaint()
+                geologyTab.calcPerms()
             } else {
                 notifyText.text = "ERROR loading project " + fileDialogOpen.fileUrl
             }

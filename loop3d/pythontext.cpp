@@ -85,7 +85,7 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
             qDebug() << xsteps << " " << ysteps << " " << zsteps;
             if (ProjectManagement::instance()) {
                 ProjectManagement* proj = ProjectManagement::instance();
-                ProjectManagement::instance()->getStModel()->loadData(result,
+                if (proj->getStModel()) proj->getStModel()->loadData(result,
                             static_cast<float>(proj->m_minEasting), static_cast<float>(proj->m_maxEasting), xsteps,
                             static_cast<float>(proj->m_minNorthing), static_cast<float>(proj->m_maxNorthing), ysteps,
                             static_cast<float>(proj->m_minDepth),static_cast<float>(proj->m_maxDepth),zsteps);
@@ -93,6 +93,7 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
                 qFatal("No global project pointer (NEED TO FIX THIS NOW!)");
             }
         }
+        qDebug() << "Finished python code exec in file " << name;
     } catch (std::exception& e) {
         qDebug() << e.what();
         qDebug() << "Failed to run python code";

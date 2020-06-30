@@ -187,3 +187,24 @@ int EventModel::findEventByID(int eventID)
     }
     return -1;
 }
+
+
+int EventModel::countPBlocks(void) const
+{
+    return events->getPermutationBlocks().size();
+}
+
+QVariant EventModel::pBlockDataIndexed(int index, QString role) const
+{
+    if (index < 0 || index > events->getPermutationBlocks().size() ) return QVariant();
+    const PermutationBlock item = events->getPermutationBlocks().at(index);
+    if (role == "minAge") {
+        return QVariant(item.minAge);
+    } else if (role == "maxAge") {
+        return QVariant(item.maxAge);
+    } else if (role == "permutations") {
+        return QVariant(item.permutations);
+    } else if (role == "maxRank") {
+        return QVariant(item.maxRank);
+    } else return QVariant();
+}

@@ -4,9 +4,7 @@
 #include <limits>
 #include <Qt3DRender/QTexture>
 #include <QOffscreenSurface>
-
 #include <QDebug>
-#include <netcdf>
 
 #define TEST_GRID_SIZE 50
 
@@ -101,86 +99,30 @@ int StructuralModel::saveToFile(QString filename)
 {
     int result = 0;
     if (!modelCreated) return result;
-    dataMutex.lock();
-    netCDF::NcFile dataFile;
-    try {
-        // Find last '/' of the first set of '/'s as in file:/// or url:///
-        QStringList list;
-        QString name;
 
+    // Find last '/' of the first set of '/'s as in file:/// or url:///
+    QStringList list;
+    QString name;
 #ifdef _WIN32
-        list = filename.split(QRegExp("///"));
-        name = (list.length() > 1 ? list[1] : list[0]);
+    list = filename.split(QRegExp("///"));
+    name = (list.length() > 1 ? list[1] : list[0]);
 #elif __linux__
-        list = filename.split(QRegExp("///"));
-        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+    list = filename.split(QRegExp("///"));
+    name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-        dataFile.open(name.toStdString().c_str(), netCDF::NcFile::write);
-        netCDF::NcGroup structuralModels = dataFile.getGroup("StructuralModels");
-        netCDF::NcDim northing;
-        netCDF::NcDim easting;
-        netCDF::NcDim depth;
-        netCDF::NcDim index;
-        if (!structuralModels.isNull()) {
-            northing = structuralModels.getDim("northing");
-            easting = structuralModels.getDim("easting");
-            depth = structuralModels.getDim("depth");
-            index = structuralModels.getDim("index");
-            if (northing.getSize() != m_width || easting.getSize() != m_height || depth.getSize() != m_depth) {
-                dataFile.close();
-                //throw std::exception("Non matching dimensions between file and structural data");
-            }
-        } else {
-            structuralModels = dataFile.addGroup("StructuralModels");
-            northing = structuralModels.addDim("northing",m_width);
-            easting = structuralModels.addDim("easting",m_height);
-            depth = structuralModels.addDim("depth",m_depth);
-            index = structuralModels.addDim("index");
-        }
-        std::vector<netCDF::NcDim> dims;
-        dims.push_back(northing);
-        dims.push_back(easting);
-        dims.push_back(depth);
-        dims.push_back(index);
-        netCDF::NcVar data = structuralModels.getVar("data");
-        if (data.isNull()) {
-            data = structuralModels.addVar("data",netCDF::ncFloat,dims);
-            data.setCompression(true, true, 9);
-        }
-        std::vector<size_t> start, count;
-        start.push_back(0);
-        start.push_back(0);
-        start.push_back(0);
-        start.push_back(0);
-        count.push_back(m_width);
-        count.push_back(m_height);
-        count.push_back(m_depth);
-        count.push_back(1);
-        data.putVar(start,count,m_valueData);
+    dataMutex.lock();
 
-        std::vector<netCDF::NcDim> indexDims;
-        start.clear();
-        start.push_back(0);
-        count.clear();
-        count.push_back(1);
-        netCDF::NcVar minValData = structuralModels.getVar("minVal");
-        if (minValData.isNull()) minValData = structuralModels.addVar("minVal",netCDF::ncFloat,indexDims);
-        minValData.putVar(start,count,&m_valmin);
-        netCDF::NcVar maxValData = structuralModels.getVar("maxVal");
-        if (maxValData.isNull()) maxValData = structuralModels.addVar("maxVal",netCDF::ncFloat,indexDims);
-        maxValData.putVar(start,count,&m_valmax);
-        dataFile.close();
-    } catch(netCDF::exceptions::NcException& e) {
-        qDebug("%s", e.what());
-        qDebug("Error creating file (%s)", filename.toStdString().c_str());
-        if (!dataFile.isNull()) dataFile.close();
-        result = 1;
-    } catch(std::exception& e) {
-        qDebug("%s", e.what());
-        qDebug("Error creating file (%s)", filename.toStdString().c_str());
-        if (!dataFile.isNull()) dataFile.close();
-        result = 1;
+    std::vector<float> data(m_valueData,m_valueData + m_width*m_height*m_depth);
+    std::vector<int> dataShape;
+    dataShape.push_back(m_width);
+    dataShape.push_back(m_height);
+    dataShape.push_back(m_depth);
+    LoopProjectFileResponse resp = {0,""};
+    resp = LoopProjectFile::SetStructuralModel(name.toStdString(),data,dataShape,0,true);
+    if (resp.errorCode) {
+        qDebug() << resp.errorMessage.c_str();
+        return 1;
     }
 
     dataMutex.unlock();
@@ -191,75 +133,48 @@ int StructuralModel::loadFromFile(QString filename)
 {
 
     int result = 0;
-    dataMutex.lock();
-    {
-        netCDF::NcFile dataFile;
-        try {
-            // Find last '/' of the first set of '/'s as in file:/// or url:///
-            QStringList list;
-            QString name;
+    // Find last '/' of the first set of '/'s as in file:/// or url:///
+    QStringList list;
+    QString name;
 
 #ifdef _WIN32
-            list = filename.split(QRegExp("///"));
-            name = (list.length() > 1 ? list[1] : list[0]);
+    list = filename.split(QRegExp("///"));
+    name = (list.length() > 1 ? list[1] : list[0]);
 #elif __linux__
-            list = filename.split(QRegExp("///"));
-            name = "/" + (list.length() > 1 ? list[1] : list[0]);
+    list = filename.split(QRegExp("///"));
+    name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-            dataFile.open(name.toStdString().c_str(), netCDF::NcFile::read);
+    dataMutex.lock();
+    {
+        std::vector<float> data;
+        std::vector<int> dataShape;
+        LoopProjectFileResponse resp = {0,""};
+        resp = LoopProjectFile::GetStructuralModel(name.toStdString(),data,dataShape,0,true);
+        if (resp.errorCode) {
+            qDebug() << resp.errorMessage.c_str();
+        } else {
+            m_width = dataShape[0];
+            m_height = dataShape[1];
+            m_depth = dataShape[2];
+            m_totalPoints = m_width * m_height * m_depth;
+            qDebug() << "Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
+            m_totalTetra = (m_width-1) * (m_height-1) * (m_depth-1) * 5;
+            if (m_valueData) free(m_valueData);
+            m_valueData = static_cast<float*>(malloc(sizeof(float)*m_totalPoints));
+            for (unsigned int i=0;i<data.size();i++) m_valueData[i] = data.data()[i];
 
-            netCDF::NcGroup structuralModels = dataFile.getGroup("StructuralModels");
-            if (structuralModels.isNull()) {
-                qDebug() << "No Structural Models Group in netCDF file";
-                modelCreated = false;
-            } else {
-                netCDF::NcDim northing = structuralModels.getDim("northing");
-                netCDF::NcDim easting = structuralModels.getDim("easting");
-                netCDF::NcDim depth = structuralModels.getDim("depth");
-                m_width = static_cast<unsigned int>(northing.getSize());
-                m_height= static_cast<unsigned int>(easting.getSize());
-                m_depth = static_cast<unsigned int>(depth.getSize());
-                m_totalPoints = m_width * m_height * m_depth;
-                m_totalTetra = (m_width-1) * (m_height-1) * (m_depth-1) * 5;
-
-                netCDF::NcDim index = structuralModels.getDim("index");
-                netCDF::NcVar data = structuralModels.getVar("data");
-                std::vector<size_t> start;
-                start.push_back(0);
-                start.push_back(0);
-                start.push_back(0);
-                start.push_back(0);
-                std::vector<size_t> count;
-                count.push_back(m_width);
-                count.push_back(m_height);
-                count.push_back(m_depth);
-                count.push_back(1);
-                if (m_valueData) free(m_valueData);
-                m_valueData = static_cast<float*>(malloc(sizeof(float)*m_totalPoints));
-                data.getVar(start,count,m_valueData);
-
-                std::vector<netCDF::NcDim> indexDims;
-                start.clear();
-                start.push_back(0);
-                count.clear();
-                count.push_back(1);
-                netCDF::NcVar minValData = structuralModels.getVar("minVal");
-                minValData.getVar(start,count,&m_valmin);
-                netCDF::NcVar maxValData = structuralModels.getVar("maxVal");
-                maxValData.getVar(start,count,&m_valmax);
-
-                // Clean up
-                dataFile.close();
-                dataChanged = true;
-                modelCreated = true;
+            // Calculate Min and Max value
+            m_valmin = std::numeric_limits<float>::max();
+            m_valmax = std::numeric_limits<float>::min();
+            for (unsigned int i=0;i<m_totalPoints;i++) {
+                if (m_valueData[i] < m_valmin) m_valmin = m_valueData[i];
+                if (m_valueData[i] > m_valmax) m_valmax = m_valueData[i];
             }
-        } catch(netCDF::exceptions::NcException& e) {
-            qFatal("%s", e.what());
-            qFatal("Error creating file (%s)", filename.toStdString().c_str());
-            if (!dataFile.isNull()) dataFile.close();
-            result = 1;
+            dataChanged = true;
+            modelCreated = true;
         }
+
         ProjectManagement* project =  ProjectManagement::instance();
         m_xmin = (float)project->m_minEasting;
         m_xmax = (float)project->m_maxEasting;

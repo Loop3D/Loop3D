@@ -280,45 +280,37 @@ m2l_interpolation.save_contact_vectors(data_dir+"/tmp/basal_contacts.shp",
 m2l_geometry.calc_thickness(data_dir+"/tmp/",data_dir+"/output/",5000,10000,c_l)
 m2l_geometry.normalise_thickness(data_dir+"/output/")
 
-# Send outputs to loop Project File
-orientations = pandas.read_csv(data_dir+"/output/orientations.csv")
-orientations['layer'] = "s0"
-orientationsData = list(zip(list(zip(orientations['X'],orientations['Y'],orientations['Z'])),
-  orientations['azimuth'],orientations['dip'],orientations['polarity'],orientations['formation'],
-  orientations['layer']))
-resp = LoopProjectFile.Set(loopFilename,"orientations",data=orientationsData,verbose=True)
-if resp["errorFlag"]: print(resp["errorString"])
 
-# contacts are a location and which formation it is on
-contacts = pandas.read_csv(data_dir+"/output/contacts4.csv")
-contactsData = list(zip(list(zip(contacts['X'],contacts['Y'],contacts['Z'])),contacts['formation']))
-resp = LoopProjectFile.Set(loopFilename,"contacts",data=contactsData,verbose=True)
-if resp["errorFlag"]: print(resp["errorString"])
+
+################ Sending outputs to loop Project File #########################
 
 # used to give a mean width of each formation
 stratigraphicLayers = pandas.read_csv(data_dir+"/output/formation_thicknesses.csv")
 thickness = {}
-for f in stratigraphicLayers['formation'].unique():
+uniqueLayers = stratigraphicLayers['formation'].unique()
+for f in uniqueLayers:
     thickness[f] = numpy.mean(stratigraphicLayers[stratigraphicLayers['formation']==f]['thickness'])
-stratigraphicLogData = list(zip(thickness.keys(),thickness.values()))
+stratigraphicLogData = numpy.zeros(uniqueLayers.shape[0],LoopProjectFile.stratigraphicLayerType)
+stratigraphicLogData['layerId'] = range(uniqueLayers.shape[0])
+stratigraphicLogData['layerId'] += 1
+stratigraphicLogData['minAge'] = range(uniqueLayers.shape[0])
+stratigraphicLogData['maxAge'] = range(uniqueLayers.shape[0])
+stratigraphicLogData['maxAge'] += 0.5
+stratigraphicLogData['formation'] = uniqueLayers
+stratigraphicLogData['thickness'] = list(thickness.values())
 resp = LoopProjectFile.Set(loopFilename,"stratigraphicLog",data=stratigraphicLogData,verbose=True)
 if resp["errorFlag"]: print(resp["errorString"])
 
 faults = pandas.read_csv(data_dir+"/output/fault_orientations.csv")
-faultsData = list(zip(list(zip(faults['X'],faults['Y'],faults['Z'])),faults['DipDirection'],
-                faults['dip'],faults['DipPolarity'],faults['formation'],faults['formation']))
-resp = LoopProjectFile.Set(loopFilename,"orientationsAmend",data=faultsData,verbose=True)
-if resp["errorFlag"]: print(resp["errorString"])
-
-#faultEvents = pandas.read_csv(data_dir+"/output/fault_orientations.csv")
 faultEvents = numpy.zeros(faults.shape[0],LoopProjectFile.faultEventType)
-faultEvents['name'] = faults['formation']
+faultEvents['name'] = faults['formation']  # The fault eventId is called formation for some reason
 faultEvents['enabled'] = 0
 faultEvents['minAge'] = numpy.arange(1.0,7.0, 6.0/faults.shape[0])
 faultEvents['maxAge'] = faultEvents['minAge']
-tmp = faults['formation']
+faultEvents['avgDisplacement'] = 0
 for i in range(faultEvents.size):
-    tmp[i] = re.sub('.*_','',faults['formation'][i])
+    faults.loc[i,'formation'] = re.sub('.*_','',faults['formation'][i])
+tmp = faults['formation']
 faultEvents['eventId'] = tmp 
 
 tmp = faultsClip[~faultsClip['fname'].isnull()]
@@ -338,6 +330,57 @@ for row in faultEvents:
 
 resp = LoopProjectFile.Set(loopFilename,"faultLog",data=faultEvents,verbose=False)
 if resp["errorFlag"]: print(resp["errorString"])
+
+faultsData = numpy.zeros(faults.shape[0],LoopProjectFile.faultObservationType)
+faultsData['eventId'] = faults['formation']
+faultsData['easting'] = faults['X']
+faultsData['northing'] = faults['Y']
+faultsData['altitude'] = faults['Z']
+faultsData['dipDir'] = faults['DipDirection']
+faultsData['dip'] = faults['dip']
+faultsData['dipPolarity'] = faults['DipPolarity']
+resp = LoopProjectFile.Set(loopFilename,"faultObservations",data=faultsData,verbose=True)
+if resp["errorFlag"]: print(resp["errorString"])
+
+# each contact contains a location and which formation it is on
+contacts = pandas.read_csv(data_dir+"/output/contacts4.csv")
+layerIds = []
+for form in contacts['formation']:
+    a = bytes(form,'ascii')
+    if a in stratigraphicLogData['formation']:
+        layerIds.append(int(stratigraphicLogData[stratigraphicLogData['formation']==a]['layerId']))
+    else:
+        layerIds.append(0)
+contactsData = numpy.zeros(contacts.shape[0],LoopProjectFile.contactObservationType)
+contactsData['layerId'] = layerIds
+contactsData['easting'] = contacts['X']
+contactsData['northing'] = contacts['Y']
+contactsData['altitude'] = contacts['Z']
+resp = LoopProjectFile.Set(loopFilename,"contacts",data=contactsData,verbose=True)
+if resp["errorFlag"]: print(resp["errorString"])
+
+observations = pandas.read_csv(data_dir+"/output/orientations.csv")
+layerIds = []
+for form in observations['formation']:
+    a = bytes(form,'ascii')
+    if a in stratigraphicLogData['formation']:
+        layerIds.append(int(stratigraphicLogData[stratigraphicLogData['formation']==a]['layerId']))
+    else:
+        layerIds.append(0)
+observations['layer'] = "s0"
+observationsData = numpy.zeros(observations.shape[0],LoopProjectFile.stratigraphicObservationType)
+observationsData['layerId'] = layerIds
+observationsData['easting'] = observations['X']
+observationsData['northing'] = observations['Y']
+observationsData['altitude'] = observations['Z']
+observationsData['dipDir'] = observations['azimuth']
+observationsData['dip'] = observations['dip']
+observationsData['dipPolarity'] = observations['polarity']
+observationsData['layer'] = observations['layer']
+resp = LoopProjectFile.Set(loopFilename,"stratigraphicObservations",data=observationsData,verbose=True)
+if resp["errorFlag"]: print(resp["errorString"])
+
+
 
 import winsound
 duration = 700  # milliseconds

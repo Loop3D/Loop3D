@@ -11,8 +11,6 @@ Scene3DView {
     width: parent.width
     height: parent.height
 
-//    property Item input
-
     Entity {
         id: scene
         property bool clearColor: true
@@ -42,28 +40,6 @@ Scene3DView {
             ,
             InputSettings  { eventSource: dataViewTab }
         ]
-
-//        Entity {
-//            id: torusEntity
-//            components: [
-//                TorusMesh {
-//                    id: torusMesh
-//                    radius: 5000
-//                    minorRadius: 1000
-//                    rings: 100
-//                    slices: 20
-//                },
-//                PhongMaterial {
-//                    id: material
-//                    diffuse: "yellow"
-//                },
-//                Transform {
-//                    id: torusTransform
-//                    scale3D: Qt.vector3d(1.5, 1.5, 1.5)
-//                    rotation: fromAxisAndAngle(Qt.vector3d(1, 0, 0), 45)
-//                }
-//            ]
-//        }
         Entity {
             id: sphereEntity
             enabled: bar.currentIndex == 2
@@ -143,16 +119,5 @@ Scene3DView {
                 }
             ]
         }
-//        NumberAnimation {
-//            paused: viewer.miscToggle1
-//            target: sphereTransform
-//            property: "userAngle"
-//            duration: 1000
-//            from: 0
-//            to: 360
-
-//            loops: Animation.Infinite
-//            running: true
-//        }
     }
 }

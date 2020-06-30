@@ -306,6 +306,7 @@ Item {
                     onPressed: {
                         misc5 = !misc5
                         viewer.miscToggle5 = misc5
+                        project.reloadProject()
                     }
                     text: "Misc5"
                 }

@@ -48,7 +48,7 @@ void L3DViewer::rotate(float horizontalFactor, float verticalFactor)
 void L3DViewer::resetView()
 {
     ProjectManagement* project = ProjectManagement::instance();
-    project->getStModel()->resetView();
+    if (project->getStModel()) project->getStModel()->resetView();
 }
 
 void L3DViewer::handleKeyEvent(int key, int modifiers)

@@ -21,7 +21,8 @@ public:
         maxAgeRole,
         eventIDRole,
         rankRole,
-        typeRole
+        typeRole,
+        permutation
     };
 
     // Basic functionality:
@@ -29,6 +30,8 @@ public:
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     Q_INVOKABLE QVariant dataIndexed(int index, QString role) const;
+    Q_INVOKABLE int countPBlocks(void) const;
+    Q_INVOKABLE QVariant pBlockDataIndexed(int index, QString role) const;
 
     // Editable:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;

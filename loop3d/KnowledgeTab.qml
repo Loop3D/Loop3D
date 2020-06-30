@@ -28,7 +28,7 @@ Item {
             color: "#dddddd"
             Text {
                 anchors.fill: parent
-                text: "List of features (selectable)\nTopology\nStratography of region"
+                text: "List of features (selectable)\nTopology\nStratigraphy of region"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }

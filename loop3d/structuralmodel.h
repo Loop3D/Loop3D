@@ -7,6 +7,9 @@
 #include <QOpenGLFunctions>
 #include <QMutex>
 #include <QTexture>
+#include "LoopProjectFileUtils.h"
+#include "LoopProjectFile.h"
+
 
 class StructuralModel : protected QOpenGLFunctions
 {
