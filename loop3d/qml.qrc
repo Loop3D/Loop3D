@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>DcTab.qml</file>
+        <file>DataColTab.qml</file>
         <file>GeologyTab.qml</file>
         <file>GeophysTab.qml</file>
         <file>KnowledgeTab.qml</file>
@@ -10,5 +10,6 @@
         <file>RoiExtents.qml</file>
         <file>DataViewer.qml</file>
         <file>Isosurface.qml</file>
+        <file>DataManTab.qml</file>
     </qresource>
 </RCC>

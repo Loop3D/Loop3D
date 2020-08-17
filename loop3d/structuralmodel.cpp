@@ -195,13 +195,6 @@ int StructuralModel::loadFromFile(QString filename)
     return result;
 }
 
-void StructuralModel::resetView()
-{
-    L3DViewer* viewer =  L3DViewer::instance();
-    viewer->setLookAtPosition(QVector3D((m_xmax-m_xmin)/2.0f,(m_ymax-m_ymin)/2.0f,(m_zmax-m_zmin)/2.0f));
-    viewer->setCameraOffsetCP(QVector3D(0.0f,10.0f,3.0f*(m_ymax-m_ymin)/2.0f));
-}
-
 void StructuralModel::createBasicTestStructure(unsigned int size)
 {
     if (size < 1) size = 1;
@@ -258,7 +251,7 @@ void StructuralModel::updateStructureDataInViewer()
     viewer->m_maxScalarValue = m_valmax;
     viewer->minScalarValueChanged();
     viewer->maxScalarValueChanged();
-    resetView();
+    viewer->resetView();
 }
 
 int StructuralModel::loadTextures()

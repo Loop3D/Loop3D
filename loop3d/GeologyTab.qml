@@ -420,9 +420,10 @@ Item {
                             // TODO: remove file open when finished testing textures
                             if (!hasFile) fileDialogOpen.open()
                             else {
+                                project.saveProject()
                                 pythonText.run(textArea.text,project.filename,false)
                                 project.reloadProject()
-                                bar.currentIndex = 2
+                                bar.currentIndex = 4
                             }
                         }
                     }
@@ -444,7 +445,7 @@ Item {
                             selectByMouse: true
                             PythonText {
                                 id: pythonText
-                                filename: "loopStructuralTemplate.py"
+                                filename: "loopStructuralTemplate2.py"
                                 Component.onCompleted: {
                                     textDocToHighlight = textArea.textDocument
                                     // Use select all and text addition to trigger immediate highlighting
@@ -462,11 +463,10 @@ Item {
                         width: 140
                         text: "Run Code"
                         onPressed: {
-                            // TODO: remove file open when finished testing textures
-                            if (!hasFile) fileDialogOpen.open()
+                            if (!hasFile) fileDialogSave.open()
                             else {
                                 pythonText.run(textArea.text,project.filename,false)
-                                bar.currentIndex = 2
+                                bar.currentIndex = 4
                                 project.reloadProject()
                             }
                         }

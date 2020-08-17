@@ -26,6 +26,7 @@ uniform float miscToggle2;
 uniform float miscToggle3;
 uniform float miscToggle4;
 uniform float miscToggle5;
+uniform bool invertedView;
 uniform mat4 mvp;
 
 out float isovalue;
@@ -34,6 +35,7 @@ out vec3 normal;
 out float instanceID;
 out float vsubcubeTetraID;
 out vec3 debugColour;
+out float difference;
 
 struct Tetra
 {
@@ -154,6 +156,12 @@ void main() {
         // Interp along line (start -> end)
         newVertex = interp(tetra.geometryPoint[start], tetra.val[start],
                            tetra.geometryPoint[  end], tetra.val[  end], isovalue);
+        difference = abs(tetra.val[start] - tetra.val[end]);
+        if (difference > 2000.0) {
+            newVertex = interp(tetra.geometryPoint[start], 0.0,
+                               tetra.geometryPoint[end],1.0,0.5);
+        }
+
         // Add colour for debugging types of marching tetra polygons
         debugColour = vec3(0.2,0.4,0.4);
 
@@ -174,6 +182,11 @@ void main() {
         int end = ttt[pointIndex];
         newVertex = interp(tetra.geometryPoint[start], tetra.val[start],
                            tetra.geometryPoint[  end], tetra.val[  end], isovalue);
+        difference = abs(tetra.val[start] - tetra.val[end]);
+        if (difference > 2000.0) {
+            newVertex = interp(tetra.geometryPoint[start], 0.0,
+                               tetra.geometryPoint[end],1.0,0.5);
+        }
 
         // Add colour for debugging types of marching tetra polygons
         vec3 colourise[3] = {vec3(1.0,0.0,0.0), vec3(0.0,1.0,0.0), vec3(0.0,0.0,1.0)};
@@ -220,6 +233,7 @@ void main() {
                                     -tetra.val[0]+tetra.val[1]+tetra.val[2]-tetra.val[3]));
         }
     }
+    if (invertedView) newVertex.z = -newVertex.z;
     position = newVertex;
     gl_Position = mvp * vec4(newVertex.xyz,1.0);
 }

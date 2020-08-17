@@ -60,10 +60,10 @@ int main(int argc, char *argv[])
     L3DViewer* viewer = L3DViewer::instance();
 
     ProjectManagement* project = ProjectManagement::instance();
-    project->m_minLatitude = -33.8;
-    project->m_maxLatitude = -33.6;
-    project->m_minLongitude = 115.2;
-    project->m_maxLongitude = 115.5;
+    project->m_minLatitude = -23.009;
+    project->m_maxLatitude = -21.992;
+    project->m_minLongitude = 117.001;
+    project->m_maxLongitude = 118.002;
 
     qmlRegisterUncreatableType<ProjectManagement>("loop3d.projectmanagement",1,0,"Project",
                                                QStringLiteral("ProjectManagement should not be created in QML"));

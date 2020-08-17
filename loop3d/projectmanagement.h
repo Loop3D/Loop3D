@@ -91,6 +91,8 @@ class ProjectManagement : public QQuickItem
 
         Q_INVOKABLE Qt3DRender::QSharedGLTexture* getStructuralModelData(void);
         Q_INVOKABLE void downloadData(QString url = "", QString datatype = "netCDF");
+        Q_INVOKABLE void incrementFlowChoice();
+        Q_INVOKABLE void decrementFlowChoice();
         Q_INVOKABLE void loadTextures();
 
         static ProjectManagement* instance() {

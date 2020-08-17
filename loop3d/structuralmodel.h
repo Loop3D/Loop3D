@@ -33,7 +33,6 @@ class StructuralModel : protected QOpenGLFunctions
 
         int saveToFile(QString filename);
         int loadFromFile(QString filename);
-        void resetView(void);
 
         QMutex dataMutex;
         float m_xmin, m_xmax, m_ymin, m_ymax, m_zmin, m_zmax;

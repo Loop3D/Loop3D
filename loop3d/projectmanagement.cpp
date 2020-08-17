@@ -11,18 +11,18 @@
 ProjectManagement* ProjectManagement::m_instance = nullptr;
 
 ProjectManagement::ProjectManagement():
-    m_minDepth(1000),
-    m_maxDepth(9000),
-    m_spacingX(100),
-    m_spacingY(100),
-    m_spacingZ(100),
+    m_minDepth(-1200),
+    m_maxDepth(12000),
+    m_spacingX(1000),
+    m_spacingY(1000),
+    m_spacingZ(300),
     m_xsize(51),
     m_ysize(51),
     m_zsize(51),
     m_inUtm(false),
     m_extentsChanged(true),
     m_flowChoiceMade(false),
-    m_flowChoice(0),
+    m_flowChoice(1),
     m_loopStructuralFlowOption(2),
     m_sharedTextureId(0),
     m_utmZone(0),
@@ -48,18 +48,18 @@ void ProjectManagement::clearProject(void)
     m_filename = "";
     m_mapCentreLatitude = 0;
     m_mapCentreLongitude = 0;
-    m_minDepth = 1000.0;
-    m_maxDepth = 9000.0;
-    m_spacingX = 100;
-    m_spacingY = 100;
-    m_spacingZ = 100;
+    m_minDepth = -1200.0;
+    m_maxDepth = 12000.0;
+    m_spacingX = 1000;
+    m_spacingY = 1000;
+    m_spacingZ = 300;
     m_xsize = 51;
     m_ysize = 51;
     m_zsize = 51;
     m_inUtm = false;
     m_extentsChanged = true;
     m_flowChoiceMade = false;
-    m_flowChoice = 0;
+    m_flowChoice = 1;
     m_loopStructuralFlowOption = 2;
     m_sharedTextureId = 0;
     minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
@@ -326,4 +326,18 @@ void ProjectManagement::downloadData(QString url, QString datatype)
     } else if (datatype == "") {
 
     }
+}
+
+void ProjectManagement::incrementFlowChoice()
+{
+    m_loopStructuralFlowOption++;
+    if (m_loopStructuralFlowOption > 3) m_loopStructuralFlowOption -= 4;
+    loopStructuralFlowOptionChanged();
+}
+
+void ProjectManagement::decrementFlowChoice()
+{
+    m_loopStructuralFlowOption--;
+    if (m_loopStructuralFlowOption < 0) m_loopStructuralFlowOption += 4;
+    loopStructuralFlowOptionChanged();
 }

@@ -110,14 +110,15 @@ Item {
             anchors.fill: parent
             padding: 4
             TabButton { text: 'Data Collection' }
+            TabButton { text: 'Data Manipulation' }
 //            TabButton { text: 'Geological Knowledge' }
             TabButton { text: 'Geological Modelling' }
-//            TabButton { text: 'Geophysical Modelling' }
+            TabButton { text: 'Geophysical Modelling' }
 //            TabButton { text: 'Post Processing' }
             TabButton { text: 'Data Viewer' }
             onCurrentIndexChanged: {
                 project.mainIndex = currentIndex
-                if (currentIndex == 2) dataViewTab.forceActiveFocus()
+                if (currentIndex == 4) dataViewTab.forceActiveFocus()
             }
         }
     }
@@ -128,10 +129,11 @@ Item {
         anchors.right: parent.right
         anchors.bottom: footer.top
         currentIndex: bar.currentIndex
-        DcTab { id: dcTab }
+        DataColTab { id: dcTab }
+        DataManTab { id: dmTab }
 //        KnowledgeTab { id: knowledgeTab }
         GeologyTab { id: geologyTab }
-//        GeophysTab { id: geophysTab }
+        GeophysTab { id: geophysTab }
 //        PostProTab { id: postProTab }
         DataViewer { id: dataViewTab }
     }
@@ -165,6 +167,12 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         color: "#dddddd"
+        MouseArea {
+            anchors.fill: parent
+            propagateComposedEvents: false
+            hoverEnabled: false
+            preventStealing: true
+        }
         Rectangle {
             id: flowArea
             width: parent.width * 2/3
@@ -172,6 +180,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
             color: "transparent"
+
             Button {
                 width: 50
                 height: 100
@@ -180,7 +189,7 @@ Item {
                 anchors.margins: 10
                 text: "<"
                 onClicked: {
-                    project.loopStructuralFlowOption = (project.loopStructuralFlowOption - 1) % 4
+                    project.decrementFlowChoice()
                 }
             }
             Button {
@@ -191,17 +200,33 @@ Item {
                 anchors.margins: 10
                 text: ">"
                 onClicked: {
-                    project.loopStructuralFlowOption = (project.loopStructuralFlowOption + 1) % 4
+                    project.incrementFlowChoice()
                 }
             }
-            Button {
-                width: 200
+            Rectangle {
+                width: 500
                 height: 100
-                enabled: project.flowChoice
-                text: "Confirm Selection"
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: project.flowChoiceMade = true
+                color: "#00000000"
+                anchors.margins: 100
+                Button {
+                    width: 200
+                    height: 100
+                    enabled: project.flowChoice
+                    text: "Create New Work-flow"
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    onClicked: project.flowChoiceMade = true
+                }
+                Button {
+                    width: 200
+                    height: 100
+                    text: "Load Existing Project"
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    onClicked: fileDialogOpen.open()
+                }
             }
 
             Rectangle {

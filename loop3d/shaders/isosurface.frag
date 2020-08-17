@@ -6,6 +6,7 @@ in vec3 normal;
 in float instanceID;
 in float vsubcubeTetraID;
 in vec3 debugColour;
+in float difference;
 
 uniform float valmin;
 uniform float valmax;
@@ -44,6 +45,7 @@ void main()
     float ambient = 0.1;
     vec3 lightDir = normalize(position - lightPos);
     colour = colour * max(abs(dot(-normal,-lightDir)),0.0);
-
-    FragColour = vec4(colour,1.0);
+    if (difference > 2000.0 && miscToggle3 > 0.0) FragColour = vec4(0.7,0.2,0.2,1.0);
+    else FragColour = vec4(colour,1.0);
 }
+

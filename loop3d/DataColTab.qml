@@ -337,9 +337,9 @@ Item {
                         width: 140
                         text: "Extract Data"
                         onPressed: {
-                            // TODO: remove file open when finished testing textures
-                            if (!hasFile) fileDialogOpen.open()
+                            if (!hasFile) fileDialogSave.open()
                             else {
+                                project.saveProject()
                                 dcPythonText.run(dcTextArea.text,project.filename)
                                 project.reloadProject()
                                 bar.currentIndex = 1
@@ -363,7 +363,7 @@ Item {
                             selectByMouse: true
                             PythonText {
                                 id: dcPythonText
-                                filename: "map2loopTemplate.py"
+                                filename: "map2loopTemplate3.py"
                                 Component.onCompleted: {
                                     textDocToHighlight = dcTextArea.textDocument
                                     // Use select all and text addition to trigger immediate highlighting

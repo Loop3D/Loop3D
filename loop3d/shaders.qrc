@@ -4,5 +4,7 @@
         <file>shaders/isosurface.vert</file>
         <file>shaders/water.frag</file>
         <file>shaders/water.vert</file>
+        <file>shaders/crossSection.vert</file>
+        <file>shaders/crossSection.frag</file>
     </qresource>
 </RCC>

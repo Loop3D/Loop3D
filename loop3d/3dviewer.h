@@ -11,6 +11,7 @@ class L3DViewer : public QQuickItem
 {
     Q_OBJECT
 
+    Q_PROPERTY (bool invertedView MEMBER m_invertedView NOTIFY invertedViewChanged)
     Q_PROPERTY (double minScalarValue MEMBER m_minScalarValue NOTIFY minScalarValueChanged)
     Q_PROPERTY (double maxScalarValue MEMBER m_maxScalarValue NOTIFY maxScalarValueChanged)
     Q_PROPERTY (double numIsosurfaces MEMBER m_numIsosurfaces NOTIFY numIsosurfacesChanged)
@@ -42,7 +43,14 @@ class L3DViewer : public QQuickItem
     Q_PROPERTY (unsigned int structureYSize MEMBER m_structureYSize NOTIFY structureYSizeChanged)
     Q_PROPERTY (unsigned int structureZSize MEMBER m_structureZSize NOTIFY structureZSizeChanged)
     Q_PROPERTY (unsigned int structureNumberTetraPerIsosurface MEMBER m_structureNumberTetraPerIsosurface NOTIFY structureNumberTetraPerIsosurfaceChanged)
+
+    Q_PROPERTY (float csPositionX MEMBER m_csPositionX NOTIFY csPositionXChanged)
+    Q_PROPERTY (float csPositionY MEMBER m_csPositionY NOTIFY csPositionYChanged)
+    Q_PROPERTY (float csPositionZ MEMBER m_csPositionZ NOTIFY csPositionZChanged)
+    Q_PROPERTY (float csOrientationPsi MEMBER m_csOrientationPsi NOTIFY csOrientationPsiChanged)
+    Q_PROPERTY (float csOrientationTheta MEMBER m_csOrientationTheta NOTIFY csOrientationThetaChanged)
 Q_SIGNALS:
+    void invertedViewChanged();
     void minScalarValueChanged();
     void maxScalarValueChanged();
     void isovalueChanged();
@@ -76,6 +84,12 @@ Q_SIGNALS:
     void structureZSizeChanged();
     void structureNumberTetraPerIsosurfaceChanged();
 
+    void csPositionXChanged();
+    void csPositionYChanged();
+    void csPositionZChanged();
+    void csOrientationPsiChanged();
+    void csOrientationThetaChanged();
+
 public Q_SLOTS:
     void setCameraPosition(QVector3D val) { m_cameraPosition = val; cameraPositionChanged(); }
     void setCameraOffsetCP(QVector3D val);
@@ -84,6 +98,7 @@ public Q_SLOTS:
     void pan(float horizontalFactor, float verticalFactor);
     void rotate(float horizontalFactor, float verticalFactor);
     void resetView(void);
+    void resetCrossSection(void);
     void handleKeyEvent(int key, int modifiers);
 
 public:
@@ -93,6 +108,7 @@ public:
     }
     void allStructureChanged();
 
+    bool m_invertedView;
     float m_minScalarValue;
     float m_maxScalarValue;
     double m_isovalue;
@@ -125,6 +141,12 @@ public:
     unsigned int m_structureYSize;
     unsigned int m_structureZSize;
     unsigned int m_structureNumberTetraPerIsosurface;
+
+    float m_csPositionX;
+    float m_csPositionY;
+    float m_csPositionZ;
+    float m_csOrientationPsi;
+    float m_csOrientationTheta;
 
 private:
     L3DViewer();

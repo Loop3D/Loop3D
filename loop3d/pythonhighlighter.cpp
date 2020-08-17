@@ -21,7 +21,7 @@ PythonHighlighter::PythonHighlighter(QTextDocument* parent)
         // Bitwise
         "\\^" << "\\|" << "&" << "~" << ">>" << "<<";
 
-    braces = QStringList() << "{" << "}" << "\\(" << "\\)" << "\\[" << "]";
+    braces = QStringList() << "\\{" << "\\}" << "\\(" << "\\)" << "\\[" << "\\]";
 
     basicStyles.insert("keyword", getTextCharFormat("blue"));
     basicStyles.insert("operator", getTextCharFormat("red"));
