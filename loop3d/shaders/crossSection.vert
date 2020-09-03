@@ -6,6 +6,9 @@ uniform sampler3D scalarField;
 uniform float xmin;
 uniform float ymin;
 uniform float zmin;
+uniform float xmax;
+uniform float ymax;
+uniform float zmax;
 uniform int xsize;
 uniform int ysize;
 uniform int zsize;
@@ -36,6 +39,7 @@ out vec3 position;
 void main()
 {
     position = (modelMatrix * vec4(vertexPosition,1.0)).xyz;
+    if (invertedView) position.z = (zmax-zmin)-position.z;
     gl_Position = mvp * vec4(vertexPosition,1.0);
 //    position = gl_Position.xyz;
 }

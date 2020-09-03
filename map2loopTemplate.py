@@ -50,7 +50,7 @@ geology_url='http://geo.waxi-gis.org/geoserver/loop/wfs?service=WFS&version=1.0.
 structure_url='http://geo.waxi-gis.org/geoserver/loop/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=warox_points_f5011&bbox='+boundariesString+'&srs='+zoneStr
 fault_url='http://geo.waxi-gis.org/geoserver/loop/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=linear_500k&bbox='+boundariesString+'&srs='+zoneStr
 
-data_dir="tmp_data2/"
+data_dir="tmp_data3/"
 data_dir_shp=data_dir+"shapeFiles/"
 geology_file='geology.shp'
 geology_file_csv=data_dir+geology_file.replace(".shp",".txt")
@@ -296,7 +296,9 @@ stratigraphicLogData['layerId'] += 1
 stratigraphicLogData['minAge'] = range(uniqueLayers.shape[0])
 stratigraphicLogData['maxAge'] = range(uniqueLayers.shape[0])
 stratigraphicLogData['maxAge'] += 0.5
-stratigraphicLogData['formation'] = uniqueLayers
+stratigraphicLogData['name'] = uniqueLayers
+stratigraphicLogData['enabled'] = 1
+stratigraphicLogData['rank'] = 0
 stratigraphicLogData['thickness'] = list(thickness.values())
 resp = LoopProjectFile.Set(loopFilename,"stratigraphicLog",data=stratigraphicLogData,verbose=True)
 if resp["errorFlag"]: print(resp["errorString"])
@@ -305,6 +307,7 @@ faults = pandas.read_csv(data_dir+"/output/fault_orientations.csv")
 faultEvents = numpy.zeros(faults.shape[0],LoopProjectFile.faultEventType)
 faultEvents['name'] = faults['formation']  # The fault eventId is called formation for some reason
 faultEvents['enabled'] = 0
+faultEvents['rank'] = 0
 faultEvents['minAge'] = numpy.arange(1.0,7.0, 6.0/faults.shape[0])
 faultEvents['maxAge'] = faultEvents['minAge']
 faultEvents['avgDisplacement'] = 0

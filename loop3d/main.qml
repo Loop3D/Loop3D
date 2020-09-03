@@ -110,7 +110,7 @@ Item {
             anchors.fill: parent
             padding: 4
             TabButton { text: 'Data Collection' }
-            TabButton { text: 'Data Manipulation' }
+            TabButton { text: 'Data Review' }
 //            TabButton { text: 'Geological Knowledge' }
             TabButton { text: 'Geological Modelling' }
             TabButton { text: 'Geophysical Modelling' }
@@ -130,7 +130,7 @@ Item {
         anchors.bottom: footer.top
         currentIndex: bar.currentIndex
         DataColTab { id: dcTab }
-        DataManTab { id: dmTab }
+        DataRevTab { id: dmTab }
 //        KnowledgeTab { id: knowledgeTab }
         GeologyTab { id: geologyTab }
         GeophysTab { id: geophysTab }
@@ -449,6 +449,8 @@ Item {
                 project.flowChoiceMade = true
                 geologyTab.repaint()
                 geologyTab.calcPerms()
+                viewer.resetView()
+                viewer.resetCrossSection()
             } else {
                 notifyText.text = "ERROR loading project " + fileDialogOpen.fileUrl
             }

@@ -114,7 +114,7 @@ zcoords = numpy.linspace(model.bounding_box[1, 2], model.bounding_box[0, 2], mod
 zz,yy,xx = numpy.meshgrid(zcoords,ycoords,xcoords,indexing='ij')
 locs = numpy.transpose([xx.flatten(),yy.flatten(),zz.flatten()])
 result = strati['feature'].evaluate_value(locs)
-LoopProjectFile.Set(loopFilename,"strModel",data=numpy.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
+resp = LoopProjectFile.Set(loopFilename,"strModel",data=numpy.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
 
 # Let me know when it's all done (loudly)
 import winsound

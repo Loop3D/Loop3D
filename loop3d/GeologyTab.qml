@@ -87,7 +87,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         color: isActive ? "#000000" : "#555555"
                         font.italic: isActive ? false : true
-                        text: "Event " + eventID + "\t" + type + "\t Age: " + minAge.toFixed(1) + " - " + maxAge.toFixed(1) + "  \t" + name
+                        text: "Event " + eventID + "\t" + (type == 0 ? "Fault" : "") + "\t Age: " + minAge.toFixed(1) + " - " + maxAge.toFixed(1) + "  \t" + name
                         font.family: mainWindow.defaultFontStyle
                         font.pixelSize: mainWindow.defaultFontSize
                     }
@@ -181,8 +181,8 @@ Item {
                         if (eventsModel.dataIndexed(i,"isActive")) {
                             var isSelected = (i === detailsView.currentIndex);
                             ctx.fillStyle =  isSelected ? "#ff49ffff" :
-                                             eventsModel.dataIndexed(i,"type") === "Fold" ? "#49ef49" :
-                                             eventsModel.dataIndexed(i,"type") === "Fault" ? "#ef4949" :
+                                             eventsModel.dataIndexed(i,"type") === 1 ? "#49ef49" :
+                                             eventsModel.dataIndexed(i,"type") === 0 ? "#ef4949" :
                                              "#aaaaaa";
                             var maxAge = eventsModel.dataIndexed(i,"maxAge");
                             var minAge = eventsModel.dataIndexed(i,"minAge");

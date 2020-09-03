@@ -34,7 +34,7 @@ foliation_params = {'interpolatortype':'PLI' , # 'interpolatortype':'PLI',
     'damp':True}
 model, m2l_data = GeologicalModel.from_map2loop_directory(
     data_dir,
-    skip_faults=True,
+    # skip_faults=True,
     fault_params=fault_params,
     foliation_params=foliation_params
     )

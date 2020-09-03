@@ -42,9 +42,9 @@ void main()
     // Add contour lines with 5.0 stepped at 2000
     colour = mix(vec3(0.0,0.0,0.0),colour,step(5.0,abs(float(int(position.z)%2000))));
     // Add lighting
-    float ambient = 0.1;
+    float ambient = 0.2;
     vec3 lightDir = normalize(position - lightPos);
-    colour = colour * max(abs(dot(-normal,-lightDir)),0.0);
+    colour = colour * max(abs(dot(-normal,-lightDir)),ambient);
     if (difference > 2000.0 && miscToggle3 > 0.0) FragColour = vec4(0.7,0.2,0.2,1.0);
     else FragColour = vec4(colour,1.0);
 }

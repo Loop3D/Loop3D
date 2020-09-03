@@ -39,8 +39,8 @@ class EventList : public QObject {
 
         int loadFromFile(QString filename);
         int saveToFile(QString filename);
-        bool setEventAt(int index, const EventItem& event);
-        QVector<EventItem> getEvents() const { return events; }
+        bool setEventAt(int index, const LoopProjectFile::Event& event);
+        QVector<LoopProjectFile::Event> getEvents() const { return events; }
         QVector<PermutationBlock> getPermutationBlocks() const { return pBlocks; }
         Q_INVOKABLE void sort(void);
         Q_INVOKABLE unsigned long long calcPermutations(void);
@@ -52,19 +52,19 @@ class EventList : public QObject {
         void postItemRemoved();
 
     public Q_SLOTS:
-        bool appendItem(int eventID, QString name, float minAge, float maxAge, QString type, int rank=0, bool isActive=true);
+        bool appendItem(int eventID, QString name, float minAge, float maxAge, LoopProjectFile::EventType type, int rank=0, bool isActive=true);
         bool removeItem(int index);
 
     private:
-        QVector<EventItem> events;
+        QVector<LoopProjectFile::Event> events;
         QVector<PermutationBlock> pBlocks;
-        static bool order(const EventItem& a, const EventItem& b) {
-            if (a.isActive == b.isActive) {
+        static bool order(const LoopProjectFile::Event& a, const LoopProjectFile::Event& b) {
+            if (a.enabled == b.enabled) {
                 if (abs(a.minAge - b.minAge) < 0.0001f) {
-                    if (abs(a.maxAge - b.maxAge) < 0.0001f) return a.eventID < b.eventID;
+                    if (abs(a.maxAge - b.maxAge) < 0.0001f) return a.eventId < b.eventId;
                     else return a.maxAge < b.maxAge;
                 } else return a.minAge < b.minAge;
-            } else if (a.isActive) return true;
+            } else if (a.enabled) return true;
             return false;
         }
         unsigned long long factorial(unsigned int n);

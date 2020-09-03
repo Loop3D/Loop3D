@@ -245,6 +245,9 @@ void StructuralModel::updateStructureDataInViewer()
     viewer->m_structureXStepSize = (m_xmax - m_xmin) / m_width;
     viewer->m_structureYStepSize = (m_ymax - m_ymin) / m_height;
     viewer->m_structureZStepSize = (m_zmax - m_zmin) / m_depth;
+//    viewer->m_structureXMid = (m_xmax - m_xmin) / 2.0f;
+//    viewer->m_structureYMid = (m_ymax - m_ymin) / 2.0f;
+//    viewer->m_structureZMid = (m_zmax - m_zmin) / 2.0f;
     viewer->m_structureNumberTetraPerIsosurface = m_totalTetra;
     viewer->allStructureChanged();
     viewer->m_minScalarValue = m_valmin;

@@ -36,6 +36,9 @@ class L3DViewer : public QQuickItem
     Q_PROPERTY (float structureYMax MEMBER m_structureYMax NOTIFY structureYMaxChanged)
     Q_PROPERTY (float structureZMin MEMBER m_structureZMin NOTIFY structureZMinChanged)
     Q_PROPERTY (float structureZMax MEMBER m_structureZMax NOTIFY structureZMaxChanged)
+    Q_PROPERTY (float structureXMid MEMBER m_structureXMid NOTIFY structureXMidChanged)
+    Q_PROPERTY (float structureYMid MEMBER m_structureYMid NOTIFY structureYMidChanged)
+    Q_PROPERTY (float structureZMid MEMBER m_structureZMid NOTIFY structureZMidChanged)
     Q_PROPERTY (float structureXStepSize MEMBER m_structureXStepSize NOTIFY structureXStepSizeChanged)
     Q_PROPERTY (float structureYStepSize MEMBER m_structureYStepSize NOTIFY structureYStepSizeChanged)
     Q_PROPERTY (float structureZStepSize MEMBER m_structureZStepSize NOTIFY structureZStepSizeChanged)
@@ -76,6 +79,9 @@ Q_SIGNALS:
     void structureYMaxChanged();
     void structureZMinChanged();
     void structureZMaxChanged();
+    void structureXMidChanged();
+    void structureYMidChanged();
+    void structureZMidChanged();
     void structureXStepSizeChanged();
     void structureYStepSizeChanged();
     void structureZStepSizeChanged();
@@ -134,6 +140,9 @@ public:
     float m_structureYMax;
     float m_structureZMin;
     float m_structureZMax;
+    float m_structureXMid;
+    float m_structureYMid;
+    float m_structureZMid;
     float m_structureXStepSize;
     float m_structureYStepSize;
     float m_structureZStepSize;

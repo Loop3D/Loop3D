@@ -6,6 +6,9 @@ uniform sampler3D scalarField;
 uniform float xmin;
 uniform float ymin;
 uniform float zmin;
+uniform float xmax;
+uniform float ymax;
+uniform float zmax;
 uniform int xsize;
 uniform int ysize;
 uniform int zsize;
@@ -233,7 +236,10 @@ void main() {
                                     -tetra.val[0]+tetra.val[1]+tetra.val[2]-tetra.val[3]));
         }
     }
-    if (invertedView) newVertex.z = -newVertex.z;
+    if (invertedView) newVertex.z = (zmax-zmin)-newVertex.z;
+
+    // Add minor offset as isosurface 3d texture values are mid-cell values not vertex values
+    newVertex = newVertex + vec3(xstepsize,ystepsize,0)*0.5;
     position = newVertex;
     gl_Position = mvp * vec4(newVertex.xyz,1.0);
 }

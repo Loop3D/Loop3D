@@ -66,7 +66,6 @@ Item {
                 viewer.rotate(lastX-mouse.x,lastY-mouse.y)
                 lastX = mouse.x
                 lastY = mouse.y
-                notifyText.text = "" + viewer.cameraPosition.x + " " +  viewer.cameraPosition.y + " " + viewer.cameraPosition.z
             }
             if (panning) {
                 viewer.pan(lastX-mouse.x,lastY-mouse.y)
@@ -250,7 +249,7 @@ Item {
                 width: 180
                 from: viewer.structureXMin
                 to: viewer.structureXMax
-                value: (viewer.structureXMax - viewer.structureXMin) / 2.0
+                value: (viewer.structureXMax + viewer.structureXMin) / 2.0
                 pressed: viewer.csPositionX = value
                 background: Rectangle {
                     x: crossSectionXSlider.leftPadding
@@ -291,7 +290,7 @@ Item {
                 width: 180
                 from: viewer.structureYMin
                 to: viewer.structureYMax
-                value: (viewer.structureYMax - viewer.structureYMin) / 2.0
+                value: (viewer.structureYMax + viewer.structureYMin) / 2.0
                 pressed: viewer.csPositionY = value
                 background: Rectangle {
                     x: crossSectionYSlider.leftPadding
@@ -332,7 +331,7 @@ Item {
                 width: 180
                 from: viewer.structureZMin
                 to: viewer.structureZMax
-                value: (viewer.structureZMax - viewer.structureZMin) / 2.0
+                value: (viewer.structureZMax + viewer.structureZMin) / 2.0
                 pressed: viewer.csPositionZ = value
                 background: Rectangle {
                     x: crossSectionZSlider.leftPadding
@@ -495,6 +494,7 @@ Item {
                     onPressed: {
                         misc3 = !misc3
                         viewer.miscToggle3 = misc3
+                        viewer.resetCrossSection()
                     }
                     text: "Misc3"
                 }

@@ -13,8 +13,6 @@ Scene3DView {
 
     Entity {
         id: scene
-        property bool clearColor: true
-
         Camera {
             id: camera
             projectionType: CameraLens.PerspectiveProjection
@@ -32,14 +30,38 @@ Scene3DView {
             RenderSettings {
                 activeFrameGraph: ForwardRenderer {
                     camera: camera
-                    clearColor: "transparent"
-                    buffersToClear: scene.clearColor ? ClearBuffers.ColorDepthBuffer : ClearBuffers.DepthBuffer
+                    clearColor: "#dddddd"
+                    buffersToClear: ClearBuffers.ColorDepthBuffer
                     frustumCulling: false
+                    Viewport {
+                        id: viewport
+                        normalizedRect: Qt.rect(0,0,1,1)
+                    }
                 }
-            }
-            ,
+            },
             InputSettings  { eventSource: dataViewTab }
         ]
+
+        Entity {
+            id: backDrop
+            components: [
+                GeometryRenderer {
+                    geometry: PlaneGeometry {
+                        width: 2
+                        height: 2
+                        resolution: Qt.size(2,2)
+                    }
+                },
+                DiffuseSpecularMaterial {
+                    ambient: "#dddddd"
+                    diffuse: "#dddddd"
+                    specular: "#dddddd"
+                },
+                Transform { translation: Qt.vector3d(0,0,0) }
+            ]
+
+        }
+
         Entity {
             id: gridded3DEntity
             enabled: bar.currentIndex == 4
@@ -59,6 +81,9 @@ Scene3DView {
                         Parameter { name: "xmin" ; value: viewer.structureXMin },
                         Parameter { name: "ymin" ; value: viewer.structureYMin },
                         Parameter { name: "zmin" ; value: viewer.structureZMin },
+                        Parameter { name: "xmax" ; value: viewer.structureXMax },
+                        Parameter { name: "ymax" ; value: viewer.structureYMax },
+                        Parameter { name: "zmax" ; value: viewer.structureZMax },
                         Parameter { name: "xsize" ; value: viewer.structureXSize },
                         Parameter { name: "ysize" ; value: viewer.structureYSize },
                         Parameter { name: "zsize" ; value: viewer.structureZSize },
@@ -110,10 +135,58 @@ Scene3DView {
             ]
         }
         Entity {
+            id: boundingGrid
+            enabled: bar.currentIndex == 4
+            components: [
+                GeometryRenderer {
+                    geometry: PlaneGeometry {
+                        width: 10000
+                        height: 10000
+                        resolution: Qt.size(2,2)
+                    }
+                    instanceCount: 24
+                },
+//                Transform { translation: Qt.vector3d(0,0,1) },
+                Material {
+                    parameters: [
+                        Parameter { name: "colour"; value: Qt.vector3d(0,0,0) },
+                        Parameter { name: "xmin" ; value: 0.0 },
+                        Parameter { name: "ymin" ; value: 0.0 },
+                        Parameter { name: "zmin" ; value: 0.0 },
+                        Parameter { name: "xmax" ; value: viewer.structureXMax - viewer.structureXMin },
+                        Parameter { name: "ymax" ; value: viewer.structureYMax - viewer.structureYMin },
+                        Parameter { name: "zmax" ; value: viewer.structureZMax - viewer.structureZMin }
+                    ]
+                    effect: Effect {
+                        techniques: [
+                            Technique {
+                                filterKeys: FilterKey { name: "renderingStyle"; value: "forward" }
+                                graphicsApiFilter {
+                                    api: GraphicsApiFilter.OpenGL
+                                    profile: GraphicsApiFilter.CoreProfile
+                                    majorVersion: 4
+                                    minorVersion: 3
+                                }
+                                renderPasses: [
+                                    RenderPass {
+                                        shaderProgram: ShaderProgram {
+                                            vertexShaderCode: loadSource("qrc:/shaders/grid.vert")
+                                            fragmentShaderCode: loadSource("qrc:/shaders/grid.frag")
+                                        }
+                                        renderStates: [ CullFace { mode: CullFace.NoCulling } ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+        Entity {
             id: crossSectionEntity
             enabled: bar.currentIndex == 4 && viewer.miscToggle3
-            property real gridSizeX: (viewer.structureXMax - viewer.structureXMin) * 1.1
-            property real gridSizeY: (viewer.structureXMax - viewer.structureXMin) * 1.1
+            property real gridSizeX: (viewer.structureXMax - viewer.structureXMin)
+            property real gridSizeY: (viewer.structureXMax - viewer.structureXMin)
 
             components: [
                 PlaneMesh {
@@ -175,7 +248,18 @@ Scene3DView {
                                             vertexShaderCode: loadSource("qrc:/shaders/crossSection.vert")
                                             fragmentShaderCode: loadSource("qrc:/shaders/crossSection.frag")
                                         }
-                                        renderStates: [ CullFace { mode: CullFace.NoCulling } ]
+                                        renderStates: [
+                                            CullFace { mode: CullFace.NoCulling },
+//                                            DepthTest { depthFunction: DepthTest.LessOrEqual },
+//                                            NoDepthMask {},
+                                            BlendEquation { blendFunction: BlendEquation.Add },
+                                            BlendEquationArguments {
+                                                sourceRgb: BlendEquationArguments.SourceAlpha
+                                                destinationRgb: BlendEquationArguments.OneMinusSourceAlpha
+                                                sourceAlpha: BlendEquationArguments.SourceAlpha
+                                                destinationAlpha: BlendEquationArguments.OneMinusSourceAlpha
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -195,6 +279,98 @@ Scene3DView {
 
                         return m;
                     }
+                }
+            ]
+        }
+        Entity {
+            Text2DEntity {
+                color: "red"
+                height: 20
+                width: 200
+                text: viewer.structureXMax
+                font.family: "Helvetica"
+//                font.pixelSize: 10000
+                components: [
+                    Transform {
+                        matrix: {
+                            var m = Qt.matrix4x4();
+                            m.translate(Qt.vector3d(viewer.structureXMax-viewer.structureXMin,0.0,0));
+                            m.scale(50.0);
+                            m.rotate(-90.0,Qt.vector3d(0,0,1))
+                            return m;
+                        }
+                    }
+                ]
+            }
+        }
+        Entity {
+            Text2DEntity {
+                color: "red"
+                height: 20
+                width: 200
+                text: viewer.structureXMin
+                font.family: "Helvetica"
+                components: [
+                    Transform {
+                        matrix: {
+                            var m = Qt.matrix4x4();
+                            m.translate(Qt.vector3d(-500.0,0.0,0));
+                            m.scale(50.0);
+                            m.rotate(-90.0,Qt.vector3d(0,0,1))
+                            return m;
+                        }
+                    }
+                ]
+            }
+        }
+        Entity {
+            Text2DEntity {
+                color: "blue"
+                height: 20
+                width: 200
+                text: viewer.structureYMax
+                font.family: "Helvetica"
+                components: [
+                    Transform {
+                        matrix: {
+                            var m = Qt.matrix4x4();
+                            m.translate(Qt.vector3d(-500.0,viewer.structureYMax-viewer.structureYMin,0));
+                            m.scale(50.0);
+                            return m;
+                        }
+                    }
+                ]
+            }
+        }
+        Entity {
+            Text2DEntity {
+                color: "blue"
+                height: 20
+                width: 200
+                text: viewer.structureYMin
+                font.family: "Helvetica"
+                components: [
+                    Transform {
+                        matrix: {
+                            var m = Qt.matrix4x4();
+                            m.translate(Qt.vector3d(-500.0,0.0,0));
+                            m.scale(50.0);
+                            return m;
+                        }
+                    }
+                ]
+            }
+        }
+        Entity {
+            components: [
+                SphereMesh { radius: 50 },
+                Transform { translation: Qt.vector3d(viewer.structureXMax-viewer.structureXMin,
+                                                     viewer.structureYMax-viewer.structureYMin,
+                                                     viewer.structureZMax-viewer.structureZMin) },
+                DiffuseSpecularMaterial {
+                    ambient: "#ff9955"
+                    diffuse: "#ee0000"
+                    specular: "#00ee00"
                 }
             ]
         }

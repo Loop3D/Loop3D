@@ -25,9 +25,23 @@ int EventList::loadFromFile(QString filename)
     std::vector<LoopProjectFile::FaultEvent> faultEvents;
     LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,true);
     for (auto it=faultEvents.begin();it!=faultEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,"Fault",0,it->enabled?true:false);
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::FAULTEVENT,it->enabled?true:false);
     }
-
+    std::vector<LoopProjectFile::FoldEvent> foldEvents;
+    LoopProjectFile::GetFoldEvents(name.toStdString(),foldEvents,true);
+    for (auto it=foldEvents.begin();it!=foldEvents.end();it++) {
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::FOLDEVENT,it->enabled?true:false);
+    }
+    std::vector<LoopProjectFile::FoliationEvent> foliationEvents;
+    LoopProjectFile::GetFoliationEvents(name.toStdString(),foliationEvents,true);
+    for (auto it=foliationEvents.begin();it!=foliationEvents.end();it++) {
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::FOLIATIONEVENT,it->enabled?true:false);
+    }
+    std::vector<LoopProjectFile::DiscontinuityEvent> discontinuityEvents;
+    LoopProjectFile::GetDiscontinuityEvents(name.toStdString(),discontinuityEvents,true);
+    for (auto it=discontinuityEvents.begin();it!=discontinuityEvents.end();it++) {
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::DISCONTINUITYEVENT,it->enabled?true:false);
+    }
     sort();
     return result;
 }
@@ -51,13 +65,13 @@ int EventList::saveToFile(QString filename)
     LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,true);
     auto eventList = getEvents();
     for (auto it=eventList.begin();it!=eventList.end();it++) {
-        if (it->type == "fault" ) {
+        if (it->type == LoopProjectFile::FAULTEVENT) {
             LoopProjectFile::FaultEvent event;
-            strncpy(event.name,it->name.toStdString().c_str(),name.size());
+            strncpy(event.name,it->name,30);
             event.maxAge = it->maxAge;
             event.minAge = it->minAge;
-            event.enabled = it->isActive;
-            event.eventId = it->eventID;
+            event.enabled = it->enabled;
+            event.eventId = it->eventId;
             faultEvents.push_back(event);
         }
     }
@@ -68,7 +82,7 @@ int EventList::saveToFile(QString filename)
     return result;
 }
 
-bool EventList::setEventAt(int index, const EventItem& event)
+bool EventList::setEventAt(int index, const LoopProjectFile::Event& event)
 {
     if (index < 0 || index >= events.size())
         return false;
@@ -84,7 +98,7 @@ void EventList::sort()
     std::list<float> maxAges;
     int rank = 0;
     for (auto event= events.begin();event!=events.end();event++) {
-        if (!event->isActive) continue;
+        if (!event->enabled) continue;
         if (minAges.size() == 0) {
             event->rank = 0;
         } else {
@@ -99,15 +113,16 @@ void EventList::sort()
     }
 }
 
-bool EventList::appendItem(int eventID, QString name, float minAge, float maxAge, QString type, int rank, bool isActive)
+bool EventList::appendItem(int eventID, QString name, float minAge, float maxAge, LoopProjectFile::EventType type, int rank, bool isActive)
 {
-    EventItem event;
-    event.name = name;
-    event.eventID = eventID;
+    LoopProjectFile::Event event;
+    strncpy(event.name,name.toStdString().c_str(),30);
+//    event.name = name;
+    event.eventId = eventID;
     event.minAge = minAge;
     event.maxAge = maxAge;
     event.type = type;
-    event.isActive = isActive;
+    event.enabled = isActive;
     event.rank = rank;
 
     preItemAppended();
@@ -187,17 +202,17 @@ unsigned long long EventList::calcPermutations()
 
     unsigned long long totalPermutations = 1;
     int startIndex = 0;
-    while (startIndex < events.size() && !events[startIndex].isActive) {
+    while (startIndex < events.size() && !events[startIndex].enabled) {
         startIndex++;
     }
     int endIndex = startIndex+1;
-    while (startIndex < events.size() && events[startIndex].isActive) {
+    while (startIndex < events.size() && events[startIndex].enabled) {
         endIndex = startIndex+1;
-        if (endIndex == events.size() || !events[endIndex].isActive) break;
+        if (endIndex == events.size() || !events[endIndex].enabled) break;
         float minAge = events[startIndex].minAge;
         float maxAge = events[startIndex].maxAge;
         int maxRank = 1;
-        while (endIndex < events.size() && events[endIndex].minAge <= maxAge && events[endIndex].isActive) {
+        while (endIndex < events.size() && events[endIndex].minAge <= maxAge && events[endIndex].enabled) {
             if (events[endIndex].maxAge > maxAge) maxAge = events[endIndex].maxAge;
             if (events[endIndex].rank > maxRank) maxRank = events[endIndex].rank;
             endIndex++;

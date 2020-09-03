@@ -48,17 +48,31 @@ void L3DViewer::rotate(float horizontalFactor, float verticalFactor)
 
 void L3DViewer::resetView()
 {
-    setLookAtPosition(QVector3D((m_structureXMax-m_structureXMin)/2.0f,(m_structureYMax-m_structureYMin)/2.0f,(m_structureZMax-m_structureZMin)/2.0f));
+    m_structureXMid = (m_structureXMax + m_structureXMin) / 2.0f;
+    m_structureYMid = (m_structureYMax + m_structureYMin) / 2.0f;
+    m_structureZMid = (m_structureZMax + m_structureZMin) / 2.0f;
+    structureXMidChanged();
+    structureYMidChanged();
+    structureZMidChanged();
+    setLookAtPosition(QVector3D(
+                          (m_structureXMax - m_structureXMin)/2.0f,
+                          (m_structureYMax - m_structureYMin)/2.0f,
+                          (m_structureZMax - m_structureZMin)/2.0f));
     setCameraOffsetCP(QVector3D(0.0,10.0,(m_structureYMax-m_structureYMin)*1.5f));
 }
 
 void L3DViewer::resetCrossSection()
 {
-    m_csPositionX = (m_structureXMax-m_structureXMin)/2.0f;
-    m_csPositionY = (m_structureYMax-m_structureYMin)/2.0f;
-    m_csPositionZ = (m_structureZMax-m_structureZMin)/2.0f;
+    m_csPositionX = m_structureXMid;
+    m_csPositionY = m_structureYMid;
+    m_csPositionZ = m_structureZMid;
     m_csOrientationPsi = 0.0f;
     m_csOrientationTheta = 0.0f;
+    csPositionXChanged();
+    csPositionYChanged();
+    csPositionZChanged();
+    csOrientationPsiChanged();
+    csOrientationThetaChanged();
 }
 
 void L3DViewer::handleKeyEvent(int key, int modifiers)
@@ -102,7 +116,7 @@ void L3DViewer::allStructureChanged()
 
 L3DViewer::L3DViewer()
 {
-    m_invertedView = false;
+    m_invertedView = true;
     m_minScalarValue = 0.0;
     m_maxScalarValue = 1.0;
     m_isovalue = 0.0;
@@ -118,6 +132,9 @@ L3DViewer::L3DViewer()
     m_structureYMax = 1.0f;
     m_structureZMin = 0.0f;
     m_structureZMax = 1.0f;
+    m_structureXMid = 0.5f;
+    m_structureYMid = 0.5f;
+    m_structureZMid = 0.5f;
     m_structureXSize = 51;
     m_structureYSize = 51;
     m_structureZSize = 51;

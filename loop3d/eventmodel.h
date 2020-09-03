@@ -43,7 +43,7 @@ public:
 
     EventList *getEvents() const;
     void setEvents(EventList *value);
-    Q_INVOKABLE EventItem get(int index) const;
+    Q_INVOKABLE LoopProjectFile::Event get(int index) const;
     Q_INVOKABLE void sortEvents(void);
     Q_INVOKABLE int findEventByID(int eventID);
 

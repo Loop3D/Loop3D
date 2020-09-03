@@ -23,18 +23,18 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() | !events)
         return QVariant();
 
-    const EventItem item = events->getEvents().at(index.row());
+    const LoopProjectFile::Event item = events->getEvents().at(index.row());
     switch(role) {
     case nameRole:
         return QVariant(item.name);
     case isActiveRole:
-        return QVariant(item.isActive);
+        return QVariant(item.enabled);
     case minAgeRole:
         return QVariant(item.minAge);
     case maxAgeRole:
         return QVariant(item.maxAge);
     case eventIDRole:
-        return QVariant(item.eventID);
+        return QVariant(item.eventId);
     case rankRole:
         return QVariant(item.rank);
     case typeRole:
@@ -54,13 +54,13 @@ bool EventModel::setData(const QModelIndex &index, const QVariant &value, int ro
 {
     if (!events) return false;
 
-    EventItem item = events->getEvents().at(index.row());
+    LoopProjectFile::Event item = events->getEvents().at(index.row());
     switch (role) {
     case nameRole:
-        item.name = value.toString();
+        strncpy(item.name,value.toString().toStdString().c_str(),30);
         break;
     case isActiveRole:
-        item.isActive = value.toBool();
+        item.enabled = value.toBool();
         break;
     case minAgeRole:
         item.minAge = value.toFloat();
@@ -69,13 +69,17 @@ bool EventModel::setData(const QModelIndex &index, const QVariant &value, int ro
         item.maxAge = value.toFloat();
         break;
     case eventIDRole:
-        item.eventID = value.toInt();
+        item.eventId = value.toInt();
         break;
     case rankRole:
         item.rank = value.toInt();
         break;
     case typeRole:
-        item.type = value.toString();
+        if (value == "fault") item.type = LoopProjectFile::FAULTEVENT;
+        else if (value == "fold") item.type = LoopProjectFile::FOLDEVENT;
+        else if (value == "foliation") item.type = LoopProjectFile::FOLIATIONEVENT;
+        else if (value == "discontinuity") item.type = LoopProjectFile::DISCONTINUITYEVENT;
+        else item.type = LoopProjectFile::INVALIDEVENT;
         break;
     }
     if (item.minAge > item.maxAge) {
@@ -164,9 +168,9 @@ EventList *EventModel::getEvents() const
     return events;
 }
 
-EventItem EventModel::get(int index) const
+LoopProjectFile::Event EventModel::get(int index) const
 {
-    EventItem res;
+    LoopProjectFile::Event res;
     if (!events || index <0 || index > events->getEvents().size())
         return res;
     return (events->getEvents()[index]);
@@ -179,11 +183,11 @@ void EventModel::sortEvents()
         Q_EMIT dataChanged(index(i),index(i));
 }
 
-int EventModel::findEventByID(int eventID)
+int EventModel::findEventByID(int eventId)
 {
     if (!events || events->getEvents().size() <=0) return -1;
     for (int i=0;i<events->getEvents().size();i++) {
-        if (events->getEvents().at(i).eventID == eventID) return i;
+        if (events->getEvents().at(i).eventId == eventId) return i;
     }
     return -1;
 }

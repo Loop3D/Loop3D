@@ -6,5 +6,9 @@
         <file>shaders/water.vert</file>
         <file>shaders/crossSection.vert</file>
         <file>shaders/crossSection.frag</file>
+        <file>shaders/grid.frag</file>
+        <file>shaders/grid.vert</file>
+        <file>shaders/basic.frag</file>
+        <file>shaders/basic.vert</file>
     </qresource>
 </RCC>

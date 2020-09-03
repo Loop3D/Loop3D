@@ -10,6 +10,6 @@
         <file>RoiExtents.qml</file>
         <file>DataViewer.qml</file>
         <file>Isosurface.qml</file>
-        <file>DataManTab.qml</file>
+        <file>DataRevTab.qml</file>
     </qresource>
 </RCC>
