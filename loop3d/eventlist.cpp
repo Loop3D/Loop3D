@@ -42,6 +42,11 @@ int EventList::loadFromFile(QString filename)
     for (auto it=discontinuityEvents.begin();it!=discontinuityEvents.end();it++) {
         appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::DISCONTINUITYEVENT,it->enabled?true:false);
     }
+    std::vector<LoopProjectFile::StratigraphicLayer> stratigraphicLayers;
+    LoopProjectFile::GetStratigraphicLayers(name.toStdString(),stratigraphicLayers,true);
+    for (auto it=stratigraphicLayers.begin();it!=stratigraphicLayers.end();it++) {
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::STRATIGRAPHICLAYER,it->enabled?true:false);
+    }
     sort();
     return result;
 }

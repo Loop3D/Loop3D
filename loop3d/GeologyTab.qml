@@ -87,7 +87,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         color: isActive ? "#000000" : "#555555"
                         font.italic: isActive ? false : true
-                        text: "Event " + eventID + "\t" + (type == 0 ? "Fault" : "") + "\t Age: " + minAge.toFixed(1) + " - " + maxAge.toFixed(1) + "  \t" + name
+                        text: "Event " + eventID + "\t" + (type == 0 ? "Fault" : (type == 1 ? "Fold" : (type == 2 ? "Foliation" : (type == 0 ? "Discontinuity" : "Strata")))) + "\t Age: " + minAge.toFixed(1) + " - " + maxAge.toFixed(1) + "  \t" + name
                         font.family: mainWindow.defaultFontStyle
                         font.pixelSize: mainWindow.defaultFontSize
                     }
