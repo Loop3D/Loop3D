@@ -67,9 +67,14 @@ int EventList::saveToFile(QString filename)
 #endif
 
     std::vector<LoopProjectFile::FaultEvent> faultEvents;
-    LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,true);
+    std::vector<LoopProjectFile::FoldEvent> foldEvents;
+    std::vector<LoopProjectFile::FoliationEvent> foliationEvents;
+    std::vector<LoopProjectFile::DiscontinuityEvent> discontinuityEvents;
+    std::vector<LoopProjectFile::StratigraphicLayer> stratigraphicLayers;
     auto eventList = getEvents();
     for (auto it=eventList.begin();it!=eventList.end();it++) {
+        // Load data into appropriate structure
+        // TODO map event data with type casting rather than copying data
         if (it->type == LoopProjectFile::FAULTEVENT) {
             LoopProjectFile::FaultEvent event;
             strncpy(event.name,it->name,30);
@@ -77,12 +82,58 @@ int EventList::saveToFile(QString filename)
             event.minAge = it->minAge;
             event.enabled = it->enabled;
             event.eventId = it->eventId;
+            event.rank = it->rank;
+            event.type = it->type;
             faultEvents.push_back(event);
+        } else if (it->type == LoopProjectFile::FOLDEVENT) {
+            LoopProjectFile::FoldEvent event;
+            strncpy(event.name,it->name,30);
+            event.maxAge = it->maxAge;
+            event.minAge = it->minAge;
+            event.enabled = it->enabled;
+            event.eventId = it->eventId;
+            event.rank = it->rank;
+            event.type = it->type;
+            foldEvents.push_back(event);
+        } else if (it->type == LoopProjectFile::FOLIATIONEVENT) {
+            LoopProjectFile::FoliationEvent event;
+            strncpy(event.name,it->name,30);
+            event.maxAge = it->maxAge;
+            event.minAge = it->minAge;
+            event.enabled = it->enabled;
+            event.eventId = it->eventId;
+            event.rank = it->rank;
+            event.type = it->type;
+            foliationEvents.push_back(event);
+        } else if (it->type == LoopProjectFile::DISCONTINUITYEVENT) {
+            LoopProjectFile::DiscontinuityEvent event;
+            strncpy(event.name,it->name,30);
+            event.maxAge = it->maxAge;
+            event.minAge = it->minAge;
+            event.enabled = it->enabled;
+            event.eventId = it->eventId;
+            event.rank = it->rank;
+            event.type = it->type;
+            discontinuityEvents.push_back(event);
+        } else if (it->type == LoopProjectFile::STRATIGRAPHICLAYER) {
+            LoopProjectFile::StratigraphicLayer layer;
+            strncpy(layer.name,it->name,30);
+            layer.maxAge = it->maxAge;
+            layer.minAge = it->minAge;
+            layer.enabled = it->enabled;
+            layer.eventId = it->eventId;
+            layer.rank = it->rank;
+            layer.type = it->type;
+            stratigraphicLayers.push_back(layer);
+        } else {
+            std::cout << "UNIDENTIFIED type for event " << it->name << std::endl;
         }
     }
-    if (faultEvents.size()) {
-        LoopProjectFile::SetFaultEvents(name.toStdString(),faultEvents,true);
-    }
+    if (faultEvents.size()) LoopProjectFile::SetFaultEvents(name.toStdString(),faultEvents,true);
+    if (foldEvents.size()) LoopProjectFile::SetFoldEvents(name.toStdString(),foldEvents,true);
+    if (foliationEvents.size()) LoopProjectFile::SetFoliationEvents(name.toStdString(),foliationEvents,true);
+    if (discontinuityEvents.size()) LoopProjectFile::SetDiscontinuityEvents(name.toStdString(),discontinuityEvents,true);
+    if (stratigraphicLayers.size()) LoopProjectFile::SetStratigraphicLayers(name.toStdString(),stratigraphicLayers,true);
 
     return result;
 }
