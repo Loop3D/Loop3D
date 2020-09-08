@@ -55,6 +55,8 @@ SOURCES += \
         eventmodel.cpp \
         eventpermutation.cpp \
         main.cpp \
+        observationlist.cpp \
+        observationmodel.cpp \
         projectmanagement.cpp \
         pythonhighlighter.cpp \
         pythontext.cpp \
@@ -83,6 +85,8 @@ HEADERS += \
     eventlist.h \
     eventmodel.h \
     eventpermutation.h \
+    observationlist.h \
+    observationmodel.h \
     projectmanagement.h \
     pythonhighlighter.h \
     pythontext.h \

@@ -12,6 +12,8 @@
 #include "datasourcelist.h"
 #include "eventmodel.h"
 #include "eventlist.h"
+#include "observationmodel.h"
+#include "observationlist.h"
 
 namespace py = pybind11;
 
@@ -73,6 +75,8 @@ int main(int argc, char *argv[])
                                                QStringLiteral("DataSourceList should not be created in QML"));
     qmlRegisterUncreatableType<EventList>("loop3d.eventmodel",1,0,"EventList",
                                                QStringLiteral("EventList should not be created in QML"));
+    qmlRegisterUncreatableType<ObservationList>("loop3d.observationmodel",1,0,"ObservationList",
+                                               QStringLiteral("ObservationList should not be created in QML"));
 
     qmlRegisterType<PythonText>("loop3d.pythontext",1,0,"PythonText");
     qmlRegisterType<LL>("loop3d.utmconverter",1,0,"LL");
@@ -81,6 +85,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<UTMExtents>("loop3d.utmconverter",1,0,"UTMExtents");
     qmlRegisterType<DataSourceModel>("loop3d.datasourcemodel",1,0,"DataSourceModel");
     qmlRegisterType<EventModel>("loop3d.eventmodel",1,0,"EventModel");
+    qmlRegisterType<ObservationModel>("loop3d.observationmodel",1,0,"ObservationModel");
 
     QQuickView view;
     project->setQmlQuickView(&view);

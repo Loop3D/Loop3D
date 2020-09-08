@@ -129,6 +129,7 @@ int ProjectManagement::saveProject(QString filename)
 
     stModel.saveToFile(filename);
     eventList.saveToFile(filename);
+    observationList.saveToFile(filename);
 
     m_extentsChanged = false;
     return 0;
@@ -194,6 +195,7 @@ int ProjectManagement::loadProject(QString filename)
     // Load structural data
     stModel.loadFromFile(filename);
     eventList.loadFromFile(filename);
+    observationList.loadFromFile(filename);
 
     m_extentsChanged = false;
     return 0;

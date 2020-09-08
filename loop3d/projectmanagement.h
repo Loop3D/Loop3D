@@ -8,6 +8,7 @@
 #include "structuralmodel.h"
 #include "eventpermutation.h"
 #include "eventlist.h"
+#include "observationlist.h"
 
 #include "LoopProjectFileUtils.h"
 #include "LoopProjectFile.h"
@@ -101,6 +102,7 @@ class ProjectManagement : public QQuickItem
         }
         StructuralModel* getStModel() { return &stModel; }
         EventList* getEventList() { return &eventList; }
+        ObservationList* getObservationList() { return &observationList; }
         QQuickView* getQmlQuickView() { return m_qmlView; }
         void setQmlQuickView(QQuickView* view) {
             m_qmlView = view;
@@ -147,6 +149,7 @@ class ProjectManagement : public QQuickItem
         std::map<int,StructuralModel*> structuralModelMap;
         std::map<int,EventPermutation*> permutationMap;
         EventList eventList;
+        ObservationList observationList;
 };
 
 #endif // PROJECTMANAGEMENT_H

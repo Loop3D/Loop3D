@@ -8,22 +8,12 @@
 #include "LoopProjectFileUtils.h"
 #include "LoopProjectFile.h"
 
-struct EventItem {
-        QString name;
-        bool isActive;
-        float minAge;
-        float maxAge;
-        int eventID;
-        int rank;
-        QString type;
-};
-
 struct PermutationBlock {
-    float minAge;
-    float maxAge;
+    double minAge;
+    double maxAge;
     unsigned long long permutations;
     int maxRank;
-    PermutationBlock(float min, float max, unsigned long long perm, int rank) {
+    PermutationBlock(double min, double max, unsigned long long perm, int rank) {
         minAge = min;
         maxAge = max;
         permutations = perm;
@@ -52,7 +42,7 @@ class EventList : public QObject {
         void postItemRemoved();
 
     public Q_SLOTS:
-        bool appendItem(int eventID, QString name, float minAge, float maxAge, LoopProjectFile::EventType type, int rank=0, bool isActive=true);
+        bool appendItem(int eventID, QString name, double minAge, double maxAge, LoopProjectFile::EventType type, int rank=0, bool isActive=true);
         bool removeItem(int index);
 
     private:
@@ -60,8 +50,8 @@ class EventList : public QObject {
         QVector<PermutationBlock> pBlocks;
         static bool order(const LoopProjectFile::Event& a, const LoopProjectFile::Event& b) {
             if (a.enabled == b.enabled) {
-                if (abs(a.minAge - b.minAge) < 0.0001f) {
-                    if (abs(a.maxAge - b.maxAge) < 0.0001f) return a.eventId < b.eventId;
+                if (abs(a.minAge - b.minAge) < 0.0001) {
+                    if (abs(a.maxAge - b.maxAge) < 0.0001) return a.eventId < b.eventId;
                     else return a.maxAge < b.maxAge;
                 } else return a.minAge < b.minAge;
             } else if (a.enabled) return true;

@@ -25,27 +25,27 @@ int EventList::loadFromFile(QString filename)
     std::vector<LoopProjectFile::FaultEvent> faultEvents;
     LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,true);
     for (auto it=faultEvents.begin();it!=faultEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::FAULTEVENT,it->enabled?true:false);
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::FAULTEVENT,0,it->enabled);
     }
     std::vector<LoopProjectFile::FoldEvent> foldEvents;
     LoopProjectFile::GetFoldEvents(name.toStdString(),foldEvents,true);
     for (auto it=foldEvents.begin();it!=foldEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::FOLDEVENT,it->enabled?true:false);
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::FOLDEVENT,0,it->enabled);
     }
     std::vector<LoopProjectFile::FoliationEvent> foliationEvents;
     LoopProjectFile::GetFoliationEvents(name.toStdString(),foliationEvents,true);
     for (auto it=foliationEvents.begin();it!=foliationEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::FOLIATIONEVENT,it->enabled?true:false);
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::FOLIATIONEVENT,0,it->enabled);
     }
     std::vector<LoopProjectFile::DiscontinuityEvent> discontinuityEvents;
     LoopProjectFile::GetDiscontinuityEvents(name.toStdString(),discontinuityEvents,true);
     for (auto it=discontinuityEvents.begin();it!=discontinuityEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::DISCONTINUITYEVENT,it->enabled?true:false);
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::DISCONTINUITYEVENT,0,it->enabled);
     }
     std::vector<LoopProjectFile::StratigraphicLayer> stratigraphicLayers;
     LoopProjectFile::GetStratigraphicLayers(name.toStdString(),stratigraphicLayers,true);
     for (auto it=stratigraphicLayers.begin();it!=stratigraphicLayers.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,it->type,LoopProjectFile::STRATIGRAPHICLAYER,it->enabled?true:false);
+        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::STRATIGRAPHICLAYER,0,it->enabled);
     }
     sort();
     return result;
@@ -150,8 +150,8 @@ bool EventList::setEventAt(int index, const LoopProjectFile::Event& event)
 void EventList::sort()
 {
     std::sort(events.begin(),events.end(),order);
-    std::list<float> minAges;
-    std::list<float> maxAges;
+    std::list<double> minAges;
+    std::list<double> maxAges;
     int rank = 0;
     for (auto event= events.begin();event!=events.end();event++) {
         if (!event->enabled) continue;
@@ -169,7 +169,7 @@ void EventList::sort()
     }
 }
 
-bool EventList::appendItem(int eventID, QString name, float minAge, float maxAge, LoopProjectFile::EventType type, int rank, bool isActive)
+bool EventList::appendItem(int eventID, QString name, double minAge, double maxAge, LoopProjectFile::EventType type, int rank, bool isActive)
 {
     LoopProjectFile::Event event;
     strncpy(event.name,name.toStdString().c_str(),30);
@@ -265,8 +265,8 @@ unsigned long long EventList::calcPermutations()
     while (startIndex < events.size() && events[startIndex].enabled) {
         endIndex = startIndex+1;
         if (endIndex == events.size() || !events[endIndex].enabled) break;
-        float minAge = events[startIndex].minAge;
-        float maxAge = events[startIndex].maxAge;
+        double minAge = events[startIndex].minAge;
+        double maxAge = events[startIndex].maxAge;
         int maxRank = 1;
         while (endIndex < events.size() && events[endIndex].minAge <= maxAge && events[endIndex].enabled) {
             if (events[endIndex].maxAge > maxAge) maxAge = events[endIndex].maxAge;
