@@ -3,10 +3,11 @@ import QtLocation 5.14
 import QtPositioning 5.14
 import QtQuick.Controls 2.14
 import loop3d.eventmodel 1.0
+import loop3d.observationmodel 1.0
 
 Item {
     id: dmTab
-    // Main area for data collection tab
+    // Main area for data review tab
     Rectangle {
         border.color: "#ffffff"
         border.width: 0
@@ -95,22 +96,6 @@ Item {
                 }
             }
         }
-//        Rectangle {
-//            id: configDM
-//            anchors.top: parent.top
-//            anchors.left: parent.left
-//            anchors.margins: mainWindow.myBorders
-//            width: parent.width / 2 - mainWindow.myBorders - 1
-//            height: parent.height / 2 - mainWindow.myBorders - 1
-//            color: "#dddddd"
-//            clip: true
-//            Text {
-//                anchors.fill: parent
-//                verticalAlignment: Text.AlignVCenter
-//                horizontalAlignment: Text.AlignHCenter
-//                text: "List of Features (fault if a fault is selected, fold if ...,\n formation if ..., discontinuity if ...)"
-//            }
-//        }
         Rectangle {
             id: visualisationDM
             anchors.left: parent.left
@@ -123,7 +108,7 @@ Item {
                 anchors.fill: parent
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
-                text: "Table of Points of the feature selected\n (position, dip, dipdir, etc)"
+                text: "Table of Observations of the event/feature selected\n (position (easting,northing,altitude), dip, dipdir, for fault),\n(position,dip,dipDir,dipPolarity,layername for strata) \n"
             }
         }
         Rectangle {
@@ -141,6 +126,13 @@ Item {
             anchors.margins: mainWindow.myBorders
             width: parent.width / 2 - mainWindow.myBorders - 1
             color: "#bbbbbb"
+            Text {
+                anchors.fill: parent
+                verticalAlignment: Text.AlignTop
+                horizontalAlignment: Text.AlignHCenter
+                text: "Map of Region of Interest\nAdd all observations as an overlay so they are selectable and toggled on/off\nHighlight selected event in event log and on map" +
+                "\nNeed a place to show structural information of event, fault area\n of displacement, etc (see Map2Loop notebooks for examples of these diagrams)"
+            }
         }
         Button {
             anchors.top: parent.top
