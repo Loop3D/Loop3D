@@ -17,7 +17,7 @@ class ObservationList : public QObject {
         int loadFromFile(QString filename);
         int saveToFile(QString filename);
         bool setObservationAt(int index, const LoopProjectFile::Observation& observation);
-        QVector<LoopProjectFile::Observation> getObservations() const { return observations; }
+        QVector<std::shared_ptr<LoopProjectFile::Observation>> getObservations() const { return observations; }
 
     Q_SIGNALS:
         void preItemAppended();
@@ -30,7 +30,7 @@ class ObservationList : public QObject {
         bool removeItem(int index);
 
     private:
-        QVector<LoopProjectFile::Observation> observations;
+        QVector<std::shared_ptr<LoopProjectFile::Observation>> observations;
 };
 
 #endif // ObservationLIST_H

@@ -23,25 +23,89 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() | !events)
         return QVariant();
 
-    const LoopProjectFile::Event item = events->getEvents().at(index.row());
+    std::shared_ptr<LoopProjectFile::Event> item = events->getEvents().at(index.row());
     switch(role) {
     case nameRole:
-        return QVariant(item.name);
+        return QVariant(item->name);
     case isActiveRole:
-        return QVariant(item.enabled);
+        return QVariant(item->enabled);
     case minAgeRole:
-        return QVariant(item.minAge);
+        return QVariant(item->minAge);
     case maxAgeRole:
-        return QVariant(item.maxAge);
+        return QVariant(item->maxAge);
     case eventIDRole:
-        return QVariant(item.eventId);
+        return QVariant(item->eventId);
     case rankRole:
-        return QVariant(item.rank);
+        return QVariant(item->rank);
     case typeRole:
-        return QVariant(item.type);
-    default:
-        return QVariant(false);
+        return QVariant(item->type);
     }
+    switch (item->type) {
+        case LoopProjectFile::FAULTEVENT: {
+            LoopProjectFile::FaultEvent* fault_item = (LoopProjectFile::FaultEvent*)(item.get());
+            switch (role) {
+                case avgDisplacementRole:
+                    return QVariant(fault_item->avgDisplacement);
+            }
+        }
+        case LoopProjectFile::FOLDEVENT: {
+            LoopProjectFile::FoldEvent* fold_item = (LoopProjectFile::FoldEvent*)(item.get());
+            switch (role) {
+                case periodicRole:
+                    return QVariant(fold_item->periodic);
+                case wavelengthRole:
+                    return QVariant(fold_item->wavelength);
+                case amplitudeRole:
+                    return QVariant(fold_item->amplitude);
+                case asymmetryRole:
+                    return QVariant(fold_item->asymmetry);
+                case asymmetryShiftRole:
+                    return QVariant(fold_item->asymmetryShift);
+                case secondaryWavelengthRole:
+                    return QVariant(fold_item->secondaryWavelength);
+                case secondaryAmplitudeRole:
+                    return QVariant(fold_item->secondaryAmplitude);
+            }
+        }
+        case LoopProjectFile::FOLIATIONEVENT: {
+            LoopProjectFile::FoliationEvent* foliation_item = (LoopProjectFile::FoliationEvent*)(item.get());
+            switch (role) {
+                case lowerScalarValueRole:
+                    return QVariant(foliation_item->lowerScalarValue);
+            case upperScalarValueRole:
+                return QVariant(foliation_item->upperScalarValue);
+            }
+        }
+        case LoopProjectFile::DISCONTINUITYEVENT: {
+            LoopProjectFile::DiscontinuityEvent* discontinuity_item = (LoopProjectFile::DiscontinuityEvent*)(item.get());
+            switch (role) {
+                case scalarValueRole:
+                    return QVariant(discontinuity_item->scalarValue);
+            }
+        }
+        case LoopProjectFile::STRATIGRAPHICLAYER: {
+            LoopProjectFile::StratigraphicLayer* stratigraphic_item = (LoopProjectFile::StratigraphicLayer*)(item.get());
+            switch (role) {
+                case thicknessRole:
+                    return QVariant(stratigraphic_item->thickness);
+                case colour1RedRole:
+                    return QVariant(stratigraphic_item->colour1Red);
+                case colour1GreenRole:
+                    return QVariant(stratigraphic_item->colour1Green);
+                case colour1BlueRole:
+                    return QVariant(stratigraphic_item->colour1Blue);
+                case colour2RedRole:
+                    return QVariant(stratigraphic_item->colour2Red);
+                case colour2GreenRole:
+                    return QVariant(stratigraphic_item->colour2Green);
+                case colour2BlueRole:
+                    return QVariant(stratigraphic_item->colour2Blue);
+            }
+        }
+        default: break;
+    }
+
+    return QVariant(false);
 }
 
 QVariant EventModel::dataIndexed(int index, QString role) const
@@ -54,45 +118,134 @@ bool EventModel::setData(const QModelIndex &index, const QVariant &value, int ro
 {
     if (!events) return false;
 
-    LoopProjectFile::Event item = events->getEvents().at(index.row());
+    std::shared_ptr<LoopProjectFile::Event> item = events->getEvents().at(index.row());
     switch (role) {
     case nameRole:
-        strncpy(item.name,value.toString().toStdString().c_str(),30);
+        strncpy_s(item->name,value.toString().toStdString().c_str(),30);
         break;
     case isActiveRole:
-        item.enabled = value.toBool();
+        item->enabled = value.toBool();
         break;
     case minAgeRole:
-        item.minAge = value.toFloat();
+        item->minAge = value.toDouble();
         break;
     case maxAgeRole:
-        item.maxAge = value.toFloat();
+        item->maxAge = value.toDouble();
         break;
     case eventIDRole:
-        item.eventId = value.toInt();
+        item->eventId = value.toInt();
         break;
     case rankRole:
-        item.rank = value.toInt();
+        item->rank = value.toInt();
         break;
     case typeRole:
-        if (value == "fault") item.type = LoopProjectFile::FAULTEVENT;
-        else if (value == "fold") item.type = LoopProjectFile::FOLDEVENT;
-        else if (value == "foliation") item.type = LoopProjectFile::FOLIATIONEVENT;
-        else if (value == "discontinuity") item.type = LoopProjectFile::DISCONTINUITYEVENT;
-        else item.type = LoopProjectFile::INVALIDEVENT;
+        // TODO: when changing type via the GUI need to remove old item, create new and refile
+        // Currently forbid this
+        std::cout << "Changing of type individually is a very bad idea, currently not implimented!!" << std::endl;
+//        if (value == "fault") item->type = LoopProjectFile::FAULTEVENT;
+//        else if (value == "fold") item->type = LoopProjectFile::FOLDEVENT;
+//        else if (value == "foliation") item->type = LoopProjectFile::FOLIATIONEVENT;
+//        else if (value == "discontinuity") item->type = LoopProjectFile::DISCONTINUITYEVENT;
+//        else if (value == "stratigraphic") item->type = LoopProjectFile::STRATIGRAPHICLAYER;
+//        else item->type = LoopProjectFile::INVALIDEVENT;
         break;
     }
-    if (item.minAge > item.maxAge) {
-        float tmp = item.minAge;
-        item.minAge = item.maxAge;
-        item.maxAge = tmp;
+    switch (item->type) {
+        case LoopProjectFile::FAULTEVENT: {
+            LoopProjectFile::FaultEvent* fault_item = (LoopProjectFile::FaultEvent*)(item.get());
+            switch (role) {
+                case avgDisplacementRole:
+                    fault_item->avgDisplacement = value.toDouble();
+                    break;
+            }
+        }
+        break;
+        case LoopProjectFile::FOLDEVENT: {
+            LoopProjectFile::FoldEvent* fold_item = (LoopProjectFile::FoldEvent*)(item.get());
+            switch (role) {
+                case periodicRole:
+                    fold_item->periodic = value.toInt();
+                    break;
+                case wavelengthRole:
+                    fold_item->wavelength = value.toDouble();
+                    break;
+                case amplitudeRole:
+                    fold_item->amplitude = value.toDouble();
+                    break;
+                case asymmetryRole:
+                    fold_item->asymmetry = value.toInt();
+                    break;
+                case asymmetryShiftRole:
+                    fold_item->asymmetryShift = value.toDouble();
+                    break;
+                case secondaryWavelengthRole:
+                    fold_item->secondaryWavelength = value.toDouble();
+                    break;
+                case secondaryAmplitudeRole:
+                    fold_item->secondaryAmplitude = value.toDouble();
+                    break;
+            }
+            break;
+        }
+        case LoopProjectFile::FOLIATIONEVENT: {
+            LoopProjectFile::FoliationEvent* foliation_item = (LoopProjectFile::FoliationEvent*)(item.get());
+            switch (role) {
+                case lowerScalarValueRole:
+                    foliation_item->lowerScalarValue = value.toDouble();
+                    break;
+                case upperScalarValueRole:
+                    foliation_item->upperScalarValue = value.toDouble();
+                    break;
+            }
+            break;
+        }
+        case LoopProjectFile::DISCONTINUITYEVENT: {
+            LoopProjectFile::DiscontinuityEvent* discontinuity_item = (LoopProjectFile::DiscontinuityEvent*)(item.get());
+            switch (role) {
+                case scalarValueRole:
+                    discontinuity_item->scalarValue = value.toDouble();
+                    break;
+            }
+            break;
+        }
+        case LoopProjectFile::STRATIGRAPHICLAYER: {
+            LoopProjectFile::StratigraphicLayer* stratigraphic_item = (LoopProjectFile::StratigraphicLayer*)(item.get());
+            switch (role) {
+                case thicknessRole:
+                    stratigraphic_item->thickness = value.toDouble();
+                    break;
+                case colour1RedRole:
+                    stratigraphic_item->colour1Red = value.toInt();
+                    break;
+                case colour1GreenRole:
+                    stratigraphic_item->colour1Green = value.toInt();
+                    break;
+                case colour1BlueRole:
+                    stratigraphic_item->colour1Blue = value.toInt();
+                    break;
+                case colour2RedRole:
+                    stratigraphic_item->colour2Red = value.toInt();
+                    break;
+                case colour2GreenRole:
+                    stratigraphic_item->colour2Green = value.toInt();
+                    break;
+                case colour2BlueRole:
+                    stratigraphic_item->colour2Blue = value.toInt();
+                    break;
+            }
+            break;
+        }
+    default: break;
     }
 
-    if (events->setEventAt(index.row(), item)) {
-        Q_EMIT dataChanged(index, index, QVector<int>() << role);
-        return true;
+    if (item->minAge > item->maxAge) {
+        double tmp = item->minAge;
+        item->minAge = item->maxAge;
+        item->maxAge = tmp;
     }
-    return false;
+
+    Q_EMIT dataChanged(index, index, QVector<int>() << role);
+    return true;
 }
 
 bool EventModel::setDataIndexed(int index, const QVariant &value, QString role)
@@ -119,6 +272,24 @@ QHash<int, QByteArray> EventModel::roleNames() const
     role[eventIDRole] = "eventID";
     role[rankRole] = "rank";
     role[typeRole] = "type";
+    role[avgDisplacementRole] = "avgDisplacement";
+    role[periodicRole] = "periodic";
+    role[wavelengthRole] = "wavelength";
+    role[amplitudeRole] = "amplitude";
+    role[asymmetryRole] = "asymmetry";
+    role[asymmetryShiftRole] = "asymmetryShift";
+    role[secondaryWavelengthRole] = "secondaryWavelength";
+    role[secondaryAmplitudeRole] = "secondaryAmplitude";
+    role[lowerScalarValueRole] = "lowerScalarValue";
+    role[upperScalarValueRole] = "upperScalarValue";
+    role[scalarValueRole] = "scalarValue";
+    role[thicknessRole] = "thickness";
+    role[colour1RedRole] = "colour1Red";
+    role[colour1GreenRole] = "colour1Green";
+    role[colour1BlueRole] = "colour1Blue";
+    role[colour2RedRole] = "colour2Red";
+    role[colour2GreenRole] = "colour2Green";
+    role[colour2BlueRole] = "colour2Blue";
 
     return role;
 }
@@ -132,6 +303,24 @@ int EventModel::lookupRoleName(QString name) const
     if (name == "eventID") return eventIDRole;
     if (name == "rank") return rankRole;
     if (name == "type") return typeRole;
+    if (name == "avgDisplacement") return avgDisplacementRole;
+    if (name == "periodic") return periodicRole;
+    if (name == "wavelength") return wavelengthRole;
+    if (name == "amplitude") return amplitudeRole;
+    if (name == "asymmetry") return asymmetryRole;
+    if (name == "asymmetryShift") return asymmetryShiftRole;
+    if (name == "secondaryWavelength") return secondaryWavelengthRole;
+    if (name == "secondaryAmplitude") return secondaryAmplitudeRole;
+    if (name == "lowerScalarValue") return lowerScalarValueRole;
+    if (name == "upperScalarValue") return upperScalarValueRole;
+    if (name == "scalarValue") return scalarValueRole;
+    if (name == "thickness") return thicknessRole;
+    if (name == "colour1Red") return colour1RedRole;
+    if (name == "colour1Green") return colour1GreenRole;
+    if (name == "colour1Blue") return colour1BlueRole;
+    if (name == "colour2Red") return colour2RedRole;
+    if (name == "colour2Green") return colour2GreenRole;
+    if (name == "colour2Blue") return colour2BlueRole;
     return 0;
 
 }
@@ -173,7 +362,7 @@ LoopProjectFile::Event EventModel::get(int index) const
     LoopProjectFile::Event res;
     if (!events || index <0 || index > events->getEvents().size())
         return res;
-    return (events->getEvents()[index]);
+    return (*(events->getEvents()[index]));
 }
 
 void EventModel::sortEvents()
@@ -187,7 +376,7 @@ int EventModel::findEventByID(int eventId)
 {
     if (!events || events->getEvents().size() <=0) return -1;
     for (int i=0;i<events->getEvents().size();i++) {
-        if (events->getEvents().at(i).eventId == eventId) return i;
+        if (events->getEvents().at(i)->eventId == eventId) return i;
     }
     return -1;
 }

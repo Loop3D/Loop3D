@@ -26,11 +26,6 @@ Item {
         }
         anchors.fill: parent
 
-        EventModel {
-            id: eventsModel
-            events: eventList
-        }
-
         Rectangle {
             id: configGL
             anchors.top: parent.top

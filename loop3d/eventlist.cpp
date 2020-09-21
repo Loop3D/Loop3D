@@ -25,27 +25,42 @@ int EventList::loadFromFile(QString filename)
     std::vector<LoopProjectFile::FaultEvent> faultEvents;
     LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,true);
     for (auto it=faultEvents.begin();it!=faultEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::FAULTEVENT,0,it->enabled);
+        std::shared_ptr<LoopProjectFile::FaultEvent> event = std::make_shared<LoopProjectFile::FaultEvent>(std::move(*it));
+        preItemAppended();
+        events.append(event);
+        postItemAppended();
     }
     std::vector<LoopProjectFile::FoldEvent> foldEvents;
     LoopProjectFile::GetFoldEvents(name.toStdString(),foldEvents,true);
     for (auto it=foldEvents.begin();it!=foldEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::FOLDEVENT,0,it->enabled);
+        std::shared_ptr<LoopProjectFile::FoldEvent> event = std::make_shared<LoopProjectFile::FoldEvent>(std::move(*it));
+        preItemAppended();
+        events.append(event);
+        postItemAppended();
     }
     std::vector<LoopProjectFile::FoliationEvent> foliationEvents;
     LoopProjectFile::GetFoliationEvents(name.toStdString(),foliationEvents,true);
     for (auto it=foliationEvents.begin();it!=foliationEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::FOLIATIONEVENT,0,it->enabled);
+        std::shared_ptr<LoopProjectFile::FoliationEvent> event = std::make_shared<LoopProjectFile::FoliationEvent>(std::move(*it));
+        preItemAppended();
+        events.append(event);
+        postItemAppended();
     }
     std::vector<LoopProjectFile::DiscontinuityEvent> discontinuityEvents;
     LoopProjectFile::GetDiscontinuityEvents(name.toStdString(),discontinuityEvents,true);
     for (auto it=discontinuityEvents.begin();it!=discontinuityEvents.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::DISCONTINUITYEVENT,0,it->enabled);
+        std::shared_ptr<LoopProjectFile::DiscontinuityEvent> event = std::make_shared<LoopProjectFile::DiscontinuityEvent>(std::move(*it));
+        preItemAppended();
+        events.append(event);
+        postItemAppended();
     }
     std::vector<LoopProjectFile::StratigraphicLayer> stratigraphicLayers;
     LoopProjectFile::GetStratigraphicLayers(name.toStdString(),stratigraphicLayers,true);
     for (auto it=stratigraphicLayers.begin();it!=stratigraphicLayers.end();it++) {
-        appendItem(it->eventId,it->name,it->minAge,it->maxAge,LoopProjectFile::STRATIGRAPHICLAYER,0,it->enabled);
+        std::shared_ptr<LoopProjectFile::StratigraphicLayer> layer = std::make_shared<LoopProjectFile::StratigraphicLayer>(std::move(*it));
+        preItemAppended();
+        events.append(layer);
+        postItemAppended();
     }
     sort();
     return result;
@@ -74,59 +89,18 @@ int EventList::saveToFile(QString filename)
     auto eventList = getEvents();
     for (auto it=eventList.begin();it!=eventList.end();it++) {
         // Load data into appropriate structure
-        // TODO map event data with type casting rather than copying data
-        if (it->type == LoopProjectFile::FAULTEVENT) {
-            LoopProjectFile::FaultEvent event;
-            strncpy(event.name,it->name,30);
-            event.maxAge = it->maxAge;
-            event.minAge = it->minAge;
-            event.enabled = it->enabled;
-            event.eventId = it->eventId;
-            event.rank = it->rank;
-            event.type = it->type;
-            faultEvents.push_back(event);
-        } else if (it->type == LoopProjectFile::FOLDEVENT) {
-            LoopProjectFile::FoldEvent event;
-            strncpy(event.name,it->name,30);
-            event.maxAge = it->maxAge;
-            event.minAge = it->minAge;
-            event.enabled = it->enabled;
-            event.eventId = it->eventId;
-            event.rank = it->rank;
-            event.type = it->type;
-            foldEvents.push_back(event);
-        } else if (it->type == LoopProjectFile::FOLIATIONEVENT) {
-            LoopProjectFile::FoliationEvent event;
-            strncpy(event.name,it->name,30);
-            event.maxAge = it->maxAge;
-            event.minAge = it->minAge;
-            event.enabled = it->enabled;
-            event.eventId = it->eventId;
-            event.rank = it->rank;
-            event.type = it->type;
-            foliationEvents.push_back(event);
-        } else if (it->type == LoopProjectFile::DISCONTINUITYEVENT) {
-            LoopProjectFile::DiscontinuityEvent event;
-            strncpy(event.name,it->name,30);
-            event.maxAge = it->maxAge;
-            event.minAge = it->minAge;
-            event.enabled = it->enabled;
-            event.eventId = it->eventId;
-            event.rank = it->rank;
-            event.type = it->type;
-            discontinuityEvents.push_back(event);
-        } else if (it->type == LoopProjectFile::STRATIGRAPHICLAYER) {
-            LoopProjectFile::StratigraphicLayer layer;
-            strncpy(layer.name,it->name,30);
-            layer.maxAge = it->maxAge;
-            layer.minAge = it->minAge;
-            layer.enabled = it->enabled;
-            layer.eventId = it->eventId;
-            layer.rank = it->rank;
-            layer.type = it->type;
-            stratigraphicLayers.push_back(layer);
+        if ((*it)->type == LoopProjectFile::FAULTEVENT) {
+            faultEvents.push_back(*(LoopProjectFile::FaultEvent*)(it->get()));
+        } else if ((*it)->type == LoopProjectFile::FOLDEVENT) {
+            foldEvents.push_back(*(LoopProjectFile::FoldEvent*)(it->get()));
+        } else if ((*it)->type == LoopProjectFile::FOLIATIONEVENT) {
+            foliationEvents.push_back(*(LoopProjectFile::FoliationEvent*)(it->get()));
+        } else if ((*it)->type == LoopProjectFile::DISCONTINUITYEVENT) {
+            discontinuityEvents.push_back(*(LoopProjectFile::DiscontinuityEvent*)(it->get()));
+        } else if ((*it)->type == LoopProjectFile::STRATIGRAPHICLAYER) {
+            stratigraphicLayers.push_back(*(LoopProjectFile::StratigraphicLayer*)(it->get()));
         } else {
-            std::cout << "UNIDENTIFIED type for event " << it->name << std::endl;
+            std::cout << "UNIDENTIFIED type for event " << (*it)->name << std::endl;
         }
     }
     if (faultEvents.size()) LoopProjectFile::SetFaultEvents(name.toStdString(),faultEvents,true);
@@ -143,7 +117,7 @@ bool EventList::setEventAt(int index, const LoopProjectFile::Event& event)
     if (index < 0 || index >= events.size())
         return false;
 
-    events[index] = event;
+    (*events[index]) = event;
     return true;
 }
 
@@ -154,32 +128,31 @@ void EventList::sort()
     std::list<double> maxAges;
     int rank = 0;
     for (auto event= events.begin();event!=events.end();event++) {
-        if (!event->enabled) continue;
+        if (!(*event)->enabled) continue;
         if (minAges.size() == 0) {
-            event->rank = 0;
+            (*event)->rank = 0;
         } else {
-            while (minAges.size() && event->minAge > maxAges.back()) {
+            while (minAges.size() && (*event)->minAge > maxAges.back()) {
                 minAges.pop_back(); maxAges.pop_back(); rank--;
             }
-            event->rank = rank;
+            (*event)->rank = rank;
         }
-        minAges.push_back(event->minAge);
-        maxAges.push_back(event->maxAge);
+        minAges.push_back((*event)->minAge);
+        maxAges.push_back((*event)->maxAge);
         rank++;
     }
 }
 
 bool EventList::appendItem(int eventID, QString name, double minAge, double maxAge, LoopProjectFile::EventType type, int rank, bool isActive)
 {
-    LoopProjectFile::Event event;
-    strncpy(event.name,name.toStdString().c_str(),30);
-//    event.name = name;
-    event.eventId = eventID;
-    event.minAge = minAge;
-    event.maxAge = maxAge;
-    event.type = type;
-    event.enabled = isActive;
-    event.rank = rank;
+    std::shared_ptr<LoopProjectFile::Event> event = std::make_shared<LoopProjectFile::Event>();
+    strncpy_s(event->name,name.toStdString().c_str(),30);
+    event->eventId = eventID;
+    event->minAge = minAge;
+    event->maxAge = maxAge;
+    event->type = type;
+    event->enabled = isActive;
+    event->rank = rank;
 
     preItemAppended();
     events.append(event);
@@ -258,19 +231,19 @@ unsigned long long EventList::calcPermutations()
 
     unsigned long long totalPermutations = 1;
     int startIndex = 0;
-    while (startIndex < events.size() && !events[startIndex].enabled) {
+    while (startIndex < events.size() && !events[startIndex]->enabled) {
         startIndex++;
     }
     int endIndex = startIndex+1;
-    while (startIndex < events.size() && events[startIndex].enabled) {
+    while (startIndex < events.size() && events[startIndex]->enabled) {
         endIndex = startIndex+1;
-        if (endIndex == events.size() || !events[endIndex].enabled) break;
-        double minAge = events[startIndex].minAge;
-        double maxAge = events[startIndex].maxAge;
+        if (endIndex == events.size() || !events[endIndex]->enabled) break;
+        double minAge = events[startIndex]->minAge;
+        double maxAge = events[startIndex]->maxAge;
         int maxRank = 1;
-        while (endIndex < events.size() && events[endIndex].minAge <= maxAge && events[endIndex].enabled) {
-            if (events[endIndex].maxAge > maxAge) maxAge = events[endIndex].maxAge;
-            if (events[endIndex].rank > maxRank) maxRank = events[endIndex].rank;
+        while (endIndex < events.size() && events[endIndex]->minAge <= maxAge && events[endIndex]->enabled) {
+            if (events[endIndex]->maxAge > maxAge) maxAge = events[endIndex]->maxAge;
+            if (events[endIndex]->rank > maxRank) maxRank = events[endIndex]->rank;
             endIndex++;
         }
 
@@ -279,7 +252,7 @@ unsigned long long EventList::calcPermutations()
         // Calculate Restrictions of sub-list
         for (int i=startIndex;i<endIndex;i++) {
             for (int j=i+1;j<endIndex;j++) {
-                if (events[j].minAge > events[i].maxAge) {
+                if (events[j]->minAge > events[i]->maxAge) {
                     restrictionElem1.push_back(i);
                     restrictionElem2.push_back(j);
                 }

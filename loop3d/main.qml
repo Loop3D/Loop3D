@@ -4,6 +4,8 @@ import QtQuick.Controls 2.14
 import QtQuick.Layouts 1.14
 import QtQuick.Dialogs 1.2
 import loop3d.projectmanagement 1.0
+import loop3d.eventmodel 1.0
+import loop3d.observationmodel 1.0
 import QtQuick.Scene3D 2.14
 //import Qt3D.Input 2.14
 
@@ -25,6 +27,15 @@ Item {
         compositingMode: Scene3D.FBO
     }
     Isosurface { id: isosurface }
+
+    EventModel {
+        id: eventsModel
+        events: eventList
+    }
+    ObservationModel {
+        id: observationsModel
+        observations: observationList
+    }
 
     MenuBar {
         id: menu

@@ -329,8 +329,8 @@ Item {
                 anchors.bottom: crossSectionPsiSlider.top
                 height: 30
                 width: 180
-                from: viewer.structureZMin
-                to: viewer.structureZMax
+                from: (viewer.invertedView ? viewer.structureZMin : viewer.structureZMax )
+                to: (viewer.invertedView ? viewer.structureZMax : viewer.structureZMin )
                 value: (viewer.structureZMax + viewer.structureZMin) / 2.0
                 pressed: viewer.csPositionZ = value
                 background: Rectangle {

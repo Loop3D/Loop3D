@@ -25,27 +25,42 @@ int ObservationList::loadFromFile(QString filename)
     std::vector<LoopProjectFile::FaultObservation> faultObservations;
     LoopProjectFile::GetFaultObservations(name.toStdString(),faultObservations,true);
     for (auto it=faultObservations.begin();it!=faultObservations.end();it++) {
-        appendItem(it->eventId,it->easting,it->northing,it->altitude,LoopProjectFile::FAULTOBSERVATION);
+        std::shared_ptr<LoopProjectFile::FaultObservation> observation = std::make_shared<LoopProjectFile::FaultObservation>(std::move(*it));
+        preItemAppended();
+        observations.append(observation);
+        postItemAppended();
     }
     std::vector<LoopProjectFile::FoldObservation> foldObservations;
     LoopProjectFile::GetFoldObservations(name.toStdString(),foldObservations,true);
     for (auto it=foldObservations.begin();it!=foldObservations.end();it++) {
-        appendItem(it->eventId,it->easting,it->northing,it->altitude,LoopProjectFile::FOLDOBSERVATION);
+        std::shared_ptr<LoopProjectFile::FoldObservation> observation = std::make_shared<LoopProjectFile::FoldObservation>(std::move(*it));
+        preItemAppended();
+        observations.append(observation);
+        postItemAppended();
     }
     std::vector<LoopProjectFile::FoliationObservation> foliationObservations;
     LoopProjectFile::GetFoliationObservations(name.toStdString(),foliationObservations,true);
     for (auto it=foliationObservations.begin();it!=foliationObservations.end();it++) {
-        appendItem(it->eventId,it->easting,it->northing,it->altitude,LoopProjectFile::FOLIATIONOBSERVATION);
+        std::shared_ptr<LoopProjectFile::FoliationObservation> observation = std::make_shared<LoopProjectFile::FoliationObservation>(std::move(*it));
+        preItemAppended();
+        observations.append(observation);
+        postItemAppended();
     }
     std::vector<LoopProjectFile::DiscontinuityObservation> discontinuityObservations;
     LoopProjectFile::GetDiscontinuityObservations(name.toStdString(),discontinuityObservations,true);
     for (auto it=discontinuityObservations.begin();it!=discontinuityObservations.end();it++) {
-        appendItem(it->eventId,it->easting,it->northing,it->altitude,LoopProjectFile::DISCONTINUITYOBSERVATION);
+        std::shared_ptr<LoopProjectFile::DiscontinuityObservation> observation = std::make_shared<LoopProjectFile::DiscontinuityObservation>(std::move(*it));
+        preItemAppended();
+        observations.append(observation);
+        postItemAppended();
     }
     std::vector<LoopProjectFile::StratigraphicObservation> stratigraphicObservations;
     LoopProjectFile::GetStratigraphicObservations(name.toStdString(),stratigraphicObservations,true);
     for (auto it=stratigraphicObservations.begin();it!=stratigraphicObservations.end();it++) {
-        appendItem(it->eventId,it->easting,it->northing,it->altitude,LoopProjectFile::STRATIGRAPHICOBSERVATION);
+        std::shared_ptr<LoopProjectFile::StratigraphicObservation> observation = std::make_shared<LoopProjectFile::StratigraphicObservation>(std::move(*it));
+        preItemAppended();
+        observations.append(observation);
+        postItemAppended();
     }
 
     return result;
@@ -74,49 +89,18 @@ int ObservationList::saveToFile(QString filename)
     auto observationList = getObservations();
     for (auto it=observationList.begin();it!=observationList.end();it++) {
         // Load data into appropriate structure
-        // TODO map observation data with type casting rather than copying data
-        if (it->type == LoopProjectFile::FAULTOBSERVATION) {
-            LoopProjectFile::FaultObservation observation;
-            observation.easting = it->easting;
-            observation.northing = it->northing;
-            observation.altitude = it->altitude;
-            observation.eventId = it->eventId;
-            observation.type = it->type;
-            faultObservations.push_back(observation);
-        } else if (it->type == LoopProjectFile::FOLDOBSERVATION) {
-            LoopProjectFile::FoldObservation observation;
-            observation.easting = it->easting;
-            observation.northing = it->northing;
-            observation.altitude = it->altitude;
-            observation.eventId = it->eventId;
-            observation.type = it->type;
-            foldObservations.push_back(observation);
-        } else if (it->type == LoopProjectFile::FOLIATIONOBSERVATION) {
-            LoopProjectFile::FoliationObservation observation;
-            observation.easting = it->easting;
-            observation.northing = it->northing;
-            observation.altitude = it->altitude;
-            observation.eventId = it->eventId;
-            observation.type = it->type;
-            foliationObservations.push_back(observation);
-        } else if (it->type == LoopProjectFile::DISCONTINUITYOBSERVATION) {
-            LoopProjectFile::DiscontinuityObservation observation;
-            observation.easting = it->easting;
-            observation.northing = it->northing;
-            observation.altitude = it->altitude;
-            observation.eventId = it->eventId;
-            observation.type = it->type;
-            discontinuityObservations.push_back(observation);
-        } else if (it->type == LoopProjectFile::STRATIGRAPHICOBSERVATION) {
-            LoopProjectFile::StratigraphicObservation observation;
-            observation.easting = it->easting;
-            observation.northing = it->northing;
-            observation.altitude = it->altitude;
-            observation.eventId = it->eventId;
-            observation.type = it->type;
-            stratigraphicObservations.push_back(observation);
+        if ((*it)->type == LoopProjectFile::FAULTOBSERVATION) {
+            faultObservations.push_back(*(LoopProjectFile::FaultObservation*)(it->get()));
+        } else if ((*it)->type == LoopProjectFile::FOLDOBSERVATION) {
+            foldObservations.push_back(*(LoopProjectFile::FoldObservation*)(it->get()));
+        } else if ((*it)->type == LoopProjectFile::FOLIATIONOBSERVATION) {
+            foliationObservations.push_back(*(LoopProjectFile::FoliationObservation*)(it->get()));
+        } else if ((*it)->type == LoopProjectFile::DISCONTINUITYOBSERVATION) {
+            discontinuityObservations.push_back(*(LoopProjectFile::DiscontinuityObservation*)(it->get()));
+        } else if ((*it)->type == LoopProjectFile::STRATIGRAPHICOBSERVATION) {
+            stratigraphicObservations.push_back(*(LoopProjectFile::StratigraphicObservation*)(it->get()));
         } else {
-            std::cout << "UNIDENTIFIED type for observation of event " << it->eventId << std::endl;
+            std::cout << "UNIDENTIFIED type for observation of event " << (*it)->eventId << std::endl;
         }
     }
     if (faultObservations.size()) LoopProjectFile::SetFaultObservations(name.toStdString(),faultObservations,true);
@@ -133,25 +117,24 @@ bool ObservationList::setObservationAt(int index, const LoopProjectFile::Observa
     if (index < 0 || index >= observations.size())
         return false;
 
-    observations[index] = observation;
+    (*observations[index]) = observation;
     return true;
 }
 
 bool ObservationList::appendItem(int eventId, double easting, double northing, double altitude, LoopProjectFile::ObservationType type)
 {
-    LoopProjectFile::Observation observation;
-    observation.eventId = eventId;
-    observation.easting = easting;
-    observation.northing = northing;
-    observation.altitude = altitude;
-    observation.type = type;
+    std::shared_ptr<LoopProjectFile::Observation> observation = std::make_shared<LoopProjectFile::Observation>();
+    observation->eventId = eventId;
+    observation->easting = easting;
+    observation->northing = northing;
+    observation->altitude = altitude;
+    observation->type = type;
 
     preItemAppended();
     observations.append(observation);
     postItemAppended();
     return 1;
 }
-
 
 bool ObservationList::removeItem(int index)
 {

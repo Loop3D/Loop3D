@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
     project->setQmlQuickView(&view);
     view.rootContext()->setContextProperty(QStringLiteral("dataSourceList"), &dataSourceList);
     view.rootContext()->setContextProperty(QStringLiteral("eventList"), project->getEventList());
+    view.rootContext()->setContextProperty(QStringLiteral("observationList"), project->getObservationList());
     view.rootContext()->setContextProperty(QStringLiteral("project"), project);
     view.rootContext()->setContextProperty(QStringLiteral("viewer"), viewer);
     view.setResizeMode(QQuickView::SizeRootObjectToView);

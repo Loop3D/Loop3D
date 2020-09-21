@@ -20,6 +20,17 @@ public:
         altitudeRole,
         eventIDRole,
         typeRole,
+        dipDirRole,
+        dipRole,
+        dipPolarityRole,
+        valRole,
+        displacementRole,
+        axisXRole,
+        axisYRole,
+        axisZRole,
+        foliationRole,
+        whatIsFoldedRole,
+        layerRole,
         permutation
     };
 
@@ -40,7 +51,6 @@ public:
     ObservationList *getObservations() const;
     void setObservations(ObservationList *value);
     Q_INVOKABLE LoopProjectFile::Observation get(int index) const;
-//    Q_INVOKABLE void sortObservations(void);
     Q_INVOKABLE int findObservationByID(int eventID);
 
 Q_SIGNALS:

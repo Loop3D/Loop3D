@@ -4,6 +4,7 @@ import Qt3D.Core 2.14
 import Qt3D.Render 2.14
 import Qt3D.Extras 2.14
 import Qt3D.Input 2.14
+import loop3d.observationmodel 1.0
 
 Scene3DView {
     id: view1
@@ -289,7 +290,6 @@ Scene3DView {
                 width: 200
                 text: viewer.structureXMax
                 font.family: "Helvetica"
-//                font.pixelSize: 10000
                 components: [
                     Transform {
                         matrix: {
@@ -368,11 +368,39 @@ Scene3DView {
                                                      viewer.structureYMax-viewer.structureYMin,
                                                      viewer.structureZMax-viewer.structureZMin) },
                 DiffuseSpecularMaterial {
-                    ambient: "#ff9955"
+                    ambient: "#555555"
                     diffuse: "#ee0000"
                     specular: "#00ee00"
                 }
             ]
+        }
+        NodeInstantiator {
+            id: observations
+            model: observationsModel
+            delegate: Entity {
+                id: observationEntity
+                components: [
+                    Mesh {
+                        id: up_arrow
+                        source: "qrc:/3dassets/Up_arrow_v1.obj"
+                    },
+                    Transform {
+                        scale: 50.0
+                         // First rotation is the dip angle and the next is the dip direction
+                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?45.0:180.0-45.0),Qt.vector3d(0.0,0.0,1.0),180.0-(180.0))
+                        translation: (viewer.invertedView ?
+                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,viewer.structureZMax-altitude)
+                          :
+                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,altitude-viewer.structureZMin)
+                          )
+                    },
+                    DiffuseSpecularMaterial {
+                        ambient: "#ff9955"
+                        diffuse: "#00ff00"
+                        specular: "#ff0000"
+                    }
+                ]
+            }
         }
     }
 }

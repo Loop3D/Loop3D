@@ -30,7 +30,7 @@ class EventList : public QObject {
         int loadFromFile(QString filename);
         int saveToFile(QString filename);
         bool setEventAt(int index, const LoopProjectFile::Event& event);
-        QVector<LoopProjectFile::Event> getEvents() const { return events; }
+        QVector<std::shared_ptr<LoopProjectFile::Event>> getEvents() const { return events; }
         QVector<PermutationBlock> getPermutationBlocks() const { return pBlocks; }
         Q_INVOKABLE void sort(void);
         Q_INVOKABLE unsigned long long calcPermutations(void);
@@ -46,15 +46,15 @@ class EventList : public QObject {
         bool removeItem(int index);
 
     private:
-        QVector<LoopProjectFile::Event> events;
+        QVector<std::shared_ptr<LoopProjectFile::Event>> events;
         QVector<PermutationBlock> pBlocks;
-        static bool order(const LoopProjectFile::Event& a, const LoopProjectFile::Event& b) {
-            if (a.enabled == b.enabled) {
-                if (abs(a.minAge - b.minAge) < 0.0001) {
-                    if (abs(a.maxAge - b.maxAge) < 0.0001) return a.eventId < b.eventId;
-                    else return a.maxAge < b.maxAge;
-                } else return a.minAge < b.minAge;
-            } else if (a.enabled) return true;
+        static bool order(const std::shared_ptr<LoopProjectFile::Event> a, const std::shared_ptr<LoopProjectFile::Event> b) {
+            if (a->enabled == b->enabled) {
+                if (abs(a->minAge - b->minAge) < 0.0001) {
+                    if (abs(a->maxAge - b->maxAge) < 0.0001) return a->eventId < b->eventId;
+                    else return a->maxAge < b->maxAge;
+                } else return a->minAge < b->minAge;
+            } else if (a->enabled) return true;
             return false;
         }
         unsigned long long factorial(unsigned int n);

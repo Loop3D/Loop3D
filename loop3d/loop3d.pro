@@ -64,6 +64,7 @@ SOURCES += \
         utmconverter.cpp
 
 RESOURCES += qml.qrc qtquickcontrols2.conf \
+    3dassets.qrc \
     images.qrc \
     shaders.qrc
 
