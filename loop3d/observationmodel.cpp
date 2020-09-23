@@ -302,9 +302,9 @@ void ObservationModel::setObservations(ObservationList *value)
     observations = value;
 
     if (observations) {
-        connect(observations, &ObservationList::preItemAppended, this, [this]() {
-            const int index = observations->getObservations().size();
-            beginInsertRows(QModelIndex(), index, index);
+        connect(observations, &ObservationList::preItemAppended, this, [this](int start, int count) {
+//            const int index = observations->getObservations().size();
+            beginInsertRows(QModelIndex(), start, start+count-1);
         });
         connect(observations, &ObservationList::postItemAppended, this, [this]() {
             endInsertRows();

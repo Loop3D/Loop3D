@@ -36,7 +36,7 @@ class EventList : public QObject {
         Q_INVOKABLE unsigned long long calcPermutations(void);
 
     Q_SIGNALS:
-        void preItemAppended();
+        void preItemAppended(int start, int count);
         void postItemAppended();
         void preItemRemoved(int index);
         void postItemRemoved();

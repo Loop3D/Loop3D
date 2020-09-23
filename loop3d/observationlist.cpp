@@ -24,45 +24,60 @@ int ObservationList::loadFromFile(QString filename)
 
     std::vector<LoopProjectFile::FaultObservation> faultObservations;
     LoopProjectFile::GetFaultObservations(name.toStdString(),faultObservations,true);
-    for (auto it=faultObservations.begin();it!=faultObservations.end();it++) {
-        std::shared_ptr<LoopProjectFile::FaultObservation> observation = std::make_shared<LoopProjectFile::FaultObservation>(std::move(*it));
-        preItemAppended();
-        observations.append(observation);
+    if (faultObservations.size()) {
+        preItemAppended(0,faultObservations.size());
+        for (auto it=faultObservations.begin();it!=faultObservations.end();it++) {
+            std::shared_ptr<LoopProjectFile::FaultObservation> observation = std::make_shared<LoopProjectFile::FaultObservation>(std::move(*it));
+//            std::shared_ptr<LoopProjectFile::FaultObservation> observation = std::make_shared<LoopProjectFile::FaultObservation>(*it);
+            observation->type = LoopProjectFile::FAULTOBSERVATION;
+            observations.append(observation);
+        }
         postItemAppended();
     }
     std::vector<LoopProjectFile::FoldObservation> foldObservations;
     LoopProjectFile::GetFoldObservations(name.toStdString(),foldObservations,true);
-    for (auto it=foldObservations.begin();it!=foldObservations.end();it++) {
-        std::shared_ptr<LoopProjectFile::FoldObservation> observation = std::make_shared<LoopProjectFile::FoldObservation>(std::move(*it));
-        preItemAppended();
-        observations.append(observation);
+    if (foldObservations.size()) {
+        preItemAppended(observations.size(),foldObservations.size());
+        for (auto it=foldObservations.begin();it!=foldObservations.end();it++) {
+            std::shared_ptr<LoopProjectFile::FoldObservation> observation = std::make_shared<LoopProjectFile::FoldObservation>(std::move(*it));
+            observation->type = LoopProjectFile::FOLDOBSERVATION;
+            observations.append(observation);
+        }
         postItemAppended();
     }
     std::vector<LoopProjectFile::FoliationObservation> foliationObservations;
     LoopProjectFile::GetFoliationObservations(name.toStdString(),foliationObservations,true);
-    for (auto it=foliationObservations.begin();it!=foliationObservations.end();it++) {
-        std::shared_ptr<LoopProjectFile::FoliationObservation> observation = std::make_shared<LoopProjectFile::FoliationObservation>(std::move(*it));
-        preItemAppended();
-        observations.append(observation);
+    if (foliationObservations.size()) {
+        preItemAppended(observations.size(),foliationObservations.size());
+        for (auto it=foliationObservations.begin();it!=foliationObservations.end();it++) {
+            std::shared_ptr<LoopProjectFile::FoliationObservation> observation = std::make_shared<LoopProjectFile::FoliationObservation>(std::move(*it));
+            observation->type = LoopProjectFile::FOLIATIONOBSERVATION;
+            observations.append(observation);
+        }
         postItemAppended();
     }
     std::vector<LoopProjectFile::DiscontinuityObservation> discontinuityObservations;
     LoopProjectFile::GetDiscontinuityObservations(name.toStdString(),discontinuityObservations,true);
-    for (auto it=discontinuityObservations.begin();it!=discontinuityObservations.end();it++) {
-        std::shared_ptr<LoopProjectFile::DiscontinuityObservation> observation = std::make_shared<LoopProjectFile::DiscontinuityObservation>(std::move(*it));
-        preItemAppended();
-        observations.append(observation);
+    if (discontinuityObservations.size()) {
+        preItemAppended(observations.size(),discontinuityObservations.size());
+        for (auto it=discontinuityObservations.begin();it!=discontinuityObservations.end();it++) {
+            std::shared_ptr<LoopProjectFile::DiscontinuityObservation> observation = std::make_shared<LoopProjectFile::DiscontinuityObservation>(std::move(*it));
+            observation->type = LoopProjectFile::DISCONTINUITYOBSERVATION;
+            observations.append(observation);
+        }
         postItemAppended();
     }
     std::vector<LoopProjectFile::StratigraphicObservation> stratigraphicObservations;
     LoopProjectFile::GetStratigraphicObservations(name.toStdString(),stratigraphicObservations,true);
-    for (auto it=stratigraphicObservations.begin();it!=stratigraphicObservations.end();it++) {
-        std::shared_ptr<LoopProjectFile::StratigraphicObservation> observation = std::make_shared<LoopProjectFile::StratigraphicObservation>(std::move(*it));
-        preItemAppended();
-        observations.append(observation);
+    if (stratigraphicObservations.size()) {
+        preItemAppended(observations.size(),stratigraphicObservations.size());
+        for (auto it=stratigraphicObservations.begin();it!=stratigraphicObservations.end();it++) {
+            std::shared_ptr<LoopProjectFile::StratigraphicObservation> observation = std::make_shared<LoopProjectFile::StratigraphicObservation>(std::move(*it));
+            observation->type = LoopProjectFile::STRATIGRAPHICOBSERVATION;
+            observations.append(observation);
+        }
         postItemAppended();
     }
-
     return result;
 }
 
@@ -130,7 +145,7 @@ bool ObservationList::appendItem(int eventId, double easting, double northing, d
     observation->altitude = altitude;
     observation->type = type;
 
-    preItemAppended();
+    preItemAppended(observations.size(),1);
     observations.append(observation);
     postItemAppended();
     return 1;

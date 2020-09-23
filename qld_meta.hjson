@@ -1,0 +1,49 @@
+{
+    #Orientations
+      "d": "dip_plunge",                 #field that contains dip information
+      "dd": "azimuth",            #field that contains dip direction information
+      "sf": 'structure',            #field that contains information on type of structure
+      "bedding": 'BEDDING',           #text to search for in field defined by sfcode to show that this is a bedding measurement
+      "otype": 'dip direction',            #flag to determine measurement convention (currently 'strike' or 'dip direction')
+      "bo": "facing",             #field that contains type of foliation
+      "btype": 'DOWN',            #text to search for in field defined by bo code to show that this is an overturned bedding measurement
+    #Stratigraphy
+      "g": 'Parent_Nam',              #field that contains coarser stratigraphic coding
+      "g2": 'Parent_Nam',              #field that contains coarser stratigraphic coding
+      "c": 'Stratigrap',                #field that contains finer stratigraphic coding
+      "ds": 'ROCK_TYPE',          #field that contains information about lithology
+      "u": 'RU_NAME',            #field that contains alternate stratigraphic coding (not used??)
+      "r1": 'Intrusive',          #field that contains  extra lithology information
+      "r2": 'LITH_SUMM',          #field that contains even more lithology information
+      "sill": 'sill',             #text to search for in field defined by dscode to show that this is a sill
+      "intrusive": 'Y',   #text to search for in field defined by dscode to show that this is an intrusion
+      "volcanic": 'VOLCANIC',     #text to search for in field defined by dscode to show that this is an intrusion
+    #Mineral Deposits
+      "msc": 'site_no',          #field that contains site code of deposit
+      "msn": 'occur_name',         #field that contains short name of deposit
+      "mst": 'mine_statu',         #field that contains site type of deposit
+      "mtc": 'main_commo',         #field that contains target commodity of deposit
+      "mscm": 'main_com_1',        #field that contains site commodity of deposit
+      "mcom": 'all_commod',        #field that contains commodity group of deposit
+      "minf": 'Infrastructure',    #text to search for in field defined by mst code that shows site to ignore #Timing
+      "min": 'Top_Mini_1',        #field that contains minimum age of unit defined by ccode
+      "max": 'ASUD_AGE',        #field that contains maximum age of unit defined by ccode
+    #faults and folds
+      "f": 'type',             #field that contains information on type of structure
+      "fault": 'Fault',           #text to search for in field defined by fcode to show that this is a fault
+      "ff": 'type',              #field that contains information on type of structure
+      "fold": 'Fold',           #text to search for in field defined by f code to show that this is a fold axial trace
+      "fdip": 'dip',               # field for numeric fault dip value
+      "fdipnull": '0',         # text to search for in field defined by fdip to show that this has no known dip
+      "fdipdir": 'dip_dir',        # field for text fault dip direction value 
+      "fdipdir_flag": 'alpha',        # flag for text fault dip direction type num e.g. 045 or alpha e.g. southeast    
+      "fdipest": 'dip_est',        # field for text fault dip estimate value
+      "fdipest_vals": 'gentle,moderate,steep',        # text to search for in field defined by fdipest to give fault dip estimate in increasing steepness
+      "n": 'name',                #field that contains information on name of fault (not used??)
+      "t": 'id_desc',                #field that contains information on type of fold
+      "syn": 'Syncline',          #text to search for in field defined by t to show that this is a syncline
+    #ids
+      "o": 'objectid',            #field that contains unique id of geometry object
+      "gi": 'geopnt_id'           #field that contains unique id of structure point
+      "deposit_dist": 500
+} 

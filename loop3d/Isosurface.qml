@@ -379,6 +379,8 @@ Scene3DView {
             model: observationsModel
             delegate: Entity {
                 id: observationEntity
+                property real elemDip: dip
+                property real elemDipDir: dipDir
                 components: [
                     Mesh {
                         id: up_arrow
@@ -387,7 +389,7 @@ Scene3DView {
                     Transform {
                         scale: 50.0
                          // First rotation is the dip angle and the next is the dip direction
-                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?45.0:180.0-45.0),Qt.vector3d(0.0,0.0,1.0),180.0-(180.0))
+                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?dip:180.0-elemDip),Qt.vector3d(0.0,0.0,1.0),180.0-(elemDipDir))
                         translation: (viewer.invertedView ?
                            Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,viewer.structureZMax-altitude)
                           :

@@ -27,6 +27,10 @@ Item {
             id: eventsModel
             events: eventList
         }
+        ObservationModel {
+            id: observationsModel
+            observations: observationList
+        }
         Rectangle {
             id: configDM
             anchors.top: parent.top
@@ -90,7 +94,15 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            detailsView.currentIndex = index
+                            if (detailsView.currentIndex == index) {
+                                detailsView.currentIndex = -1
+                                observationView.selectedEntityId = -1
+                                observationView.isEntityActive = true
+                            } else {
+                                detailsView.currentIndex = index
+                                observationView.selectedEntityId = eventID
+                                observationView.isEntityActive = isActive
+                            }
                         }
                     }
                 }
@@ -104,14 +116,86 @@ Item {
             width: parent.width / 2 - mainWindow.myBorders - 1
             height: parent.height / 2 - mainWindow.myBorders - 1
             color: "#999999"
+            // This section is a list of observations of the above selected event/feature with
+            // eventId, position in (easting,northing,altitude) and appropriate info based on the
+            // type of event selected (dip, dipdir, for fault), (dip,dipDir,dipPolarity,layername for strata), etc"
             Text {
-                anchors.fill: parent
-                verticalAlignment: Text.AlignVCenter
+                id: visualisationDMHeader
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.margins: mainWindow.myBorders
+                text: "Observation List"
+                height: 20
+                font.bold: true
+                font.family: mainWindow.headingFontStyle
+                font.pixelSize: mainWindow.headingFontSize
                 horizontalAlignment: Text.AlignHCenter
-                text: "Table of Observations of the event/feature selected\n (position (easting,northing,altitude), dip, dipdir, for fault),\n(position,dip,dipDir,dipPolarity,layername for strata) \n"
+                verticalAlignment: Text.AlignTop
+            }
+
+            ScrollView {
+                id: observationView
+                property int selectedEntityId: -1
+                property bool isEntityActive: true
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: visualisationDMHeader.bottom
+                clip: true
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                ListView {
+                    id: visualisationDMView
+                    anchors.fill: parent
+                    anchors.margins: mainWindow.myBorders
+                    model: observationsModel
+                    delegate: observationsDelegate
+                    highlight: Rectangle { height: 28; color: "#8849ffff"; radius: 20 }
+                    currentIndex: -1
+                    highlightFollowsCurrentItem: true
+                    highlightMoveDuration: 200
+                    highlightMoveVelocity: -1
+                }
+            }
+            Component {
+                id: observationsDelegate
+                Item {
+                    id: observationComponent
+                    property int componentHeight: 30
+                    width: parent.width - mainWindow.myBorders
+                    height: eventID == observationView.selectedEntityId ? 30 : 0
+                    Text {
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.margins: mainWindow.myBorders
+                        height: parent.height
+                        verticalAlignment: Text.AlignVCenter
+                        color: eventID == observationView.selectedEntityId ? "#000000" : "#00000000"
+                        font.italic: observationView.isEntityActive ? false : true
+                        text: eventID + "\t(" + Math.round(easting) + "," + Math.round(northing) + "," + Math.round(altitude) + ")\t"
+                              + (type == 0 ? "Fault\t" + dip + "\t" + dipDir + "\t" + dipPolarity : "")
+                              + (type == 1 ? "Fold\t (" + axisX + "," + axisY + "," + axisZ + ")" + "\t" + foliation + "\t" + whatIsFolded : "")
+                              + (type == 2 ? "Foliation\t " + dip + "\t" + dipDir : "")
+                              + (type == 3 ? "Discont\t " + dip + "\t" + dipDir : "")
+                              + (type == 4 ? "Strata\t " + dip + "\t" + dipDir + "\t" + dipPolarity + "\t" + layer : "")
+                        font.family: mainWindow.defaultFontStyle
+                        font.pixelSize: mainWindow.defaultFontSize
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            visualisationDMView.currentIndex = index
+                        }
+                    }
+                }
             }
         }
         Rectangle {
+            // This section should contain a geological map of the region of interest
+            // With overlayed observation points.  The points should be selectable and which in turn highlights that points feature and
+            // that observation in the event log and observation list
+            // There also needs to be a place to show the structural information of event (radial diagram of observations for example)
+            // Also somewhere on this page there should be a stratigraphic column showing the colours and names of the strata
             Image {
                 id: map
                 source: project.filename + ".jpg"
@@ -130,7 +214,7 @@ Item {
                 anchors.fill: parent
                 verticalAlignment: Text.AlignTop
                 horizontalAlignment: Text.AlignHCenter
-                text: "Map of Region of Interest\nAdd all observations as an overlay so they are selectable and toggled on/off\nHighlight selected event in event log and on map" +
+                text: "(TO BE REPLACED) Map of Region of Interest\nAdd all observations as an overlay so they are selectable and toggled on/off\nHighlight selected event in event log and on map" +
                 "\nNeed a place to show structural information of event, fault area\n of displacement, etc (see Map2Loop notebooks for examples of these diagrams)"
             }
         }

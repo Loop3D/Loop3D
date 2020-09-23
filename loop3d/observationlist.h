@@ -20,7 +20,7 @@ class ObservationList : public QObject {
         QVector<std::shared_ptr<LoopProjectFile::Observation>> getObservations() const { return observations; }
 
     Q_SIGNALS:
-        void preItemAppended();
+        void preItemAppended(int start, int count);
         void postItemAppended();
         void preItemRemoved(int index);
         void postItemRemoved();

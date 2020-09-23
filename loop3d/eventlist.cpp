@@ -24,42 +24,52 @@ int EventList::loadFromFile(QString filename)
 
     std::vector<LoopProjectFile::FaultEvent> faultEvents;
     LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,true);
-    for (auto it=faultEvents.begin();it!=faultEvents.end();it++) {
-        std::shared_ptr<LoopProjectFile::FaultEvent> event = std::make_shared<LoopProjectFile::FaultEvent>(std::move(*it));
-        preItemAppended();
-        events.append(event);
+    if (faultEvents.size()) {
+        preItemAppended(0,faultEvents.size());
+        for (auto it=faultEvents.begin();it!=faultEvents.end();it++) {
+            std::shared_ptr<LoopProjectFile::FaultEvent> event = std::make_shared<LoopProjectFile::FaultEvent>(std::move(*it));
+            events.append(event);
+        }
         postItemAppended();
     }
     std::vector<LoopProjectFile::FoldEvent> foldEvents;
     LoopProjectFile::GetFoldEvents(name.toStdString(),foldEvents,true);
-    for (auto it=foldEvents.begin();it!=foldEvents.end();it++) {
-        std::shared_ptr<LoopProjectFile::FoldEvent> event = std::make_shared<LoopProjectFile::FoldEvent>(std::move(*it));
-        preItemAppended();
-        events.append(event);
+    if (foldEvents.size()) {
+        preItemAppended(events.size(),foldEvents.size());
+        for (auto it=foldEvents.begin();it!=foldEvents.end();it++) {
+            std::shared_ptr<LoopProjectFile::FoldEvent> event = std::make_shared<LoopProjectFile::FoldEvent>(std::move(*it));
+            events.append(event);
+        }
         postItemAppended();
     }
     std::vector<LoopProjectFile::FoliationEvent> foliationEvents;
     LoopProjectFile::GetFoliationEvents(name.toStdString(),foliationEvents,true);
-    for (auto it=foliationEvents.begin();it!=foliationEvents.end();it++) {
-        std::shared_ptr<LoopProjectFile::FoliationEvent> event = std::make_shared<LoopProjectFile::FoliationEvent>(std::move(*it));
-        preItemAppended();
-        events.append(event);
+    if (foliationEvents.size()) {
+        preItemAppended(events.size(),foliationEvents.size());
+        for (auto it=foliationEvents.begin();it!=foliationEvents.end();it++) {
+            std::shared_ptr<LoopProjectFile::FoliationEvent> event = std::make_shared<LoopProjectFile::FoliationEvent>(std::move(*it));
+            events.append(event);
+        }
         postItemAppended();
     }
     std::vector<LoopProjectFile::DiscontinuityEvent> discontinuityEvents;
     LoopProjectFile::GetDiscontinuityEvents(name.toStdString(),discontinuityEvents,true);
-    for (auto it=discontinuityEvents.begin();it!=discontinuityEvents.end();it++) {
-        std::shared_ptr<LoopProjectFile::DiscontinuityEvent> event = std::make_shared<LoopProjectFile::DiscontinuityEvent>(std::move(*it));
-        preItemAppended();
-        events.append(event);
+    if (discontinuityEvents.size()) {
+        preItemAppended(events.size(),discontinuityEvents.size());
+        for (auto it=discontinuityEvents.begin();it!=discontinuityEvents.end();it++) {
+            std::shared_ptr<LoopProjectFile::DiscontinuityEvent> event = std::make_shared<LoopProjectFile::DiscontinuityEvent>(std::move(*it));
+            events.append(event);
+        }
         postItemAppended();
     }
     std::vector<LoopProjectFile::StratigraphicLayer> stratigraphicLayers;
     LoopProjectFile::GetStratigraphicLayers(name.toStdString(),stratigraphicLayers,true);
-    for (auto it=stratigraphicLayers.begin();it!=stratigraphicLayers.end();it++) {
-        std::shared_ptr<LoopProjectFile::StratigraphicLayer> layer = std::make_shared<LoopProjectFile::StratigraphicLayer>(std::move(*it));
-        preItemAppended();
-        events.append(layer);
+    if (stratigraphicLayers.size()) {
+        preItemAppended(events.size(),stratigraphicLayers.size());
+        for (auto it=stratigraphicLayers.begin();it!=stratigraphicLayers.end();it++) {
+            std::shared_ptr<LoopProjectFile::StratigraphicLayer> layer = std::make_shared<LoopProjectFile::StratigraphicLayer>(std::move(*it));
+            events.append(layer);
+        }
         postItemAppended();
     }
     sort();
@@ -154,7 +164,7 @@ bool EventList::appendItem(int eventID, QString name, double minAge, double maxA
     event->enabled = isActive;
     event->rank = rank;
 
-    preItemAppended();
+    preItemAppended(events.size(),1);
     events.append(event);
     postItemAppended();
     return 1;

@@ -363,7 +363,7 @@ Item {
                             selectByMouse: true
                             PythonText {
                                 id: dcPythonText
-                                filename: "map2loopTemplate3.py"
+                                filename: "map2loopTemplate4.py"
                                 Component.onCompleted: {
                                     textDocToHighlight = dcTextArea.textDocument
                                     // Use select all and text addition to trigger immediate highlighting

@@ -334,9 +334,9 @@ void EventModel::setEvents(EventList *value)
     events = value;
 
     if (events) {
-        connect(events, &EventList::preItemAppended, this, [this]() {
-            const int index = events->getEvents().size();
-            beginInsertRows(QModelIndex(), index, index);
+        connect(events, &EventList::preItemAppended, this, [this](int start, int count) {
+//            const int index = events->getEvents().size();
+            beginInsertRows(QModelIndex(), start, start+count-1);
         });
         connect(events, &EventList::postItemAppended, this, [this]() {
             endInsertRows();
