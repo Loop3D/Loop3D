@@ -16,7 +16,7 @@ uniform float xstepsize;
 uniform float ystepsize;
 uniform float zstepsize;
 uniform int numTetraPerIso;
-//uniform float isovalues[6];  // Why can't Qt pass vector arrays to shaders
+uniform float isovalues[7];
 uniform float isovalue1;
 uniform float isovalue2;
 uniform float isovalue3;
@@ -107,7 +107,7 @@ Tetra getTetra(int subcubeTetraID, ivec3 referenceIndex)
 
 void main() {
     instanceID = gl_InstanceID;
-    float isovalues[7] = {isovalue1, isovalue2,  isovalue3,  isovalue4,  isovalue5,  isovalue6, isovalue7};
+//    float isovalues[7] = {isovalue1, isovalue2,  isovalue3,  isovalue4,  isovalue5,  isovalue6, isovalue7};
     isovalue = isovalues[int(floor(gl_InstanceID / numTetraPerIso))];
 //    isovalue = isovalue1;
     int subcubeTetraID = int(instanceID) % 5;

@@ -14,9 +14,8 @@ Item {
     height: 768
     id: mainWindow
     property int myBorders: 6
-    property string version: "0.0.3"
+    property string version: "0.0.5"
     property bool confirmOnQuit: false
-    property bool hasFile: false
     property string headingFontStyle: "Arial"
     property int headingFontSize: 14
     property string defaultFontStyle: "Arial"
@@ -52,10 +51,10 @@ Item {
                 text: qsTr("&New...")
                 shortcut: "Ctrl+N"
                 onTriggered: {
-                    project.clearProject()
+                    project.clearProject(true)
                     dcTab.roiReproject()
-                    hasFile = false
-                    dcTab.lockRegionOfInterest = false
+                    project.setLockedExtents(false)
+                    dmTab.reloadMap()
                 }
             }
             Action {
@@ -66,13 +65,13 @@ Item {
             Action {
                 text: qsTr("&Reload...")
                 shortcut: "Ctrl+R"
-                onTriggered: if (hasFile) project.reloadProject()
+                onTriggered: if (project.hasFilename()) project.reloadProject()
             }
             Action {
                 text: qsTr("&Save")
                 shortcut: "Ctrl+S"
                 onTriggered: {
-                    if (hasFile) {
+                    if (project.hasFilename()) {
                         project.saveProject()
                         notifyText.text = "Saved project to " + project.filename
                     } else fileDialogSave.open()
@@ -453,8 +452,7 @@ Item {
                 console.log("Open Project Action - Open " + fileDialogOpen.fileUrl)
                 notifyText.text = "Loaded project from " + fileDialogOpen.fileUrl
                 dcTab.inUTM = project.inUtm
-                dcTab.lockRegionOfInterest = true
-                hasFile = true
+                project.setLockedExtents(true)
                 dcTab.roiReproject()
                 dcTab.reCentreMap()
                 project.flowChoiceMade = true
@@ -480,7 +478,7 @@ Item {
         onAccepted: {
             // Save file here
             if (!project.saveProject(fileDialogSave.fileUrl)) {
-                hasFile = true
+                project.setLockedExtents(true)
                 console.log("Save Project Action - Save to " + fileDialogSave.fileUrl)
                 notifyText.text = "Saved project to " + fileDialogSave.fileUrl
             }

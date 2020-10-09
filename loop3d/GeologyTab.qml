@@ -413,7 +413,7 @@ Item {
                         text: "Create Model"
                         onPressed: {
                             // TODO: remove file open when finished testing textures
-                            if (!hasFile) fileDialogOpen.open()
+                            if (!project.hasFilename()) fileDialogOpen.open()
                             else {
                                 project.saveProject()
                                 pythonText.run(textArea.text,project.filename,false)
@@ -458,7 +458,7 @@ Item {
                         width: 140
                         text: "Run Code"
                         onPressed: {
-                            if (!hasFile) fileDialogSave.open()
+                            if (!project.hasFilename()) fileDialogSave.open()
                             else {
                                 pythonText.run(textArea.text,project.filename,false)
                                 bar.currentIndex = 4

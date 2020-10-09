@@ -265,7 +265,8 @@ QHash<int, QByteArray> ObservationModel::roleNames() const
     role[axisZRole] = "axisZ";
     role[foliationRole] = "folation";
     role[whatIsFoldedRole] = "whatIsFolded";
-    role[layerRole] = "layer";
+    // Need to use a different name for layer as 'layer' seems to be a qml keyword
+    role[layerRole] = "layerName";
 
     return role;
 }
@@ -287,7 +288,8 @@ int ObservationModel::lookupRoleName(QString name) const
     if (name == "axisZ") return axisZRole;
     if (name == "foliation") return foliationRole;
     if (name == "whatIsFolded") return whatIsFoldedRole;
-    if (name == "layer") return layerRole;
+    // Need to use a different name for layer as 'layer' seems to be a qml keyword
+    if (name == "layerName") return layerRole;
 
     return 0;
 
@@ -314,6 +316,12 @@ void ObservationModel::setObservations(ObservationList *value)
         });
         connect(observations, &ObservationList::postItemRemoved, this, [this]() {
             endRemoveRows();
+        });
+        connect(observations, &ObservationList::preItemReset, this, [this]() {
+            beginResetModel();
+        });
+        connect(observations, &ObservationList::postItemReset, this, [this]() {
+            endResetModel();
         });
     }
 

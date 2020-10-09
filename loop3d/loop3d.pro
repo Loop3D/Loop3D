@@ -6,7 +6,12 @@ QT += 3dcore 3drender 3dinput 3dquick 3dquickextras
 QT_OPENGL=desktop
 
 CONFIG += c++11 no_keywords
-#CONFIG += console
+
+win32 {
+    CONFIG(release, debug|release) {
+#        CONFIG += console
+    }
+}
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings

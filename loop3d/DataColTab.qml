@@ -12,7 +12,7 @@ Item {
 
     // Core region of interest values
     property bool inUTM: false
-    property bool lockRegionOfInterest: false
+//    property bool lockRegionOfInterest: false
     property real mapCentreLatitude: 0
     property real mapCentreLongitude: 0
     Component.onCompleted: {
@@ -136,7 +136,7 @@ Item {
                 if (mouse.button === Qt.LeftButton) {
                     panning = true
                 }
-                if (mouse.button === Qt.RightButton && !lockRegionOfInterest) {
+                if (mouse.button === Qt.RightButton && !project.lockedExtents) {
                     project.utmZone = 0
                     startPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
                     endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
@@ -144,7 +144,7 @@ Item {
                 }
             }
             onReleased: {
-                if (mouse.button === Qt.RightButton && !lockRegionOfInterest) {
+                if (mouse.button === Qt.RightButton && !project.lockedExtents) {
                     endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
                     roiReproject()
                 }
@@ -337,12 +337,13 @@ Item {
                         width: 140
                         text: "Extract Data"
                         onPressed: {
-                            if (!hasFile) fileDialogSave.open()
+                            if (!project.hasFilename()) fileDialogSave.open()
                             else {
                                 project.saveProject()
                                 dcPythonText.run(dcTextArea.text,project.filename)
                                 project.reloadProject()
                                 bar.currentIndex = 1
+                                dmTab.reloadMap()
                             }
                         }
                     }
@@ -363,7 +364,7 @@ Item {
                             selectByMouse: true
                             PythonText {
                                 id: dcPythonText
-                                filename: "map2loopTemplate4.py"
+                                filename: "m2l-wa-template.py"
                                 Component.onCompleted: {
                                     textDocToHighlight = dcTextArea.textDocument
                                     // Use select all and text addition to trigger immediate highlighting
@@ -382,12 +383,13 @@ Item {
                         text: "Run Code"
                         onPressed: {
                             // TODO: remove file open when finished testing textures
-                            if (!hasFile) fileDialogOpen.open()
+                            if (!project.hasFilename()) fileDialogSave.open()
                             else {
+                                project.saveProject()
                                 dcPythonText.run(dcTextArea.text,project.filename)
                                 project.reloadProject()
                                 bar.currentIndex = 1
-//                                dcDetailsBar.currentIndex = 2
+                                dmTab.reloadMap()
                             }
                         }
                     }

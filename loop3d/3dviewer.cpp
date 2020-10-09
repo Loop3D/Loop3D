@@ -27,9 +27,9 @@ void L3DViewer::zoom(float factor)
 
 void L3DViewer::pan(float horizontalFactor, float verticalFactor)
 {
-    QVector3D offset(-horizontalFactor*-cos(qDegreesToRadians(m_cameraOffsetCP.x())),
-                     -horizontalFactor*sin(qDegreesToRadians(m_cameraOffsetCP.x())),
-                     -verticalFactor);
+    QVector3D offset(horizontalFactor*-cos(qDegreesToRadians(m_cameraOffsetCP.x())),
+                     horizontalFactor*sin(qDegreesToRadians(m_cameraOffsetCP.x())),
+                     verticalFactor);
     float multiplicationFactor = m_cameraOffsetCP.z() / 1000.0f;
     setLookAtPosition(m_lookatPosition + offset*multiplicationFactor);
     setCameraOffsetCP(m_cameraOffsetCP);
@@ -89,6 +89,14 @@ void L3DViewer::handleKeyEvent(int key, int modifiers)
     }
 }
 
+bool L3DViewer::setIsovalue(int index, float value)
+{
+    if (index < 0 || index >= m_isovalues.size()) return true;
+    m_isovalues[index] = value;
+    isovaluesChanged();
+    return false;
+}
+
 void L3DViewer::allStructureChanged()
 {
     structureXMinChanged();
@@ -119,7 +127,6 @@ L3DViewer::L3DViewer()
     m_invertedView = true;
     m_minScalarValue = 0.0;
     m_maxScalarValue = 1.0;
-    m_isovalue = 0.0;
     m_numIsosurfaces = 1;
     m_miscToggle1 = true;
     m_miscToggle2 = false;
@@ -142,6 +149,9 @@ L3DViewer::L3DViewer()
     m_structureYStepSize = (m_structureYMax-m_structureYMin)/m_structureYSize;
     m_structureZStepSize = (m_structureZMax-m_structureZMin)/m_structureZSize;
     m_structureNumberTetraPerIsosurface = (m_structureXSize-1)*(m_structureYSize-1)*(m_structureZSize-1) * 5;
+    for (int i=0;i<7;i++) {
+        m_isovalues.push_back(i/7.0f);
+    }
     resetView();
     resetCrossSection();
 }

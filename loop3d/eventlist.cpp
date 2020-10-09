@@ -6,6 +6,15 @@ EventList::EventList(QObject *parent) : QObject(parent)
 {
 }
 
+void EventList::clearList()
+{
+    qDebug() << "Clearing event list";
+    preItemReset();
+    events.clear();
+    postItemReset();
+    qDebug() << "Cleared event list";
+}
+
 int EventList::loadFromFile(QString filename)
 {
     int result = 0;
@@ -22,56 +31,48 @@ int EventList::loadFromFile(QString filename)
     name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
+    preItemReset();
     std::vector<LoopProjectFile::FaultEvent> faultEvents;
     LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,true);
     if (faultEvents.size()) {
-        preItemAppended(0,faultEvents.size());
         for (auto it=faultEvents.begin();it!=faultEvents.end();it++) {
             std::shared_ptr<LoopProjectFile::FaultEvent> event = std::make_shared<LoopProjectFile::FaultEvent>(std::move(*it));
             events.append(event);
         }
-        postItemAppended();
     }
     std::vector<LoopProjectFile::FoldEvent> foldEvents;
     LoopProjectFile::GetFoldEvents(name.toStdString(),foldEvents,true);
     if (foldEvents.size()) {
-        preItemAppended(events.size(),foldEvents.size());
         for (auto it=foldEvents.begin();it!=foldEvents.end();it++) {
             std::shared_ptr<LoopProjectFile::FoldEvent> event = std::make_shared<LoopProjectFile::FoldEvent>(std::move(*it));
             events.append(event);
         }
-        postItemAppended();
     }
     std::vector<LoopProjectFile::FoliationEvent> foliationEvents;
     LoopProjectFile::GetFoliationEvents(name.toStdString(),foliationEvents,true);
     if (foliationEvents.size()) {
-        preItemAppended(events.size(),foliationEvents.size());
         for (auto it=foliationEvents.begin();it!=foliationEvents.end();it++) {
             std::shared_ptr<LoopProjectFile::FoliationEvent> event = std::make_shared<LoopProjectFile::FoliationEvent>(std::move(*it));
             events.append(event);
         }
-        postItemAppended();
     }
     std::vector<LoopProjectFile::DiscontinuityEvent> discontinuityEvents;
     LoopProjectFile::GetDiscontinuityEvents(name.toStdString(),discontinuityEvents,true);
     if (discontinuityEvents.size()) {
-        preItemAppended(events.size(),discontinuityEvents.size());
         for (auto it=discontinuityEvents.begin();it!=discontinuityEvents.end();it++) {
             std::shared_ptr<LoopProjectFile::DiscontinuityEvent> event = std::make_shared<LoopProjectFile::DiscontinuityEvent>(std::move(*it));
             events.append(event);
         }
-        postItemAppended();
     }
     std::vector<LoopProjectFile::StratigraphicLayer> stratigraphicLayers;
     LoopProjectFile::GetStratigraphicLayers(name.toStdString(),stratigraphicLayers,true);
     if (stratigraphicLayers.size()) {
-        preItemAppended(events.size(),stratigraphicLayers.size());
         for (auto it=stratigraphicLayers.begin();it!=stratigraphicLayers.end();it++) {
             std::shared_ptr<LoopProjectFile::StratigraphicLayer> layer = std::make_shared<LoopProjectFile::StratigraphicLayer>(std::move(*it));
             events.append(layer);
         }
-        postItemAppended();
     }
+    postItemReset();
     sort();
     return result;
 }

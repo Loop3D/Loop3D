@@ -78,9 +78,9 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
             // Get results back from algorithm (numpy arrays work but don't go past boundaries)
             py::array_t<float> result = locals["result"].cast<py::array_t<float> >();
             py::array_t<float> stepsizes = locals["stepsizes"].cast<py::array_t<float> >();
-            xsteps = locals["xsteps"].cast<float>();
-            ysteps = locals["ysteps"].cast<float>();
-            zsteps = locals["zsteps"].cast<float>();
+            xsteps = locals["xsteps"].cast<int>();
+            ysteps = locals["ysteps"].cast<int>();
+            zsteps = locals["zsteps"].cast<int>();
             qDebug() << stepsizes.at(0) << " " << stepsizes.at(1) << " " << stepsizes.at(2);
             qDebug() << xsteps << " " << ysteps << " " << zsteps;
             if (ProjectManagement::instance()) {

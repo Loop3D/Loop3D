@@ -6,6 +6,15 @@ ObservationList::ObservationList(QObject *parent) : QObject(parent)
 {
 }
 
+void ObservationList::clearList()
+{
+    qDebug() << "Clearing observation list";
+    preItemReset();
+    observations.clear();
+    postItemReset();
+    qDebug() << "Cleared observation list";
+}
+
 int ObservationList::loadFromFile(QString filename)
 {
     int result = 0;
@@ -22,62 +31,57 @@ int ObservationList::loadFromFile(QString filename)
     name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
+    preItemReset();
     std::vector<LoopProjectFile::FaultObservation> faultObservations;
     LoopProjectFile::GetFaultObservations(name.toStdString(),faultObservations,true);
     if (faultObservations.size()) {
-        preItemAppended(0,faultObservations.size());
         for (auto it=faultObservations.begin();it!=faultObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::FaultObservation> observation = std::make_shared<LoopProjectFile::FaultObservation>(std::move(*it));
-//            std::shared_ptr<LoopProjectFile::FaultObservation> observation = std::make_shared<LoopProjectFile::FaultObservation>(*it);
             observation->type = LoopProjectFile::FAULTOBSERVATION;
+            while (observation->dipdir > 360.0) observation->dipdir -=  360.0;
             observations.append(observation);
         }
-        postItemAppended();
     }
     std::vector<LoopProjectFile::FoldObservation> foldObservations;
     LoopProjectFile::GetFoldObservations(name.toStdString(),foldObservations,true);
     if (foldObservations.size()) {
-        preItemAppended(observations.size(),foldObservations.size());
         for (auto it=foldObservations.begin();it!=foldObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::FoldObservation> observation = std::make_shared<LoopProjectFile::FoldObservation>(std::move(*it));
             observation->type = LoopProjectFile::FOLDOBSERVATION;
             observations.append(observation);
         }
-        postItemAppended();
     }
     std::vector<LoopProjectFile::FoliationObservation> foliationObservations;
     LoopProjectFile::GetFoliationObservations(name.toStdString(),foliationObservations,true);
     if (foliationObservations.size()) {
-        preItemAppended(observations.size(),foliationObservations.size());
         for (auto it=foliationObservations.begin();it!=foliationObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::FoliationObservation> observation = std::make_shared<LoopProjectFile::FoliationObservation>(std::move(*it));
             observation->type = LoopProjectFile::FOLIATIONOBSERVATION;
+            while (observation->dipdir > 360.0) observation->dipdir -=  360.0;
             observations.append(observation);
         }
-        postItemAppended();
     }
     std::vector<LoopProjectFile::DiscontinuityObservation> discontinuityObservations;
     LoopProjectFile::GetDiscontinuityObservations(name.toStdString(),discontinuityObservations,true);
     if (discontinuityObservations.size()) {
-        preItemAppended(observations.size(),discontinuityObservations.size());
         for (auto it=discontinuityObservations.begin();it!=discontinuityObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::DiscontinuityObservation> observation = std::make_shared<LoopProjectFile::DiscontinuityObservation>(std::move(*it));
             observation->type = LoopProjectFile::DISCONTINUITYOBSERVATION;
+            while (observation->dipdir > 360.0) observation->dipdir -=  360.0;
             observations.append(observation);
         }
-        postItemAppended();
     }
     std::vector<LoopProjectFile::StratigraphicObservation> stratigraphicObservations;
     LoopProjectFile::GetStratigraphicObservations(name.toStdString(),stratigraphicObservations,true);
     if (stratigraphicObservations.size()) {
-        preItemAppended(observations.size(),stratigraphicObservations.size());
         for (auto it=stratigraphicObservations.begin();it!=stratigraphicObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::StratigraphicObservation> observation = std::make_shared<LoopProjectFile::StratigraphicObservation>(std::move(*it));
             observation->type = LoopProjectFile::STRATIGRAPHICOBSERVATION;
+            while (observation->dipdir > 360.0) observation->dipdir -=  360.0;
             observations.append(observation);
         }
-        postItemAppended();
     }
+    postItemReset();
     return result;
 }
 

@@ -46,6 +46,7 @@ class ProjectManagement : public QQuickItem
     Q_PROPERTY (unsigned int xsize MEMBER m_xsize NOTIFY xsizeChanged)
     Q_PROPERTY (unsigned int ysize MEMBER m_ysize NOTIFY ysizeChanged)
     Q_PROPERTY (unsigned int zsize MEMBER m_zsize NOTIFY zsizeChanged)
+    Q_PROPERTY (bool lockedExtents MEMBER m_lockedExtents WRITE setLockedExtents NOTIFY lockedExtentsChanged)
 
     Q_SIGNALS:
         void filenameChanged();
@@ -77,9 +78,14 @@ class ProjectManagement : public QQuickItem
         void xsizeChanged();
         void ysizeChanged();
         void zsizeChanged();
+        void lockedExtentsChanged();
+
+public Q_SLOTS:
+        void setLockedExtents(bool val) { m_lockedExtents = val; lockedExtentsChanged();}
 
     public:
-        Q_INVOKABLE void clearProject(void);
+        Q_INVOKABLE void clearProject(bool clearExtents);
+        Q_INVOKABLE void deleteProject(void);
         Q_INVOKABLE int saveProject(QString filename = "");
         Q_INVOKABLE int loadProject(QString filename = "");
         Q_INVOKABLE int reloadProject(void);
@@ -95,6 +101,7 @@ class ProjectManagement : public QQuickItem
         Q_INVOKABLE void incrementFlowChoice();
         Q_INVOKABLE void decrementFlowChoice();
         Q_INVOKABLE void loadTextures();
+        Q_INVOKABLE bool hasFilename() { return m_filename != "";}
 
         static ProjectManagement* instance() {
             if (!m_instance) m_instance = new ProjectManagement;
@@ -125,6 +132,7 @@ class ProjectManagement : public QQuickItem
         unsigned int m_xsize;
         unsigned int m_ysize;
         unsigned int m_zsize;
+        bool m_lockedExtents;
         bool m_inUtm;
         int m_mainIndex;
         bool m_extentsChanged;

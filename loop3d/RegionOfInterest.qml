@@ -3,6 +3,7 @@ import QtLocation 5.14
 import QtPositioning 5.14
 import QtQuick.Controls 2.14
 import QtQuick.Shapes 1.14
+import QtQuick.Dialogs 1.2
 
 Item {
     id: element
@@ -38,14 +39,24 @@ Item {
         anchors.margins: 4
         width: 30
         height: 20
-        onClicked: lockRegionOfInterest = !lockRegionOfInterest
+        onClicked: {
+            if (project.hasFilename()) {
+                if (project.lockedExtents) {
+                    unlockDialog.open()
+                }
+                else project.setLockedExtents(true)
+            } else {
+                fileDialogSave.open()
+                if (project.hasFilename()) project.setLockedExtents(true)
+            }
+        }
     }
     Image {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 4
         id: padlockLocked
-        visible: lockRegionOfInterest
+        visible: project.lockedExtents
         source: "images/locked.png"
         width: padlockROI.width
         height: padlockROI.height
@@ -55,7 +66,7 @@ Item {
         anchors.top: parent.top
         anchors.margins: 4
         id: padlockUnlocked
-        visible: !lockRegionOfInterest
+        visible: !project.lockedExtents
         source: "images/unlocked.png"
         width: padlockROI.width
         height: padlockROI.height
@@ -358,7 +369,7 @@ Item {
                 color: "white"
                 border.width: 1
                 TextInput {
-                    readOnly: lockRegionOfInterest
+                    readOnly: project.lockedExtents
                     anchors.fill: parent
                     color: "#000000"
                     font.family: mainWindow.defaultFontStyle
@@ -367,7 +378,7 @@ Item {
                     maximumLength: 10
                     horizontalAlignment: Text.AlignHCenter
                     text: project.spacingX
-                    onTextChanged: if (text != "" && text != "-" && !lockRegionOfInterest) project.spacingX = text
+                    onTextChanged: if (text != "" && text != "-" && !project.lockedExtents) project.spacingX = text
                     selectByMouse: true
                 }
             }
@@ -402,7 +413,7 @@ Item {
                 color: "white"
                 border.width: 1
                 TextInput {
-                    readOnly: lockRegionOfInterest
+                    readOnly: project.lockedExtents
                     anchors.fill: parent
                     color: "#000000"
                     font.family: mainWindow.defaultFontStyle
@@ -411,7 +422,7 @@ Item {
                     maximumLength: 10
                     horizontalAlignment: Text.AlignHCenter
                     text: project.spacingY
-                    onTextChanged: if (text != "" && text != "-" && !lockRegionOfInterest) project.spacingY = text
+                    onTextChanged: if (text != "" && text != "-" && !project.lockedExtents) project.spacingY = text
                     selectByMouse: true
                 }
             }
@@ -446,7 +457,7 @@ Item {
                 color: "white"
                 border.width: 1
                 TextInput {
-                    readOnly: lockRegionOfInterest
+                    readOnly: project.lockedExtents
                     anchors.fill: parent
                     color: "#000000"
                     font.family: mainWindow.defaultFontStyle
@@ -455,7 +466,7 @@ Item {
                     maximumLength: 10
                     horizontalAlignment: Text.AlignHCenter
                     text: project.spacingZ
-                    onTextChanged: if (text != "" && text != "-" && !lockRegionOfInterest) project.spacingZ = text
+                    onTextChanged: if (text != "" && text != "-" && !project.lockedExtents) project.spacingZ = text
                     selectByMouse: true
                 }
             }
@@ -490,7 +501,7 @@ Item {
             text: inUTM ? "UTM" : "GEODETIC"
             onClicked: {
                 // Ensure reprojection before swap
-                if(!lockRegionOfInterest && project.utmZone != 0) {
+                if(!project.lockedExtents && project.utmZone != 0) {
                     roiReproject()
                     reCentreMap()
                 }
@@ -552,7 +563,7 @@ Item {
         height: 40
         text: "Clear Extents"
         onClicked: {
-            if(!lockRegionOfInterest) {
+            if(!project.lockedExtents) {
                 project.clearProject()
                 roiReproject()
             }
@@ -576,6 +587,24 @@ Item {
               "\n Grid Size = "  + ((project.maxEasting - project.minEasting)/project.spacingX).toFixed(0) +
               " x " + ((project.maxNorthing - project.minNorthing)/project.spacingY).toFixed(0) +
               " x " + ((project.maxDepth - project.minDepth)/project.spacingZ).toFixed(0)
+    }
+
+    // Dialog box for unlocking extents
+    MessageDialog {
+        id: unlockDialog
+        title: "Are you sure?"
+        icon: StandardIcon.Question
+        informativeText: "You might have data and/or models already created with these extents.\n"
+            + "Changing them will require these to be re-calculated.\n\n"
+            + "Continuing will delete the current project file and re-create an empty one.\n"
+            + "Do you want to continue?"
+        standardButtons: StandardButton.Yes | StandardButton.No
+        onYes: {
+            project.deleteProject()
+            project.clearProject(false)
+            project.saveProject()
+            project.setLockedExtents(false)
+        }
     }
 
     Component.onCompleted: reCentreMap()

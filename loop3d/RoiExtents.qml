@@ -30,7 +30,7 @@ Item {
         border.width: 1
         TextInput {
             id: editField
-            readOnly: lockRegionOfInterest
+            readOnly: project.lockedExtents
             anchors.fill: parent
             color: "#000000"
             font.family: mainWindow.defaultFontStyle
@@ -39,7 +39,7 @@ Item {
             maximumLength: 10
             horizontalAlignment: Text.AlignHCenter
             Component.onCompleted: text = parent.parent.text
-            onTextChanged: if (text != "" && text != "-" && !lockRegionOfInterest) parent.parent.text = text
+            onTextChanged: if (text != "" && text != "-" && !project.lockedExtents) parent.parent.text = text
             selectByMouse: true
             onFocusChanged: {
                 if (inUTM) project.checkUTMLimits()

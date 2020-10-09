@@ -23,9 +23,10 @@ class StructuralModel : protected QOpenGLFunctions
         unsigned int getWidthUI() { return m_width; }
         unsigned int getHeightUI() { return m_height; }
         unsigned int getDepthUI() { return m_depth; }
-        bool getDataChanged() { return dataChanged; }
+        bool getDataChanged() { return m_dataChanged; }
         Qt3DRender::QSharedGLTexture* getStructuralData(void) { return m_sharedTexture; }
 
+        void clearData(void);
         void loadData(pybind11::array_t<float> values_in,
                                        float xmin, float xmax, int xsteps,
                                        float ymin, float ymax, int ysteps,
@@ -49,8 +50,8 @@ class StructuralModel : protected QOpenGLFunctions
 
         float* m_valueData;
 
-        bool modelCreated;
-        bool dataChanged;
+        bool m_modelCreated;
+        bool m_dataChanged;
 
        // Graphics Thread
     public:

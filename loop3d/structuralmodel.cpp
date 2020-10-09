@@ -28,10 +28,10 @@ StructuralModel::StructuralModel()
 
     m_values.clear();
     m_valueData = nullptr;
-    dataChanged = false;
+    m_dataChanged = false;
     valueTexture = new QOpenGLTexture(QOpenGLTexture::Target3D);
     m_sharedTexture = new Qt3DRender::QSharedGLTexture();
-    modelCreated = false;
+    m_modelCreated = false;
     createBasicTestStructure(TEST_GRID_SIZE);
 }
 
@@ -41,6 +41,12 @@ StructuralModel::~StructuralModel()
     if (valueTexture) delete valueTexture;
     if (m_sharedTexture) delete m_sharedTexture;
 
+}
+
+void StructuralModel::clearData()
+{
+    m_modelCreated = false;
+    createBasicTestStructure(TEST_GRID_SIZE);
 }
 
 void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, float xmax,  int xsteps, float ymin, float ymax, int ysteps, float zmin, float zmax, int zsteps)
@@ -88,8 +94,8 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
                 if (val > m_valmax) m_valmax = val;
             }
             qDebug() << "Loaded structures";
-            dataChanged = true;
-            modelCreated = true;
+            m_dataChanged = true;
+            m_modelCreated = true;
         }
     }
     dataMutex.unlock();
@@ -98,7 +104,7 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
 int StructuralModel::saveToFile(QString filename)
 {
     int result = 0;
-    if (!modelCreated) return result;
+    if (!m_modelCreated) return result;
 
     // Find last '/' of the first set of '/'s as in file:/// or url:///
     QStringList list;
@@ -171,8 +177,8 @@ int StructuralModel::loadFromFile(QString filename)
                 if (m_valueData[i] < m_valmin) m_valmin = m_valueData[i];
                 if (m_valueData[i] > m_valmax) m_valmax = m_valueData[i];
             }
-            dataChanged = true;
-            modelCreated = true;
+            m_dataChanged = true;
+            m_modelCreated = true;
         }
 
         ProjectManagement* project =  ProjectManagement::instance();
@@ -198,7 +204,7 @@ int StructuralModel::loadFromFile(QString filename)
 void StructuralModel::createBasicTestStructure(unsigned int size)
 {
     if (size < 1) size = 1;
-    modelCreated = false;
+    m_modelCreated = false;
     dataMutex.lock();
     {
         m_xmin = m_ymin = m_zmin = 0.0f;
@@ -223,7 +229,7 @@ void StructuralModel::createBasicTestStructure(unsigned int size)
                         m_values.push_back(val);
                         m_valueData[i*getHeightUI()*getDepthUI() + j*getDepthUI() + k] = val;
                     }
-            dataChanged = true;
+            m_dataChanged = true;
         }
         updateStructureDataInViewer();
     }
@@ -259,7 +265,7 @@ void StructuralModel::updateStructureDataInViewer()
 
 int StructuralModel::loadTextures()
 {
-    if (dataChanged) {
+    if (m_dataChanged) {
         qDebug() << "Setting up textures for displays";
         ProjectManagement* project =  ProjectManagement::instance();
         openGLContext = project->getQmlQuickView()->openglContext();
@@ -279,11 +285,9 @@ int StructuralModel::loadTextures()
             valueTexture->setMinMagFilters(QOpenGLTexture::Nearest,QOpenGLTexture::Nearest);
             valueTexture->allocateStorage(QOpenGLTexture::Red,QOpenGLTexture::Float32);
             valueTexture->setData(QOpenGLTexture::Red,QOpenGLTexture::Float32,static_cast<const void*>(m_valueData));
-
-            QByteArray data((char*)(m_valueData),sizeof(float)*m_totalPoints);
             m_sharedTexture->setTextureId(static_cast<int>(valueTexture->textureId()));
 
-            dataChanged = false;
+            m_dataChanged = false;
         }
         dataMutex.unlock();
         return 1;

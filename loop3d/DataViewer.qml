@@ -146,13 +146,7 @@ Item {
                     value: (index+1) / 7 * (viewer.maxScalarValue - viewer.minScalarValue) + viewer.minScalarValue
                     to: viewer.maxScalarValue
                     pressed: {
-                        if (index == 0) viewer.isovalue = value
-                        else if (index == 1) viewer.isovalue2 = value
-                        else if (index == 2) viewer.isovalue3 = value
-                        else if (index == 3) viewer.isovalue4 = value
-                        else if (index == 4) viewer.isovalue5 = value
-                        else if (index == 5) viewer.isovalue6 = value
-                        else if (index == 6) viewer.isovalue7 = value
+                        viewer.setIsovalue(index,value)
                     }
 
                     background: Rectangle {

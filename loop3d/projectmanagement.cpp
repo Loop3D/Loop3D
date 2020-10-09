@@ -6,6 +6,7 @@
 #include <exception>
 #include <netcdf>
 #include <sys/types.h>
+#include <stdio.h>
 
 
 ProjectManagement* ProjectManagement::m_instance = nullptr;
@@ -27,46 +28,81 @@ ProjectManagement::ProjectManagement():
     m_sharedTextureId(0),
     m_utmZone(0),
     m_utmNorthSouth(-1),
-    m_filename("")
+    m_filename(""),
+    m_lockedExtents(false)
 {
 
 }
 
-void ProjectManagement::clearProject(void)
+void ProjectManagement::clearProject(bool clearExtents)
 {
-    m_utmZone = 0;
-    m_utmNorthSouth = 0;
-    m_utmNorthSouthStr = "-";
-    m_minLatitude = 0;
-    m_maxLatitude = 0;
-    m_minLongitude = 0;
-    m_maxLongitude = 0;
-    m_minNorthing = 0;
-    m_maxNorthing = 0;
-    m_minEasting = 0;
-    m_maxEasting = 0;
-    m_filename = "";
-    m_mapCentreLatitude = 0;
-    m_mapCentreLongitude = 0;
-    m_minDepth = -1200.0;
-    m_maxDepth = 12000.0;
-    m_spacingX = 1000;
-    m_spacingY = 1000;
-    m_spacingZ = 300;
-    m_xsize = 51;
-    m_ysize = 51;
-    m_zsize = 51;
-    m_inUtm = false;
-    m_extentsChanged = true;
-    m_flowChoiceMade = false;
-    m_flowChoice = 1;
-    m_loopStructuralFlowOption = 2;
+    if (clearExtents) {
+        m_utmZone = 0;
+        m_utmNorthSouth = 0;
+        m_utmNorthSouthStr = "-";
+        m_minLatitude = 0;
+        m_maxLatitude = 0;
+        m_minLongitude = 0;
+        m_maxLongitude = 0;
+        m_minNorthing = 0;
+        m_maxNorthing = 0;
+        m_minEasting = 0;
+        m_maxEasting = 0;
+        m_filename = "";
+        m_mapCentreLatitude = 0;
+        m_mapCentreLongitude = 0;
+        m_minDepth = -1200.0;
+        m_maxDepth = 12000.0;
+        m_spacingX = 1000;
+        m_spacingY = 1000;
+        m_spacingZ = 300;
+        m_xsize = 51;
+        m_ysize = 51;
+        m_zsize = 51;
+        m_extentsChanged = true;
+        m_inUtm = false;
+        m_flowChoiceMade = false;
+        m_flowChoice = 1;
+        m_loopStructuralFlowOption = 2;
+        minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
+        minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
+        utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
+        spacingXChanged(); spacingYChanged(); spacingZChanged(); extentsChangedChanged();
+        flowChoiceChanged(); flowChoiceMadeChanged(); loopStructuralFlowOptionChanged();
+    }
     m_sharedTextureId = 0;
-    minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
-    minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
-    utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
-    spacingXChanged(); spacingYChanged(); spacingZChanged(); extentsChangedChanged();
-    flowChoiceChanged(); flowChoiceMadeChanged(); loopStructuralFlowOptionChanged();
+    eventList.clearList();
+    observationList.clearList();
+    stModel.clearData();
+    m_lockedExtents = false;
+    if (hasFilename()) saveProject(m_filename);
+}
+
+void ProjectManagement::deleteProject()
+{
+    QString filename = m_filename;
+    QStringList list;
+    QString name;
+    // Find last '/' of the first set of '/'s as in file:/// or url:///
+#ifdef _WIN32
+    list = filename.split(QRegExp("///"));
+    name = (list.length() > 1 ? list[1] : list[0]);
+#elif __linux__
+    list = filename.split(QRegExp("///"));
+    name = "/" + (list.length() > 1 ? list[1] : list[0]);
+#endif
+
+    struct stat bf;
+    // Check whether file exists
+    bool loopFileExists = stat(name.toStdString().c_str(), &bf) == 0;
+
+    if (loopFileExists) {
+        qDebug() << "Deleting project file " << name;
+        if (remove(name.toStdString().c_str()))
+            qDebug() << "ERROR: Failed to delete project file " << name;
+        else
+            qDebug() << "Successfully deleted project file " << name;
+    }
 }
 
 int ProjectManagement::saveProject(QString filename)
@@ -132,6 +168,8 @@ int ProjectManagement::saveProject(QString filename)
     observationList.saveToFile(filename);
 
     m_extentsChanged = false;
+    m_lockedExtents = true;
+    lockedExtentsChanged();
     return 0;
 }
 
@@ -198,6 +236,8 @@ int ProjectManagement::loadProject(QString filename)
     observationList.loadFromFile(filename);
 
     m_extentsChanged = false;
+    m_lockedExtents = true;
+    lockedExtentsChanged();
     return 0;
 }
 

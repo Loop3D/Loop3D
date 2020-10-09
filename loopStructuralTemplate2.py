@@ -4,17 +4,24 @@ from LoopStructural.modelling.features.geological_feature import GeologicalFeatu
 import LoopProjectFile
 import numpy
 
-data_dir="new_tmp_data/"
+skip_faults = False
+
+if ('m2l_data_dir' not in vars() and 'm2l_data_dir' not in globals()):
+    m2l_data_dir = "m2l_data/"
+
 # Check filename
 if ('loopFilename' not in vars() and 'loopFilename' not in globals()):
-    loopFilename = "qld.loop3d"
+    loopFilename = "default.loop3d"
 else:
     print("Opening loop project file: " + loopFilename)
+
 # UTM boundary is [minEasting, maxEasting, minNorthing, maxNorthing, minDepth, maxDepth]
-boundaries = [-334514,-292074,7713303,7739799,-1200,8200]
-stepsizes = [1000,1000,300]
 resp = LoopProjectFile.Get(loopFilename,"extents")
-if resp["errorFlag"]: print(resp["errorString"])
+if resp["errorFlag"]:
+    boundaries = [500102.854, 603064.443,
+                  7455392.3, 7567970.26,-1200.0, 12000.0]
+    stepsizes = [1000,1000,300]
+    print(resp["errorString"])
 else:
     boundaries = resp["value"]["utm"][2:] + resp["value"]["depth"]
     stepsizes = resp["value"]["spacing"]
@@ -33,8 +40,8 @@ foliation_params = {'interpolatortype':'PLI' , # 'interpolatortype':'PLI',
     'solver':'pyamg',
     'damp':True}
 model, m2l_data = GeologicalModel.from_map2loop_directory(
-    data_dir,
-    # skip_faults=True,
+    m2l_data_dir,
+    skip_faults=skip_faults,
     fault_params=fault_params,
     foliation_params=foliation_params
     )

@@ -347,6 +347,12 @@ void EventModel::setEvents(EventList *value)
         connect(events, &EventList::postItemRemoved, this, [this]() {
             endRemoveRows();
         });
+        connect(events, &EventList::preItemReset, this, [this]() {
+            beginResetModel();
+        });
+        connect(events, &EventList::postItemReset, this, [this]() {
+            endResetModel();
+        });
     }
 
     endResetModel();

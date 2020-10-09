@@ -27,6 +27,7 @@ class EventList : public QObject {
         EventList(QObject* parent=nullptr);
         ~EventList() { events.clear(); pBlocks.clear(); }
 
+        void clearList();
         int loadFromFile(QString filename);
         int saveToFile(QString filename);
         bool setEventAt(int index, const LoopProjectFile::Event& event);
@@ -40,6 +41,8 @@ class EventList : public QObject {
         void postItemAppended();
         void preItemRemoved(int index);
         void postItemRemoved();
+        void preItemReset();
+        void postItemReset();
 
     public Q_SLOTS:
         bool appendItem(int eventID, QString name, double minAge, double maxAge, LoopProjectFile::EventType type, int rank=0, bool isActive=true);

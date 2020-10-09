@@ -14,6 +14,7 @@ class ObservationList : public QObject {
         ObservationList(QObject* parent=nullptr);
         ~ObservationList() { observations.clear(); }
 
+        void clearList();
         int loadFromFile(QString filename);
         int saveToFile(QString filename);
         bool setObservationAt(int index, const LoopProjectFile::Observation& observation);
@@ -24,6 +25,8 @@ class ObservationList : public QObject {
         void postItemAppended();
         void preItemRemoved(int index);
         void postItemRemoved();
+        void preItemReset();
+        void postItemReset();
 
     public Q_SLOTS:
         bool appendItem(int eventID, double easting, double northing, double altitude, LoopProjectFile::ObservationType type);

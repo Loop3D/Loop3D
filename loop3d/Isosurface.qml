@@ -102,13 +102,7 @@ Scene3DView {
                         Parameter { name: "lightPos" ; value: Qt.vector3d(0.0,0.0,500000.0) },
                         Parameter { name: "scalarField" ; value: project.getStructuralModelData() },
                         Parameter { name: "invertedView" ; value: viewer.invertedView },
-                        Parameter { name: "isovalue1" ; value: viewer.isovalue },
-                        Parameter { name: "isovalue2" ; value: viewer.isovalue2 },
-                        Parameter { name: "isovalue3" ; value: viewer.isovalue3 },
-                        Parameter { name: "isovalue4" ; value: viewer.isovalue4 },
-                        Parameter { name: "isovalue5" ; value: viewer.isovalue5 },
-                        Parameter { name: "isovalue6" ; value: viewer.isovalue6 },
-                        Parameter { name: "isovalue7" ; value: viewer.isovalue7 }
+                        Parameter { name: "isovalues[0]" ; value: viewer.isovalues }
                     ]
                     effect: Effect {
                         techniques: [
@@ -225,13 +219,7 @@ Scene3DView {
                         Parameter { name: "lightPos" ; value: Qt.vector3d(0.0,0.0,500000.0) },
                         Parameter { name: "scalarField" ; value: project.getStructuralModelData() },
                         Parameter { name: "invertedView" ; value: viewer.invertedView },
-                        Parameter { name: "isovalue1" ; value: viewer.isovalue },
-                        Parameter { name: "isovalue2" ; value: viewer.isovalue2 },
-                        Parameter { name: "isovalue3" ; value: viewer.isovalue3 },
-                        Parameter { name: "isovalue4" ; value: viewer.isovalue4 },
-                        Parameter { name: "isovalue5" ; value: viewer.isovalue5 },
-                        Parameter { name: "isovalue6" ; value: viewer.isovalue6 },
-                        Parameter { name: "isovalue7" ; value: viewer.isovalue7 }
+                        Parameter { name: "isovalue[0]" ; value: viewer.isovalues }
                     ]
                     effect: Effect {
                         techniques: [
@@ -376,6 +364,7 @@ Scene3DView {
         }
         NodeInstantiator {
             id: observations
+            enabled: bar.currentIndex == 4
             model: observationsModel
             delegate: Entity {
                 id: observationEntity
@@ -398,7 +387,7 @@ Scene3DView {
                     },
                     DiffuseSpecularMaterial {
                         ambient: "#ff9955"
-                        diffuse: "#00ff00"
+                        diffuse: "#222222"
                         specular: "#ff0000"
                     }
                 ]

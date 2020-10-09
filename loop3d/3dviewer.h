@@ -15,13 +15,7 @@ class L3DViewer : public QQuickItem
     Q_PROPERTY (double minScalarValue MEMBER m_minScalarValue NOTIFY minScalarValueChanged)
     Q_PROPERTY (double maxScalarValue MEMBER m_maxScalarValue NOTIFY maxScalarValueChanged)
     Q_PROPERTY (double numIsosurfaces MEMBER m_numIsosurfaces NOTIFY numIsosurfacesChanged)
-    Q_PROPERTY (double isovalue MEMBER m_isovalue NOTIFY isovalueChanged)
-    Q_PROPERTY (double isovalue2 MEMBER m_isovalue2 NOTIFY isovalue2Changed)
-    Q_PROPERTY (double isovalue3 MEMBER m_isovalue3 NOTIFY isovalue3Changed)
-    Q_PROPERTY (double isovalue4 MEMBER m_isovalue4 NOTIFY isovalue4Changed)
-    Q_PROPERTY (double isovalue5 MEMBER m_isovalue5 NOTIFY isovalue5Changed)
-    Q_PROPERTY (double isovalue6 MEMBER m_isovalue6 NOTIFY isovalue6Changed)
-    Q_PROPERTY (double isovalue7 MEMBER m_isovalue7 NOTIFY isovalue7Changed)
+    Q_PROPERTY (QList<float> isovalues MEMBER m_isovalues NOTIFY isovaluesChanged)
     Q_PROPERTY (int miscToggle1 MEMBER m_miscToggle1 NOTIFY miscToggle1Changed)
     Q_PROPERTY (int miscToggle2 MEMBER m_miscToggle2 NOTIFY miscToggle2Changed)
     Q_PROPERTY (int miscToggle3 MEMBER m_miscToggle3 NOTIFY miscToggle3Changed)
@@ -56,13 +50,6 @@ Q_SIGNALS:
     void invertedViewChanged();
     void minScalarValueChanged();
     void maxScalarValueChanged();
-    void isovalueChanged();
-    void isovalue2Changed();
-    void isovalue3Changed();
-    void isovalue4Changed();
-    void isovalue5Changed();
-    void isovalue6Changed();
-    void isovalue7Changed();
     void miscToggle1Changed();
     void miscToggle2Changed();
     void miscToggle3Changed();
@@ -73,6 +60,7 @@ Q_SIGNALS:
     void cameraOffsetCPChanged();
     void lookatPositionChanged();
     void numIsosurfacesChanged();
+    void isovaluesChanged();
     void structureXMinChanged();
     void structureXMaxChanged();
     void structureYMinChanged();
@@ -108,6 +96,7 @@ public Q_SLOTS:
     void handleKeyEvent(int key, int modifiers);
 
 public:
+    Q_INVOKABLE bool setIsovalue(int index, float value);
     static L3DViewer* instance() {
         if (!m_instance) m_instance = new L3DViewer;
         return m_instance;
@@ -117,14 +106,8 @@ public:
     bool m_invertedView;
     float m_minScalarValue;
     float m_maxScalarValue;
-    double m_isovalue;
-    double m_isovalue2;
-    double m_isovalue3;
-    double m_isovalue4;
-    double m_isovalue5;
-    double m_isovalue6;
-    double m_isovalue7;
     int m_numIsosurfaces;
+    QList<float> m_isovalues;
     int m_miscToggle1;
     int m_miscToggle2;
     int m_miscToggle3;

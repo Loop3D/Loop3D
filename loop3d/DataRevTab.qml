@@ -8,6 +8,10 @@ import loop3d.observationmodel 1.0
 Item {
     id: dmTab
     // Main area for data review tab
+    function reloadMap() {
+        map.source = ""
+        map.source = project.filename + ".png"
+    }
     Rectangle {
         border.color: "#ffffff"
         border.width: 0
@@ -97,10 +101,12 @@ Item {
                             if (detailsView.currentIndex == index) {
                                 detailsView.currentIndex = -1
                                 observationView.selectedEntityId = -1
+                                observationView.selectedEntityType = -1
                                 observationView.isEntityActive = true
                             } else {
                                 detailsView.currentIndex = index
                                 observationView.selectedEntityId = eventID
+                                observationView.selectedEntityType = type
                                 observationView.isEntityActive = isActive
                             }
                         }
@@ -125,23 +131,41 @@ Item {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 anchors.margins: mainWindow.myBorders
-                text: "Observation List"
-                height: 20
+                text: "Observation List\n"
+                height: mainWindow.defaultFontSize
                 font.bold: true
                 font.family: mainWindow.headingFontStyle
                 font.pixelSize: mainWindow.headingFontSize
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignTop
             }
+            Text {
+                id: visualisationDMHeadings
+                anchors.top: visualisationDMHeader.bottom
+                anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.margins: mainWindow.myBorders
+                text: (observationView.selectedEntityType == 0 ? "ID\t(East/North/Alt)\tDipDir\tDip\tDipPol\tDisplacement\tVal" : "")
+                    + (observationView.selectedEntityType == 1 ? "ID\t(East/North/Alt)\t(AxisX/AxisY/AxisZ)\tFoliation\tWhatisFolded" : "")
+                    + (observationView.selectedEntityType == 2 ? "ID\t(East/North/Alt)\tDipDir\tDip" : "")
+                    + (observationView.selectedEntityType == 3 ? "ID\t(East/North/Alt)\tDipDir\tDip" : "")
+                    + (observationView.selectedEntityType == 4 ? "ID\t(East/North/Alt)\tDipDir\tDip\tDipPol\tLayer" : "")
+                height: mainWindow.defaultFontSize
+                font.bold: true
+                font.family: mainWindow.headingFontStyle
+                font.pixelSize: mainWindow.headingFontSize
+                verticalAlignment: Text.AlignTop
+            }
 
             ScrollView {
                 id: observationView
                 property int selectedEntityId: -1
+                property int selectedEntityType: -1
                 property bool isEntityActive: true
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.top: visualisationDMHeader.bottom
+                anchors.top: visualisationDMHeadings.bottom
                 clip: true
                 ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                 ListView {
@@ -173,11 +197,11 @@ Item {
                         color: eventID == observationView.selectedEntityId ? "#000000" : "#00000000"
                         font.italic: observationView.isEntityActive ? false : true
                         text: eventID + "\t(" + Math.round(easting) + "," + Math.round(northing) + "," + Math.round(altitude) + ")\t"
-                              + (type == 0 ? "Fault\t" + dip + "\t" + dipDir + "\t" + dipPolarity : "")
-                              + (type == 1 ? "Fold\t (" + axisX + "," + axisY + "," + axisZ + ")" + "\t" + foliation + "\t" + whatIsFolded : "")
-                              + (type == 2 ? "Foliation\t " + dip + "\t" + dipDir : "")
-                              + (type == 3 ? "Discont\t " + dip + "\t" + dipDir : "")
-                              + (type == 4 ? "Strata\t " + dip + "\t" + dipDir + "\t" + dipPolarity + "\t" + layer : "")
+                              + (type == 0 ? Math.round(dipDir) + "\t" + dip + "\t" + dipPolarity + "\t" + displacement + "\t" + val : "")
+                              + (type == 1 ? "(" + axisX + "," + axisY + "," + axisZ + ")" + "\t" + foliation + "\t" + whatIsFolded : "")
+                              + (type == 2 ? dipDir + "\t" + dip : "")
+                              + (type == 3 ? dipDir + "\t" + dip  : "")
+                              + (type == 4 ? dipDir + "\t" + dip + "\t" + dipPolarity + "\t" + layerName : "")
                         font.family: mainWindow.defaultFontStyle
                         font.pixelSize: mainWindow.defaultFontSize
                     }
@@ -198,7 +222,7 @@ Item {
             // Also somewhere on this page there should be a stratigraphic column showing the colours and names of the strata
             Image {
                 id: map
-                source: project.filename + ".jpg"
+                source: project.filename + ".png"
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
 
@@ -223,9 +247,9 @@ Item {
             anchors.right: parent.right
             anchors.margins: 10
             text: "Reload"
-            onPressed: {
-                map.source = ""
-                map.source = project.filename + ".jpg"
+            onPressed: { reloadMap()
+//                map.source = ""
+//                map.source = project.filename + ".png"
             }
 
         }
