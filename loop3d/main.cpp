@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlContext>
 #include <QtQuick/QQuickView>
+#include <QDir>
 
 #include <pybind11/embed.h>
 
@@ -94,6 +95,7 @@ int main(int argc, char *argv[])
     view.rootContext()->setContextProperty(QStringLiteral("observationList"), project->getObservationList());
     view.rootContext()->setContextProperty(QStringLiteral("project"), project);
     view.rootContext()->setContextProperty(QStringLiteral("viewer"), viewer);
+    view.rootContext()->setContextProperty(QStringLiteral("workingDir"), QString(QDir::currentPath()));
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:///main.qml"));
     view.show();

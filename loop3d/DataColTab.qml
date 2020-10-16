@@ -12,7 +12,6 @@ Item {
 
     // Core region of interest values
     property bool inUTM: false
-//    property bool lockRegionOfInterest: false
     property real mapCentreLatitude: 0
     property real mapCentreLongitude: 0
     Component.onCompleted: {
@@ -74,26 +73,23 @@ Item {
             }
         }
 
-        // Initiate map plugin
-        Plugin {
-            id: mapPlugin
-            name: "osm"
-        }
-
         // Map information using open street view
         // Needs online access to function
         Map {
-            id: mapBase
+            id: mapUnderlayer
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.margins: mainWindow.myBorders
             width: parent.width / 2 - mainWindow.myBorders - 1
             height: parent.height / 2 - mainWindow.myBorders - 1
-            plugin: mapPlugin
-            center: QtPositioning.coordinate(mapCentreLatitude, mapCentreLongitude)
-            zoomLevel: 7
+            plugin: Plugin {
+                name: "osm"
+            }
+            center: mapBase.center
+            zoomLevel: mapBase.zoomLevel
+            maximumZoomLevel: mapBase.maximumZoomLevel
             MapPolygon {
-                id: regionOfInterestPoly
+                id: regionOfInterestPolyUnderlayer
                 color: "#55aa0000"
                 path: [
                     QtPositioning.coordinate(project.minLatitude, project.minLongitude),
@@ -104,82 +100,111 @@ Item {
                 border.width: 2
             }
         }
+        Rectangle {
+            id: mapArea
+            layer.enabled: true
+            opacity: 0.5
+            color: "#00000000"
+            anchors.fill: mapUnderlayer
 
-        MouseArea {
-            id: mapInteraction
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.margins: mainWindow.myBorders
-            width: parent.width / 2 - mainWindow.myBorders - 1
-            height: parent.height / 2 - mainWindow.myBorders - 1
-            // hover enables events without clicks
-            hoverEnabled: true
-            pressAndHoldInterval: 0
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-
-
-            property int lastX: -1
-            property int lastY: -1
-            property bool panning: false
-            property bool drawRegion: false
-            UTM { id: llConvert }
-            LL { id: llPos }
-            Location { id: llLoc }
-            Location { id: startPos }
-            Location { id: endPos }
-
-            onPressed: {
-                lastX = mouse.x
-                lastY = mouse.y
-            }
-            onPressAndHold: {
-                if (mouse.button === Qt.LeftButton) {
-                    panning = true
-                }
-                if (mouse.button === Qt.RightButton && !project.lockedExtents) {
-                    project.utmZone = 0
-                    startPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
-                    endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
-                    drawRegion = true
-                }
-            }
-            onReleased: {
-                if (mouse.button === Qt.RightButton && !project.lockedExtents) {
-                    endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
-                    roiReproject()
-                }
-                panning = false
-                drawRegion = false
-            }
-
-            onPositionChanged: {
-                if (panning) {
-                    mapBase.pan(lastX-mouseX, lastY-mouseY)
-                    lastX = mouseX
-                    lastY = mouseY
-                }
-                if (drawRegion) {
-                    endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
-
-                    // Check for NaNs (i.e. when mouse is dragged outside map area
-                    if (endPos.coordinate.latitude === endPos.coordinate.latitude && endPos.coordinate.longitude === endPos.coordinate.longitude) {
-                        // Proceed as no NaNs detected
-                        project.updateGeodeticLimits(startPos.coordinate.latitude, endPos.coordinate.latitude, startPos.coordinate.longitude, endPos.coordinate.longitude)
-                        roiReproject()
+            Map {
+                id: mapBase
+                anchors.fill: parent
+                color: "#00000000"
+                plugin: Plugin {
+                    name: "osm"
+                    PluginParameter {
+                        name: "osm.mapping.offline.directory"
+                        value: workingDir + "/offline_tiles/"
                     }
                 }
-
-                llLoc.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
-                if (project.inUtm) {
-                    llPos.latitude = llLoc.coordinate.latitude
-                    llPos.longitude = llLoc.coordinate.longitude
-                    llConvert.fromLL(llPos)
-                    notifyText.text = "Mouse Position: Zone:"+ llConvert.zone + llConvert.northStr + " N:" + llConvert.northing.toFixed(1) + " S:" + llConvert.easting.toFixed(1)
-                } else {
-                    notifyText.text = "Mouse Position: " + llLoc.coordinate.toString().match(/.*[SN].*[EW]/)[0]
+                center: QtPositioning.coordinate(mapCentreLatitude, mapCentreLongitude)
+                zoomLevel: 6
+                maximumZoomLevel: 10
+                MapPolygon {
+                    id: regionOfInterestPoly
+                    color: "#55aa0000"
+                    path: [
+                        QtPositioning.coordinate(project.minLatitude, project.minLongitude),
+                        QtPositioning.coordinate(project.maxLatitude, project.minLongitude),
+                        QtPositioning.coordinate(project.maxLatitude, project.maxLongitude),
+                        QtPositioning.coordinate(project.minLatitude, project.maxLongitude)
+                    ]
+                    border.width: 2
                 }
             }
-            onExited: notifyText.text = ""
+            MouseArea {
+                id: mapInteraction
+                anchors.fill: parent
+
+                // hover enables events without clicks
+                hoverEnabled: true
+                pressAndHoldInterval: 0
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                property int lastX: -1
+                property int lastY: -1
+                property bool panning: false
+                property bool drawRegion: false
+                UTM { id: llConvert }
+                LL { id: llPos }
+                Location { id: llLoc }
+                Location { id: startPos }
+                Location { id: endPos }
+
+                onPressed: {
+                    lastX = mouse.x
+                    lastY = mouse.y
+                }
+                onPressAndHold: {
+                    if (mouse.button === Qt.LeftButton) {
+                        panning = true
+                    }
+                    if (mouse.button === Qt.RightButton && !project.lockedExtents) {
+                        project.utmZone = 0
+                        startPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
+                        endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
+                        drawRegion = true
+                    }
+                }
+                onReleased: {
+                    if (mouse.button === Qt.RightButton && !project.lockedExtents) {
+                        endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
+                        roiReproject()
+                    }
+                    panning = false
+                    drawRegion = false
+                }
+
+                onPositionChanged: {
+                    if (panning) {
+                        mapBase.pan(lastX-mouseX, lastY-mouseY)
+                        lastX = mouseX
+                        lastY = mouseY
+                    }
+                    if (drawRegion) {
+                        endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
+
+                        // Check for NaNs (i.e. when mouse is dragged outside map area
+                        if (endPos.coordinate.latitude === endPos.coordinate.latitude && endPos.coordinate.longitude === endPos.coordinate.longitude) {
+                            // Proceed as no NaNs detected
+                            project.updateGeodeticLimits(startPos.coordinate.latitude, endPos.coordinate.latitude, startPos.coordinate.longitude, endPos.coordinate.longitude)
+                            roiReproject()
+                        }
+                    }
+
+                    llLoc.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
+                    if (project.inUtm) {
+                        llPos.latitude = llLoc.coordinate.latitude
+                        llPos.longitude = llLoc.coordinate.longitude
+                        llConvert.fromLL(llPos)
+                        notifyText.text = "Mouse Position: Zone:"+ llConvert.zone + llConvert.northStr + " N:" + llConvert.northing.toFixed(1) + " S:" + llConvert.easting.toFixed(1)
+                    } else {
+                        notifyText.text = "Mouse Position: " + llLoc.coordinate.toString().match(/.*[SN].*[EW]/)[0]
+                    }
+                }
+                onExited: notifyText.text = ""
+            }
         }
 
         // Details window for selecting and viewing data appropriate for this
