@@ -1,5 +1,6 @@
 #include "datasourcemodel.h"
 #include "datasourcelist.h"
+#include "tokenise.h"
 #include <iostream>
 #include <QDebug>
 
@@ -34,8 +35,10 @@ QVariant DataSourceModel::data(const QModelIndex &index, int role) const
         return QVariant(item.isParent);
     case isExpandedRole:
         return QVariant(item.isExpanded);
-    case dlStateRole:
-        return QVariant(item.dlState);
+    case selectedRole:
+        return QVariant(item.selected);
+    case urlRole:
+        return QVariant(item.url);
     default:
         return QVariant(false);
     }
@@ -59,9 +62,12 @@ bool DataSourceModel::setData(const QModelIndex &index, const QVariant &value, i
     case isExpandedRole:
         item.isExpanded = value.toBool();
         break;
-    case dlStateRole:
+    case selectedRole:
         if (value.toString() == "downloading") item.startDownload();
-        item.dlState = value.toString();
+        item.selected = value.toBool();
+        break;
+    case urlRole:
+        item.url= value.toString();
         break;
     }
 
@@ -101,7 +107,8 @@ QHash<int, QByteArray> DataSourceModel::roleNames() const
     role[isExpandedRole] = "isExpanded";
     role[groupRole] = "group";
     role[nameRole] = "name";
-    role[dlStateRole] = "dlState";
+    role[selectedRole] = "selected";
+    role[urlRole] = "url";
 
     return role;
 }
@@ -159,6 +166,73 @@ void DataSourceModel::loadDataSources(QVariant filename)
         qDebug() << "No List of data sources to load data into!";
     }
     endResetModel();
+}
+
+void DataSourceModel::selectItem(int index, bool value)
+{
+    if (!dataSources || index >= dataSources->getDataSources().size()) return;
+
+    DataSourceItem reference = dataSources->getDataSources().at(index);
+
+    // If this item is a CDS now selectItems on all ids that are in the CDS's url
+    if (reference.format == "CDS") {
+        // tokenise the ids from the url
+        std::vector<std::string> tokens;
+        StringTokenise::tokenise(reference.url.toStdString().c_str(),tokens," ,");
+        // find the list element that matches the id
+        for (auto it=tokens.begin();it!=tokens.end();it++) {
+            selectItemById(QString((*it).c_str()), value);
+        }
+    } else {
+        for (int i=0;i<dataSources->getDataSources().size();i++) {
+            DataSourceItem item = dataSources->getDataSources().at(i);
+            if (item.format == "CDS") {
+                item.selected = false;
+                if (dataSources->setDataSourceAt(index, reference)) {
+                    QModelIndex ind = this->index(i,0);
+                    Q_EMIT dataChanged(ind, ind, QVector<int>() << selectedRole);
+                }
+            }
+        }
+    }
+
+    if (reference.selected == false) {
+        for (int i=0;i<dataSources->getDataSources().size();i++) {
+            DataSourceItem item = dataSources->getDataSources().at(i);
+            if (item.group == reference.group) {
+                item.selected = false;
+                if (dataSources->setDataSourceAt(i, item)) {
+                    QModelIndex ind = this->index(i,0);
+                    Q_EMIT dataChanged(ind, ind, QVector<int>() << selectedRole);
+                }
+            }
+        }
+    }
+    reference.selected = value;
+    if (ProjectManagement::instance()) {
+        if (reference.group == "STRUCT")   ProjectManagement::instance()->m_structureUrl = value ? reference.url.toStdString() : "";
+        if (reference.group == "GEOL")     ProjectManagement::instance()->m_geologyUrl   = value ? reference.url.toStdString() : "";
+        if (reference.group == "FAULT")    ProjectManagement::instance()->m_faultUrl     = value ? reference.url.toStdString() : "";
+        if (reference.group == "FOLD")     ProjectManagement::instance()->m_foldUrl      = value ? reference.url.toStdString() : "";
+        if (reference.group == "MINDEP")   ProjectManagement::instance()->m_mindepUrl    = value ? reference.url.toStdString() : "";
+        if (reference.group == "METADATA") ProjectManagement::instance()->m_metadataUrl  = value ? reference.url.toStdString() : "";
+    }
+    if (dataSources->setDataSourceAt(index, reference)) {
+        QModelIndex ind = this->index(index,0);
+        Q_EMIT dataChanged(ind, ind, QVector<int>() << selectedRole);
+    }
+}
+
+void DataSourceModel::selectItemById(QString id, bool value)
+{
+    for (int i=0;i<dataSources->getDataSources().size();i++) {
+        DataSourceItem item = dataSources->getDataSources().at(i);
+        if (item.id == id) {
+            // call selectItem on that element
+            selectItem(i, value);
+            break;
+        }
+    }
 }
 
 DataSourceList *DataSourceModel::getDataSources() const

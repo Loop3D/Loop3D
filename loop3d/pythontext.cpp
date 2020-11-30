@@ -60,18 +60,43 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
         int xsteps = 50;
         int ysteps = 50;
         int zsteps = 50;
+        std::string structureUrl = "";
+        std::string geologyUrl = "";
+        std::string mindepUrl = "";
+        std::string faultUrl = "";
+        std::string foldUrl = "";
+        std::string metadataUrl = "";
         if (ProjectManagement::instance()) {
             ProjectManagement* proj = ProjectManagement::instance();
             xsteps = static_cast<int>((proj->m_maxEasting - proj->m_minEasting) / proj->m_spacingX)+1;
             ysteps = static_cast<int>((proj->m_maxNorthing - proj->m_minNorthing) / proj->m_spacingY)+1;
             zsteps = static_cast<int>((proj->m_maxDepth - proj->m_minDepth) / proj->m_spacingZ)+1;
+            structureUrl = replaceKeywords(proj->m_structureUrl);
+            geologyUrl = replaceKeywords(proj->m_geologyUrl);
+            mindepUrl = replaceKeywords(proj->m_mindepUrl);
+            faultUrl = replaceKeywords(proj->m_faultUrl);
+            foldUrl = replaceKeywords(proj->m_foldUrl);
+            metadataUrl = replaceKeywords(proj->m_metadataUrl);
+            std::cout << "structure = " << structureUrl << std::endl;
+            std::cout << "geology   = " << geologyUrl << std::endl;
+            std::cout << "mindep    = " << mindepUrl << std::endl;
+            std::cout << "fault     = " << faultUrl << std::endl;
+            std::cout << "fold      = " << foldUrl << std::endl;
+            std::cout << "meta      = " << metadataUrl << std::endl;
         }
         qDebug() << "Trying to load file " << name;
         auto locals = py::dict("loopFilename"_a = name.toStdString().c_str());
         locals["xsteps"] = xsteps;
         locals["ysteps"] = ysteps;
         locals["zsteps"] = zsteps;
-        qDebug() << xsteps << " " << ysteps << " " << zsteps;
+        locals["structure_url"] = structureUrl;
+        locals["geology_url"] = geologyUrl;
+        locals["mindep_url"] = mindepUrl;
+        locals["fault_url"] = faultUrl;
+        locals["fold_url"] = foldUrl;
+        locals["metadata"] = metadataUrl;
+        locals["use_lavavu"] = (ProjectManagement::instance()->m_useLavavu ? true : false);
+//        qDebug() << xsteps << " " << ysteps << " " << zsteps;
         py::exec(code.toStdString().c_str(),py::globals(),locals);
 
         if (useResult) {
@@ -98,4 +123,29 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
         qDebug() << e.what();
         qDebug() << "Failed to run python code";
     }
+}
+
+std::string PythonText::replaceKeywords(std::string incoming)
+{
+    if (ProjectManagement::instance()) {
+        ProjectManagement* proj = ProjectManagement::instance();
+        // MGA zone 28348 - 28358 for zones S48 to S58
+        // UTM zones 32401 - 32460 for N01 to N60 and 32501 - 32560 for S01 to S60
+        std::string epsgMGA = std::to_string(28300 + proj->m_utmZone);
+        std::string wpsgUTM = std::to_string(32400 + (proj->m_utmNorthSouth ? 100 : 0) + proj->m_utmZone);
+        std::string bboxstr = std::to_string(proj->m_minEasting) + "," + std::to_string(proj->m_minNorthing)
+                + "," + std::to_string(proj->m_maxEasting) + "," + std::to_string(proj->m_maxNorthing) + ",EPSG:" + epsgMGA;
+
+        if (incoming.find("$(MINLAT)") != std::string::npos)   incoming.replace(incoming.find("$(MINLAT)"),9,std::to_string(proj->m_minLatitude));
+        if (incoming.find("$(MAXLAT)") != std::string::npos)   incoming.replace(incoming.find("$(MAXLAT)"),9,std::to_string(proj->m_maxLatitude));
+        if (incoming.find("$(MINLONG)") != std::string::npos)  incoming.replace(incoming.find("$(MINLONG)"),10,std::to_string(proj->m_minLongitude));
+        if (incoming.find("$(MAXLONG)") != std::string::npos)  incoming.replace(incoming.find("$(MAXLONG)"),10,std::to_string(proj->m_maxLongitude));
+        if (incoming.find("$(MAXNORTH)") != std::string::npos) incoming.replace(incoming.find("$(MAXNORTH)"),11,std::to_string(proj->m_maxNorthing));
+        if (incoming.find("$(MINNORTH)") != std::string::npos) incoming.replace(incoming.find("$(MINNORTH)"),11,std::to_string(proj->m_minNorthing));
+        if (incoming.find("$(MINEAST)") != std::string::npos)  incoming.replace(incoming.find("$(MINEAST)"),10,std::to_string(proj->m_minEasting));
+        if (incoming.find("$(MAXEAST)") != std::string::npos)  incoming.replace(incoming.find("$(MAXEAST)"),10,std::to_string(proj->m_maxEasting));
+        if (incoming.find("$(BBOXSTR)") != std::string::npos)  incoming.replace(incoming.find("$(BBOXSTR)"),10,bboxstr);
+        if (incoming.find("$(EPSG)") != std::string::npos)     incoming.replace(incoming.find("$(EPSG)"),7,epsgMGA);
+    }
+    return incoming;
 }

@@ -66,6 +66,7 @@ SOURCES += \
         pythonhighlighter.cpp \
         pythontext.cpp \
         structuralmodel.cpp \
+        tokenise.cpp \
         utmconverter.cpp
 
 RESOURCES += qml.qrc qtquickcontrols2.conf \

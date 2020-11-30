@@ -38,7 +38,7 @@ Item {
         // Ensure change in centre location to force recentre
         mapCentreLongitude = (project.minLongitude + project.maxLongitude) / 2 - 1
         mapCentreLongitude = (project.minLongitude + project.maxLongitude) / 2
-        mapBase.fitViewportToMapItems()
+        mapUnderlayer.fitViewportToMapItems()
     }
 
     // Main area for data collection tab
@@ -82,69 +82,20 @@ Item {
             anchors.margins: mainWindow.myBorders
             width: parent.width / 2 - mainWindow.myBorders - 1
             height: parent.height / 2 - mainWindow.myBorders - 1
-            plugin: Plugin {
-                name: "osm"
-            }
-            center: mapBase.center
-            zoomLevel: mapBase.zoomLevel
-            maximumZoomLevel: mapBase.maximumZoomLevel
-            MapPolygon {
-                id: regionOfInterestPolyUnderlayer
-                color: "#55aa0000"
-                path: [
-                    QtPositioning.coordinate(project.minLatitude, project.minLongitude),
-                    QtPositioning.coordinate(project.maxLatitude, project.minLongitude),
-                    QtPositioning.coordinate(project.maxLatitude, project.maxLongitude),
-                    QtPositioning.coordinate(project.minLatitude, project.maxLongitude)
-                ]
-                border.width: 2
-            }
-        }
-        Rectangle {
-            id: mapArea
-            layer.enabled: true
-            opacity: 0.5
-            color: "#00000000"
-            anchors.fill: mapUnderlayer
-
-            Map {
-                id: mapBase
-                anchors.fill: parent
-                color: "#00000000"
-                plugin: Plugin {
-                    name: "osm"
-                    PluginParameter {
-                        name: "osm.mapping.offline.directory"
-                        value: workingDir + "/offline_tiles/"
-                    }
-                }
-                center: QtPositioning.coordinate(mapCentreLatitude, mapCentreLongitude)
-                zoomLevel: 6
-                maximumZoomLevel: 10
-                MapPolygon {
-                    id: regionOfInterestPoly
-                    color: "#55aa0000"
-                    path: [
-                        QtPositioning.coordinate(project.minLatitude, project.minLongitude),
-                        QtPositioning.coordinate(project.maxLatitude, project.minLongitude),
-                        QtPositioning.coordinate(project.maxLatitude, project.maxLongitude),
-                        QtPositioning.coordinate(project.minLatitude, project.maxLongitude)
-                    ]
-                    border.width: 2
-                }
-            }
+            plugin: Plugin { name: "osm" }
+            center: QtPositioning.coordinate(mapCentreLatitude, mapCentreLongitude)
+            zoomLevel: 6
+            maximumZoomLevel: 10
             MouseArea {
                 id: mapInteraction
                 anchors.fill: parent
-
-                // hover enables events without clicks
+                propagateComposedEvents: false
                 hoverEnabled: true
                 pressAndHoldInterval: 0
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                 property int lastX: -1
                 property int lastY: -1
-                property bool panning: false
                 property bool drawRegion: false
                 UTM { id: llConvert }
                 LL { id: llPos }
@@ -155,35 +106,28 @@ Item {
                 onPressed: {
                     lastX = mouse.x
                     lastY = mouse.y
-                }
-                onPressAndHold: {
-                    if (mouse.button === Qt.LeftButton) {
-                        panning = true
-                    }
+//                    console.log("pressed")
                     if (mouse.button === Qt.RightButton && !project.lockedExtents) {
                         project.utmZone = 0
-                        startPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
-                        endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
-                        drawRegion = true
+                        startPos.coordinate = mapUnderlayer.toCoordinate(Qt.point(mouseX, mouseY))
+                        endPos.coordinate = mapUnderlayer.toCoordinate(Qt.point(mouseX, mouseY))
+                        mapUnderlayer.gesture.acceptedGestures = 0
+                        drawRegion = !drawRegion
                     }
                 }
                 onReleased: {
+//                    console.log("released")
                     if (mouse.button === Qt.RightButton && !project.lockedExtents) {
-                        endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
+                        endPos.coordinate = mapUnderlayer.toCoordinate(Qt.point(mouseX, mouseY))
                         roiReproject()
+                        drawRegion = !drawRegion
                     }
-                    panning = false
-                    drawRegion = false
+                    mapUnderlayer.gesture.acceptedGestures = 31
                 }
 
                 onPositionChanged: {
-                    if (panning) {
-                        mapBase.pan(lastX-mouseX, lastY-mouseY)
-                        lastX = mouseX
-                        lastY = mouseY
-                    }
                     if (drawRegion) {
-                        endPos.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
+                        endPos.coordinate = mapUnderlayer.toCoordinate(Qt.point(mouseX, mouseY))
 
                         // Check for NaNs (i.e. when mouse is dragged outside map area
                         if (endPos.coordinate.latitude === endPos.coordinate.latitude && endPos.coordinate.longitude === endPos.coordinate.longitude) {
@@ -193,7 +137,7 @@ Item {
                         }
                     }
 
-                    llLoc.coordinate = mapBase.toCoordinate(Qt.point(mouseX, mouseY))
+                    llLoc.coordinate = mapUnderlayer.toCoordinate(Qt.point(mouseX, mouseY))
                     if (project.inUtm) {
                         llPos.latitude = llLoc.coordinate.latitude
                         llPos.longitude = llLoc.coordinate.longitude
@@ -205,7 +149,166 @@ Item {
                 }
                 onExited: notifyText.text = ""
             }
+            MapOverlayLayer {}
         }
+        Map {
+            id: mapBaseWA
+            enabled: project.activeState === 1
+            visible: project.activeState === 1
+            gesture.acceptedGestures: MapGestureArea.NoGesture
+            layer.enabled: true
+            opacity: geologyLayerTransparency.value
+            anchors.fill: mapUnderlayer
+            color: "#00000000"
+            plugin: Plugin { name: "osm"
+                PluginParameter { name: "osm.mapping.offline.directory"; value: workingDir + "/offline_tiles/wa/" }
+            }
+            center: mapUnderlayer.center
+            zoomLevel: mapUnderlayer.zoomLevel
+            maximumZoomLevel: mapUnderlayer.maximumZoomLevel
+            MapOverlayLayer {}
+        }
+        Map {
+            id: mapBaseSA
+            enabled: project.activeState === 2
+            visible: project.activeState === 2
+            gesture.acceptedGestures: MapGestureArea.NoGesture
+            anchors.fill: mapUnderlayer
+            layer.enabled: true
+            opacity: geologyLayerTransparency.value
+            color: "#00000000"
+            plugin: Plugin { name: "osm"
+                PluginParameter { name: "osm.mapping.offline.directory"; value: workingDir + "/offline_tiles/sa/" }
+            }
+            center: mapUnderlayer.center
+            zoomLevel: mapUnderlayer.zoomLevel
+            maximumZoomLevel: mapUnderlayer.maximumZoomLevel
+            MapOverlayLayer {}
+        }
+        Map {
+            id: mapBaseNT
+            enabled: project.activeState === 3
+            visible: project.activeState === 3
+            gesture.acceptedGestures: MapGestureArea.NoGesture
+            anchors.fill: mapUnderlayer
+            layer.enabled: true
+            opacity: geologyLayerTransparency.value
+            color: "#00000000"
+            plugin: Plugin { name: "osm"
+                PluginParameter { name: "osm.mapping.offline.directory"; value: workingDir + "/offline_tiles/nt/" }
+            }
+            center: mapUnderlayer.center
+            zoomLevel: mapUnderlayer.zoomLevel
+            maximumZoomLevel: mapUnderlayer.maximumZoomLevel
+            MapOverlayLayer {}
+        }
+        Map {
+            id: mapBaseQLD
+            enabled: project.activeState === 4
+            visible: project.activeState === 4
+            gesture.acceptedGestures: MapGestureArea.NoGesture
+            anchors.fill: mapUnderlayer
+            layer.enabled: true
+            opacity: geologyLayerTransparency.value
+            color: "#00000000"
+            plugin: Plugin { name: "osm"
+                PluginParameter { name: "osm.mapping.offline.directory"; value: workingDir + "/offline_tiles/qld/" }
+            }
+            center: mapUnderlayer.center
+            zoomLevel: mapUnderlayer.zoomLevel
+            maximumZoomLevel: mapUnderlayer.maximumZoomLevel
+            MapOverlayLayer {}
+        }
+        Map {
+            id: mapBaseNSW
+            enabled: project.activeState === 5
+            visible: project.activeState === 5
+            gesture.acceptedGestures: MapGestureArea.NoGesture
+            anchors.fill: mapUnderlayer
+            layer.enabled: true
+            opacity: geologyLayerTransparency.value
+            color: "#00000000"
+            plugin: Plugin { name: "osm"
+                PluginParameter { name: "osm.mapping.offline.directory"; value: workingDir + "/offline_tiles/nsw/" }
+            }
+            center: mapUnderlayer.center
+            zoomLevel: mapUnderlayer.zoomLevel
+            maximumZoomLevel: mapUnderlayer.maximumZoomLevel
+            MapOverlayLayer {}
+        }
+        Map {
+            id: mapBaseVIC
+            enabled: project.activeState === 6
+            visible: project.activeState === 6
+            gesture.acceptedGestures: MapGestureArea.NoGesture
+            anchors.fill: mapUnderlayer
+            layer.enabled: true
+            opacity: geologyLayerTransparency.value
+            color: "#00000000"
+            plugin: Plugin { name: "osm"
+                PluginParameter { name: "osm.mapping.offline.directory"; value: workingDir + "/offline_tiles/vic/" }
+            }
+            center: mapUnderlayer.center
+            zoomLevel: mapUnderlayer.zoomLevel
+            maximumZoomLevel: mapUnderlayer.maximumZoomLevel
+            MapOverlayLayer {}
+        }
+        Map {
+            id: mapBaseTAS
+            enabled: project.activeState === 7
+            visible: project.activeState === 7
+            gesture.acceptedGestures: MapGestureArea.NoGesture
+            anchors.fill: mapUnderlayer
+            layer.enabled: true
+            opacity: geologyLayerTransparency.value
+            color: "#00000000"
+            plugin: Plugin { name: "osm"
+                PluginParameter { name: "osm.mapping.offline.directory"; value: workingDir + "/offline_tiles/tas/" }
+            }
+            center: mapUnderlayer.center
+            zoomLevel: mapUnderlayer.zoomLevel
+            maximumZoomLevel: mapUnderlayer.maximumZoomLevel
+            MapOverlayLayer {}
+        }
+        Rectangle {
+            id: mapControls
+            layer.enabled: true
+            color: "#00000000"
+            anchors.fill: mapUnderlayer
+            Slider {
+                id: geologyLayerTransparency
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 4
+                width: 100
+                height: 20
+                from: 0.0
+                to: 1.0
+                value: 0.5
+            }
+            Button {
+                property string activeState: "WA"
+                id: mapLayer
+                anchors.top: parent.top
+                anchors.right: parent.right
+                width: 100
+                height: 30
+                text: project.activeStateName
+                onPressed: {
+                    project.activeState = (project.activeState + 1) % 8
+                    if (project.activeState === 0) project.activeStateName = "--"
+                    else if (project.activeState === 1) project.activeStateName = "WA"
+                    else if (project.activeState === 2) project.activeStateName = "SA"
+                    else if (project.activeState === 3) project.activeStateName = "NT"
+                    else if (project.activeState === 4) project.activeStateName = "QLD"
+                    else if (project.activeState === 5) project.activeStateName = "NSW"
+                    else if (project.activeState === 6) project.activeStateName = "VIC"
+                    else if (project.activeState === 7) project.activeStateName = "TAS"
+                    dataSourceModel.selectItemById(project.activeStateName,true)
+                }
+            }
+        }
+
 
         // Details window for selecting and viewing data appropriate for this
         // project
@@ -245,8 +348,12 @@ Item {
                     DataSourceModel {
                         id: dataSourceModel
                         property string dsfilename: "loop3d/DataSource.conf"
+//                        property string dsfilename: "DataSource.conf"
                         dataSources: dataSourceList
-                        Component.onCompleted: loadDataSources(dsfilename)
+                        Component.onCompleted: {
+                            loadDataSources(dsfilename)
+                            dataSourceModel.selectItemById("WA",true)
+                        }
                     }
 
                     ListView {
@@ -270,7 +377,7 @@ Item {
                             property int itemHeight: 30
                             width: parent.width
                             height: isParent ? itemHeight : 0
-                            color: isParent ? "lightblue" : "white"
+                            color: isParent ? "lightblue" : selected == true ? "grey" : "lightgrey"
                             border.width: 1
 
                             states: State {
@@ -314,10 +421,9 @@ Item {
                                 height: 20
                             }
                             Text {
-                                id: text
                                 verticalAlignment: Text.AlignVCenter
                                 height: parent.height
-                                text: name
+                                text: name + "\t" + url
                                 clip: true
                                 anchors.left: stateExpanded.right
                                 anchors.margins: mainWindow.myBorders
@@ -334,23 +440,15 @@ Item {
                                 }
                             }
                             // Ensure button is after MouseArea so that it is layered above the mouse capture event
-                            Button {
-                                id: statusButton
-                                visible: !isParent
+                            CheckBox {
+                                visible: !isParent && height != 0
                                 height: parent.height
-                                text: (dlState == "" ? "Download": dlState)
                                 anchors.right: parent.right
-                                anchors.margins: 2
                                 anchors.top: parent.top
-                                anchors.bottom: parent.bottom
-                                width: 150
-                                onClicked: {
-                                    if (dlState == "") {
-                                        dlState = "downloading"
-                                    } else {
-                                        dlState = ""
-                                    }
-                                }
+                                tristate: false
+                                checkable: !project.lockedExtents
+                                checkState: selected ? Qt.Checked : Qt.Unchecked
+                                onToggled: dataSourceModel.selectItem(index,!selected)
                             }
                         }
                     }
@@ -426,7 +524,7 @@ Item {
                     color: "#bbbbbb"
                     Text {
                         anchors.fill: parent
-                        text: "Once run list of observations extracted from geology model"
+                        text: "List of observations extracted from geology model"
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -447,3 +545,9 @@ Item {
 }
 
 
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

@@ -6,6 +6,9 @@ import numpy
 
 skip_faults = False
 
+if ('use_lavavu' not in vars() and 'use_lavavu' not in globals()):
+    use_lavavu = False
+
 if ('m2l_data_dir' not in vars() and 'm2l_data_dir' not in globals()):
     m2l_data_dir = "m2l_data/"
 
@@ -26,18 +29,20 @@ else:
     boundaries = resp["value"]["utm"][2:] + resp["value"]["depth"]
     stepsizes = resp["value"]["spacing"]
 
-
+solver = 'pyamg'
+# solver = 'cg'
+# solver = 'lu'
 fault_params = {'interpolatortype':'FDI',
     'nelements':3e4,
-    'data_region':.1,
-    'solver':'pyamg',
+    'data_region':.3,
+    'solver':solver,
     # overprints:overprints,
     'cpw':10,
     'npw':10}
 foliation_params = {'interpolatortype':'PLI' , # 'interpolatortype':'PLI',
     'nelements':1e5,  # how many tetras/voxels
     'buffer':0.8,  # how much to extend nterpolation around box
-    'solver':'pyamg',
+    'solver':solver,
     'damp':True}
 model, m2l_data = GeologicalModel.from_map2loop_directory(
     m2l_data_dir,
@@ -46,18 +51,14 @@ model, m2l_data = GeologicalModel.from_map2loop_directory(
     foliation_params=foliation_params
     )
 
-
-# view = LavaVuModelViewer(model,vertical_exaggeration=1) 
-# view.nsteps = numpy.array([200,200,200])
-# #view.set_zscale(2)
-# #view.add_model(cmap='tab20')
-# view.nsteps=numpy.array([50,50,50])
-# view.add_model_surfaces()
-# #view.add_model_surfaces(filename=filename)
-# for sg in model.feature_name_index:
-#     if( 'super' in sg):
-#         view.add_data(model.features[model.feature_name_index[sg]])
-# view.interactive()  
+if (use_lavavu):
+    view = LavaVuModelViewer(model,vertical_exaggeration=1) 
+    view.nsteps = numpy.array([200,200,200])
+    view.add_model(cmap='tab20')
+    view.nsteps=numpy.array([50,50,50])
+    view.add_model_surfaces()
+    view.add_isosurface(model.get_feature_by_name("supergroup_0"),nslices=5)
+    view.interactive()  
 
 xsteps = int((boundaries[1]-boundaries[0]) / stepsizes[0])+1
 ysteps = int((boundaries[3]-boundaries[2]) / stepsizes[1])+1

@@ -2,6 +2,7 @@
 #define DATASOURCEMODEL_H
 
 #include <QAbstractListModel>
+#include "projectmanagement.h"
 
 class DataSourceList;
 
@@ -19,7 +20,8 @@ public:
         typeRole,
         isParentRole,
         isExpandedRole,
-        dlStateRole
+        selectedRole,
+        urlRole
     };
 
     // Basic functionality:
@@ -46,6 +48,8 @@ public:
 
     Q_INVOKABLE void expandGroup(QVariant group);
     Q_INVOKABLE void loadDataSources(QVariant filename);
+    Q_INVOKABLE void selectItem(int index, bool value);
+    Q_INVOKABLE void selectItemById(QString id, bool value);
 
 private:
     DataSourceList *dataSources;

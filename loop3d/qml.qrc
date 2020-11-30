@@ -11,5 +11,6 @@
         <file>DataViewer.qml</file>
         <file>Isosurface.qml</file>
         <file>DataRevTab.qml</file>
+        <file>MapOverlayLayer.qml</file>
     </qresource>
 </RCC>

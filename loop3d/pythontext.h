@@ -39,6 +39,7 @@ class PythonText : public QObject
         QString m_pythonCode;
         QString m_filename;
         PythonHighlighter* pythonHighlighter;
+        std::string replaceKeywords(std::string);
 };
 
 #endif // PYTHONTEXT_H

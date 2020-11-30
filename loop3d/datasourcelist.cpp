@@ -16,7 +16,6 @@ bool DataSourceList::setDataSourceAt(int index, const DataSourceItem& dataSource
 
     dataSources[index] = dataSource;
     return true;
-
 }
 
 void DataSourceList::loadDataSources(QString resourceFile)
@@ -28,46 +27,52 @@ void DataSourceList::loadDataSources(QString resourceFile)
     if (dataFile.is_open()) {
         std::string line;
         while (getline(dataFile,line)) {
+            if (line[0] == '#') continue;
             std::vector<std::string> tokens;
             StringTokenise::tokenise(line, tokens," \t,");
             if (tokens.size() >= 3 && tokens[1] == "GROUP") {
                 appendGroup(tokens[2].c_str(), tokens[0].c_str());
-            } else if (tokens.size() >= 4) {
-//                qDebug() << "Loading " << tokens[2].c_str() << " to group " << tokens[0].c_str() << " with url " << tokens[3].c_str() << " in format(" << tokens[1].c_str() << ")";
-                appendItem(tokens[2].c_str(), tokens[0].c_str(), tokens[3].c_str(), tokens[1].c_str());
             }
+            else if (tokens.size() >= 4 && tokens[1] == "CDS") {
+                std::string groups = "";
+                for (unsigned int i=4;i<tokens.size();i++) groups += tokens[i] + " ";
+                appendItem(tokens[2].c_str(),tokens[0].c_str(),tokens[3].c_str(),groups.c_str(),tokens[1].c_str());
+            }
+            else if (tokens.size() == 4) appendItem(tokens[2].c_str(),tokens[0].c_str(),tokens[3].c_str(),"",tokens[1].c_str());
+            else if (tokens.size() == 5) appendItem(tokens[2].c_str(),tokens[0].c_str(),tokens[3].c_str(),tokens[4].c_str(),tokens[1].c_str());
         }
         dataFile.close();
     } else {
         // Load default data sources (TODO: fill in proper URLs for these sources)
         qDebug() << "Failed to open file (" << resourceFile << "), Using default Data Sources";
         appendGroup("Digital Elevation Map", "DEM");
-        appendItem("Unidata DEM", "DEM", "");
-        appendItem("GeoView WA DEM", "DEM", "");
-        appendItem("Local Data DEM", "DEM", "");
+        appendItem("Unidata DEM", "DEM");
+        appendItem("GeoView WA DEM", "DEM");
+        appendItem("Local Data DEM", "DEM");
         appendGroup("Gravity Variation Map", "GRAV");
-        appendItem("nci.org.au Grav","GRAV", "");
-        appendItem("GeoView WA Grav", "GRAV", "");
-        appendItem("Local Data Grav", "GRAV", "");
+        appendItem("nci.org.au Grav","GRAV");
+        appendItem("GeoView WA Grav", "GRAV");
+        appendItem("Local Data Grav", "GRAV");
         appendGroup("Magnetic Variation Map", "MAG");
-        appendItem("nci.org.au Mag", "MAG", "");
-        appendItem("GeoView WA Mag", "MAG", "");
+        appendItem("nci.org.au Mag", "MAG");
+        appendItem("GeoView WA Mag", "MAG");
         appendGroup("Geological Map", "GEOL");
-        appendItem("Unknown Source Geol", "GEOL", "");
-        appendItem("GeoView WA Geol", "GEOL", "");
-        appendItem("Local Data Geol", "GEOL", "");
+        appendItem("Unknown Source Geol", "GEOL");
+        appendItem("GeoView WA Geol", "GEOL");
+        appendItem("Local Data Geol", "GEOL");
     }
 //    std::sort(dataSources.begin(),dataSources.end(),order);
 }
 
-bool DataSourceList::appendItem(QString name, QString group, QString url, QString format)
+bool DataSourceList::appendItem(QString name, QString group, QString id, QString url, QString format)
 {
     DataSourceItem dataSource;
     dataSource.name = name;
     dataSource.group = group;
+    dataSource.id = id;
     dataSource.isParent = false;
     dataSource.isExpanded = false;
-    dataSource.dlState = "";
+    dataSource.selected = false;
     dataSource.url = url;
     dataSource.format = format;
 
@@ -82,10 +87,12 @@ bool DataSourceList::appendGroup(QString name, QString group)
     DataSourceItem dataSource;
     dataSource.name = name;
     dataSource.group = group;
+    dataSource.id = "";
     dataSource.isParent = true;
     dataSource.isExpanded = false;
-    dataSource.dlState = "";
+    dataSource.selected = false;
     dataSource.url = "";
+
     dataSource.format = "";
 
     preItemAppended();

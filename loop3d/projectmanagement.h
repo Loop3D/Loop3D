@@ -47,6 +47,9 @@ class ProjectManagement : public QQuickItem
     Q_PROPERTY (unsigned int ysize MEMBER m_ysize NOTIFY ysizeChanged)
     Q_PROPERTY (unsigned int zsize MEMBER m_zsize NOTIFY zsizeChanged)
     Q_PROPERTY (bool lockedExtents MEMBER m_lockedExtents WRITE setLockedExtents NOTIFY lockedExtentsChanged)
+    Q_PROPERTY (unsigned int activeState MEMBER m_activeState WRITE setActiveState NOTIFY activeStateChanged)
+    Q_PROPERTY (QString activeStateName MEMBER m_activeStateName NOTIFY activeStateNameChanged)
+    Q_PROPERTY (bool useLavavu MEMBER m_useLavavu WRITE setUseLavavu NOTIFY useLavavuChanged)
 
     Q_SIGNALS:
         void filenameChanged();
@@ -79,9 +82,14 @@ class ProjectManagement : public QQuickItem
         void ysizeChanged();
         void zsizeChanged();
         void lockedExtentsChanged();
+        void activeStateChanged();
+        void activeStateNameChanged();
+        void useLavavuChanged();
 
 public Q_SLOTS:
         void setLockedExtents(bool val) { m_lockedExtents = val; lockedExtentsChanged();}
+        void setActiveState(unsigned int val) { m_activeState = val; activeStateChanged();}
+        void setUseLavavu(bool val) { m_useLavavu = val; useLavavuChanged();}
 
     public:
         Q_INVOKABLE void clearProject(bool clearExtents);
@@ -124,6 +132,8 @@ public Q_SLOTS:
         double m_maxNorthing;
         double m_minEasting;
         double m_maxEasting;
+        int m_utmZone;
+        int m_utmNorthSouth;
         double m_minDepth;
         double m_maxDepth;
         unsigned int m_spacingX;
@@ -140,14 +150,25 @@ public Q_SLOTS:
         int m_flowChoice;
         int m_loopStructuralFlowOption;
         int m_sharedTextureId;
+        unsigned int m_activeState;
+        QString m_activeStateName;
+        bool m_useLavavu;
+
+        // Currently project to store selected Urls
+        // TODO: multiple urls that can be added as a list to map2loop
+        std::string m_structureUrl;
+        std::string m_geologyUrl;
+        std::string m_faultUrl;
+        std::string m_foldUrl;
+        std::string m_mindepUrl;
+        std::string m_metadataUrl;
+
     private:
         ProjectManagement();
         static ProjectManagement* m_instance;
 
         double m_mapCentreLatitude;
         double m_mapCentreLongitude;
-        int m_utmZone;
-        int m_utmNorthSouth;
         QString m_utmNorthSouthStr;
 
         QString m_filename;

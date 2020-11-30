@@ -12,6 +12,8 @@
 ProjectManagement* ProjectManagement::m_instance = nullptr;
 
 ProjectManagement::ProjectManagement():
+    m_utmZone(0),
+    m_utmNorthSouth(-1),
     m_minDepth(-1200),
     m_maxDepth(12000),
     m_spacingX(1000),
@@ -20,16 +22,23 @@ ProjectManagement::ProjectManagement():
     m_xsize(51),
     m_ysize(51),
     m_zsize(51),
+    m_lockedExtents(false),
     m_inUtm(false),
     m_extentsChanged(true),
     m_flowChoiceMade(false),
     m_flowChoice(1),
     m_loopStructuralFlowOption(2),
     m_sharedTextureId(0),
-    m_utmZone(0),
-    m_utmNorthSouth(-1),
-    m_filename(""),
-    m_lockedExtents(false)
+    m_activeState(1),
+    m_activeStateName("WA"),
+    m_useLavavu(false),
+    m_structureUrl(""),
+    m_geologyUrl(""),
+    m_faultUrl(""),
+    m_foldUrl(""),
+    m_mindepUrl(""),
+    m_metadataUrl(""),
+    m_filename("")
 {
 
 }

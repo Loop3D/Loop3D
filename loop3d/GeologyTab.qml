@@ -405,7 +405,7 @@ Item {
                         }
                     }
                     Button {
-                        id: createBedding
+                        id: createModel
                         anchors.bottom: parent.bottom
                         anchors.right: parent.right
                         height: 80
@@ -416,6 +416,26 @@ Item {
                             if (!project.hasFilename()) fileDialogOpen.open()
                             else {
                                 project.saveProject()
+                                project.setUseLavavu(false)
+                                pythonText.run(textArea.text,project.filename,false)
+                                project.reloadProject()
+                                bar.currentIndex = 4
+                            }
+                        }
+                    }
+                    Button {
+                        id: createModelLavavu
+                        anchors.bottom: parent.bottom
+                        anchors.right: createModel.left
+                        height: 80
+                        width: 200
+                        text: "Create Lavavu Model"
+                        onPressed: {
+                            // TODO: remove file open when finished testing textures
+                            if (!project.hasFilename()) fileDialogOpen.open()
+                            else {
+                                project.saveProject()
+                                project.setUseLavavu(true)
                                 pythonText.run(textArea.text,project.filename,false)
                                 project.reloadProject()
                                 bar.currentIndex = 4
@@ -456,10 +476,30 @@ Item {
                         anchors.right: parent.right
                         height: 80
                         width: 140
-                        text: "Run Code"
+                        text: "Create Model"
                         onPressed: {
                             if (!project.hasFilename()) fileDialogSave.open()
                             else {
+                                project.saveProject()
+                                project.setUseLavavu(false)
+                                pythonText.run(textArea.text,project.filename,false)
+                                bar.currentIndex = 4
+                                project.reloadProject()
+                            }
+                        }
+                    }
+                    Button {
+                        id: runCodeLavavu
+                        anchors.bottom: parent.bottom
+                        anchors.right: runCode.left
+                        height: 80
+                        width: 200
+                        text: "Create Lavavu Model"
+                        onPressed: {
+                            if (!project.hasFilename()) fileDialogSave.open()
+                            else {
+                                project.saveProject()
+                                project.setUseLavavu(true)
                                 pythonText.run(textArea.text,project.filename,false)
                                 bar.currentIndex = 4
                                 project.reloadProject()

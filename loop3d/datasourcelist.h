@@ -9,7 +9,8 @@ struct DataSourceItem {
     bool isExpanded;
     bool isParent;
     QString group;
-    QString dlState;
+    QString id;
+    bool selected;
     double extents[4];
     double stride;
     QString url;
@@ -38,7 +39,7 @@ Q_SIGNALS:
         void postItemRemoved();
 
     public Q_SLOTS:
-        bool appendItem(QString name, QString group, QString url, QString format="");
+        bool appendItem(QString name, QString group, QString id="", QString url="", QString format="");
         bool appendGroup(QString name, QString group);
         bool removeItem(int index);
 

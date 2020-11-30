@@ -140,6 +140,7 @@ Item {
                 id: isovalueDelegate
                 Slider {
                     id: isovalue
+                    height: 30
 
                     visible: dataViewerControls.isosurfaces - 1 >= index
                     from: viewer.minScalarValue
@@ -148,37 +149,9 @@ Item {
                     pressed: {
                         viewer.setIsovalue(index,value)
                     }
-
-                    background: Rectangle {
-                        x: isovalue.leftPadding
-                        y: isovalue.topPadding + isovalue.availableHeight / 2 - height / 2
-                        implicitWidth: 200
-                        implicitHeight: 4
-                        width: isovalue.availableWidth
-                        height: implicitHeight
-                        radius: 2
-                        color: "#bdbebf"
-
-                        Rectangle {
-                            width: isovalue.visualPosition * parent.width
-                            height: parent.height
-                            color: "#21be2b"
-                            radius: 2
-                        }
-                        Text {
-                            anchors.fill: parent
-                            text: viewer.miscToggle2 ? value : ""
-                        }
-                    }
-
-                    handle: Rectangle {
-                        x: isovalue.leftPadding + isovalue.visualPosition * (isovalue.availableWidth - width)
-                        y: isovalue.topPadding + isovalue.availableHeight / 2 - height / 2
-                        implicitWidth: 26
-                        implicitHeight: 26
-                        radius: 13
-                        color: isovalue.pressed ? "#a0f0f0f0" : "#a0f6f6f6"
-                        border.color: "#a0bdbebf"
+                    Text {
+                        anchors.fill: parent
+                        text: viewer.miscToggle2 ? value : ""
                     }
                     Keys.onPressed: event.reject
                 }
@@ -245,34 +218,9 @@ Item {
                 to: viewer.structureXMax
                 value: (viewer.structureXMax + viewer.structureXMin) / 2.0
                 pressed: viewer.csPositionX = value
-                background: Rectangle {
-                    x: crossSectionXSlider.leftPadding
-                    y: crossSectionXSlider.topPadding + crossSectionXSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 200
-                    implicitHeight: 4
-                    width: crossSectionXSlider.availableWidth
-                    height: implicitHeight
-                    radius: 2
-                    color: "#bdbebf"
-                    Rectangle {
-                        width: crossSectionXSlider.visualPosition * parent.width
-                        height: 4
-                        color: "#21be2b"
-                        radius: 2
-                    }
-                    Text {
-                        anchors.fill: parent
-                        text: viewer.miscToggle2 ? crossSectionXSlider.value : ""
-                    }
-                }
-                handle: Rectangle {
-                    x: crossSectionXSlider.leftPadding + crossSectionXSlider.visualPosition * (parent.width - width * 1.5)
-                    y: parent.height / 2 - height / 2
-                    implicitWidth: 26
-                    implicitHeight: 26
-                    radius: 13
-                    color: crossSectionXSlider.pressed ? "#a0f0f0f0" : "#a0f6f6f6"
-                    border.color: "#a0bdbebf"
+                Text {
+                    anchors.fill: parent
+                    text: viewer.miscToggle2 ? crossSectionXSlider.value : ""
                 }
                 Keys.onPressed: event.reject
             }
@@ -286,34 +234,9 @@ Item {
                 to: viewer.structureYMax
                 value: (viewer.structureYMax + viewer.structureYMin) / 2.0
                 pressed: viewer.csPositionY = value
-                background: Rectangle {
-                    x: crossSectionYSlider.leftPadding
-                    y: crossSectionYSlider.topPadding + crossSectionYSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 200
-                    implicitHeight: 4
-                    width: crossSectionYSlider.availableWidth
-                    height: implicitHeight
-                    radius: 2
-                    color: "#bdbebf"
-                    Rectangle {
-                        width: crossSectionYSlider.visualPosition * parent.width
-                        height: 4
-                        color: "#21be2b"
-                        radius: 2
-                    }
-                    Text {
-                        anchors.fill: parent
-                        text: viewer.miscToggle2 ? crossSectionYSlider.value : ""
-                    }
-                }
-                handle: Rectangle {
-                    x: crossSectionYSlider.leftPadding + crossSectionYSlider.visualPosition * (parent.width - width * 1.5)
-                    y: parent.height / 2 - height / 2
-                    implicitWidth: 26
-                    implicitHeight: 26
-                    radius: 13
-                    color: crossSectionYSlider.pressed ? "#a0f0f0f0" : "#a0f6f6f6"
-                    border.color: "#a0bdbebf"
+                Text {
+                    anchors.fill: parent
+                    text: viewer.miscToggle2 ? crossSectionYSlider.value : ""
                 }
                 Keys.onPressed: event.reject
             }
@@ -327,34 +250,9 @@ Item {
                 to: (viewer.invertedView ? viewer.structureZMax : viewer.structureZMin )
                 value: (viewer.structureZMax + viewer.structureZMin) / 2.0
                 pressed: viewer.csPositionZ = value
-                background: Rectangle {
-                    x: crossSectionZSlider.leftPadding
-                    y: crossSectionZSlider.topPadding + crossSectionZSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 200
-                    implicitHeight: 4
-                    width: crossSectionZSlider.availableWidth
-                    height: implicitHeight
-                    radius: 2
-                    color: "#bdbebf"
-                    Rectangle {
-                        width: crossSectionZSlider.visualPosition * parent.width
-                        height: 4
-                        color: "#21be2b"
-                        radius: 2
-                    }
-                    Text {
-                        anchors.fill: parent
-                        text: viewer.miscToggle2 ? crossSectionZSlider.value : ""
-                    }
-                }
-                handle: Rectangle {
-                    x: crossSectionZSlider.leftPadding + crossSectionZSlider.visualPosition * (parent.width - width * 1.5)
-                    y: parent.height / 2 - height / 2
-                    implicitWidth: 26
-                    implicitHeight: 26
-                    radius: 13
-                    color: crossSectionZSlider.pressed ? "#a0f0f0f0" : "#a0f6f6f6"
-                    border.color: "#a0bdbebf"
+                Text {
+                    anchors.fill: parent
+                    text: viewer.miscToggle2 ? crossSectionZSlider.value : ""
                 }
                 Keys.onPressed: event.reject
             }
@@ -368,34 +266,9 @@ Item {
                 to: 180.0
                 value: 0
                 pressed: viewer.csOrientationPsi = value
-                background: Rectangle {
-                    x: crossSectionPsiSlider.leftPadding
-                    y: crossSectionPsiSlider.topPadding + crossSectionPsiSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 200
-                    implicitHeight: 4
-                    width: crossSectionPsiSlider.availableWidth
-                    height: implicitHeight
-                    radius: 2
-                    color: "#bdbebf"
-                    Rectangle {
-                        width: crossSectionPsiSlider.visualPosition * parent.width
-                        height: 4
-                        color: "#21be2b"
-                        radius: 2
-                    }
-                    Text {
-                        anchors.fill: parent
-                        text: viewer.miscToggle2 ? crossSectionPsiSlider.value : ""
-                    }
-                }
-                handle: Rectangle {
-                    x: crossSectionPsiSlider.leftPadding + crossSectionPsiSlider.visualPosition * (parent.width - width * 1.5)
-                    y: parent.height / 2 - height / 2
-                    implicitWidth: 26
-                    implicitHeight: 26
-                    radius: 13
-                    color: crossSectionPsiSlider.pressed ? "#a0f0f0f0" : "#a0f6f6f6"
-                    border.color: "#a0bdbebf"
+                Text {
+                    anchors.fill: parent
+                    text: viewer.miscToggle2 ? crossSectionPsiSlider.value : ""
                 }
                 Keys.onPressed: event.reject
             }
@@ -409,34 +282,9 @@ Item {
                 to: 90.0
                 value: 0.0
                 pressed: viewer.csOrientationTheta = value
-                background: Rectangle {
-                    x: crossSectionThetaSlider.leftPadding
-                    y: crossSectionThetaSlider.topPadding + crossSectionThetaSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 200
-                    implicitHeight: 4
-                    width: crossSectionThetaSlider.availableWidth
-                    height: implicitHeight
-                    radius: 2
-                    color: "#bdbebf"
-                    Rectangle {
-                        width: crossSectionThetaSlider.visualPosition * parent.width
-                        height: 4
-                        color: "#21be2b"
-                        radius: 2
-                    }
-                    Text {
-                        anchors.fill: parent
-                        text: viewer.miscToggle2 ? crossSectionThetaSlider.value : ""
-                    }
-                }
-                handle: Rectangle {
-                    x: crossSectionThetaSlider.leftPadding + crossSectionThetaSlider.visualPosition * (parent.width - width * 1.5)
-                    y: parent.height / 2 - height / 2
-                    implicitWidth: 26
-                    implicitHeight: 26
-                    radius: 13
-                    color: crossSectionThetaSlider.pressed ? "#a0f0f0f0" : "#a0f6f6f6"
-                    border.color: "#a0bdbebf"
+                Text {
+                    anchors.fill: parent
+                    text: viewer.miscToggle2 ? crossSectionThetaSlider.value : ""
                 }
                 Keys.onPressed: event.reject
             }
