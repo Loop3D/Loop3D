@@ -22,13 +22,14 @@ else:
 resp = LoopProjectFile.Get(loopFilename,"extents")
 if resp["errorFlag"]:
     boundaries = [500102.854, 603064.443,
-                  7455392.3, 7567970.26,-1200.0, 12000.0]
+                  7455392.3, 7567970.26, 1200.0, -12000.0]
     stepsizes = [1000,1000,300]
     print(resp["errorString"])
 else:
     boundaries = resp["value"]["utm"][2:] + resp["value"]["depth"]
     stepsizes = resp["value"]["spacing"]
 
+print(boundaries)
 solver = 'pyamg'
 # solver = 'cg'
 # solver = 'lu'
@@ -66,7 +67,7 @@ zsteps = int((boundaries[5]-boundaries[4]) / stepsizes[2])+1
 # Get scalar field results and send to loop project file
 xcoords = numpy.linspace(model.bounding_box[0, 0], model.bounding_box[1, 0], xsteps)
 ycoords = numpy.linspace(model.bounding_box[0, 1], model.bounding_box[1, 1], ysteps)
-zcoords = numpy.linspace(model.bounding_box[1, 2], model.bounding_box[0, 2], zsteps)
+zcoords = numpy.linspace(model.bounding_box[0, 2], model.bounding_box[1, 2], zsteps)
 zz,yy,xx = numpy.meshgrid(zcoords,ycoords,xcoords,indexing='ij')
 locs = numpy.transpose([xx.flatten(),yy.flatten(),zz.flatten()])
 

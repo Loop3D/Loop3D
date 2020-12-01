@@ -186,8 +186,8 @@ int StructuralModel::loadFromFile(QString filename)
         m_xmax = (float)project->m_maxEasting;
         m_ymin = (float)project->m_minNorthing;
         m_ymax = (float)project->m_maxNorthing;
-        m_zmin = (float)project->m_minDepth;
-        m_zmax = (float)project->m_maxDepth;
+        m_zmin = (float)project->m_botExtent;
+        m_zmax = (float)project->m_topExtent;
         project->m_xsize = m_width;
         project->m_ysize = m_height;
         project->m_zsize = m_depth;

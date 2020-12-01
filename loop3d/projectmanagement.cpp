@@ -14,8 +14,8 @@ ProjectManagement* ProjectManagement::m_instance = nullptr;
 ProjectManagement::ProjectManagement():
     m_utmZone(0),
     m_utmNorthSouth(-1),
-    m_minDepth(-1200),
-    m_maxDepth(12000),
+    m_botExtent(-12000),
+    m_topExtent(1200),
     m_spacingX(1000),
     m_spacingY(1000),
     m_spacingZ(300),
@@ -60,8 +60,8 @@ void ProjectManagement::clearProject(bool clearExtents)
         m_filename = "";
         m_mapCentreLatitude = 0;
         m_mapCentreLongitude = 0;
-        m_minDepth = -1200.0;
-        m_maxDepth = 12000.0;
+        m_botExtent = -12000.0;
+        m_topExtent = 1200.0;
         m_spacingX = 1000;
         m_spacingY = 1000;
         m_spacingZ = 300;
@@ -155,8 +155,8 @@ int ProjectManagement::saveProject(QString filename)
     extents.maxEasting = m_maxEasting;
     extents.minNorthing = m_minNorthing;
     extents.maxNorthing = m_maxNorthing;
-    extents.minDepth = m_minDepth;
-    extents.maxDepth = m_maxDepth;
+    extents.topDepth = m_topExtent;
+    extents.bottomDepth = m_botExtent;
     extents.utmZone = m_utmZone;
     extents.utmNorthSouth = m_utmNorthSouth;
     extents.spacingX = m_spacingX;
@@ -222,8 +222,8 @@ int ProjectManagement::loadProject(QString filename)
     m_maxEasting = extents.maxEasting;
     m_minNorthing = extents.minNorthing;
     m_maxNorthing = extents.maxNorthing;
-    m_minDepth = extents.minDepth;
-    m_maxDepth = extents.maxDepth;
+    m_topExtent = extents.topDepth;
+    m_botExtent = extents.bottomDepth;
     m_spacingX = static_cast<unsigned int>(extents.spacingX);
     m_spacingY = static_cast<unsigned int>(extents.spacingY);
     m_spacingZ = static_cast<unsigned int>(extents.spacingZ);
@@ -232,7 +232,7 @@ int ProjectManagement::loadProject(QString filename)
     m_inUtm = extents.workingFormat;
 
     updateGeodeticLimits(m_minLatitude,m_maxLatitude,m_minLongitude,m_maxLongitude);
-    minDepthChanged(); maxDepthChanged();
+    botExtentChanged(); topExtentChanged();
     spacingXChanged(); spacingYChanged(); spacingZChanged();
     inUtmChanged();
     // Data file all working so save filename

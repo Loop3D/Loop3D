@@ -11,7 +11,7 @@ if ("m2l_data_dir" not in vars() and "m2l_data_dir" not in globals()):
 
 # Set default values for boundaries and projection
 proj_crs = {"init": "EPSG:28350"}
-boundaries = [500102.854, 603064.443,7455392.3, 7567970.26,-1200.0, 12000.0]
+boundaries = [500102.854, 603064.443, 7455392.3, 7567970.26, -12000.0, 1200.0]
 
 # TODO: Add utm/gda zone when that can happen
 # Collect extents from loopFilename
@@ -57,9 +57,9 @@ proj.config.update_projectfile()
 postProjectFile = time.time()
 print("MAP2LOOP Project File Upload took " + str(postProjectFile-postRun) + " seconds")
 
-proj.config.export_png()
-postPNG = time.time()
-print("MAP2LOOP PNG export took " + str(postPNG-postProjectFile) + " seconds")
+# proj.config.export_png()
+# postPNG = time.time()
+# print("MAP2LOOP PNG export took " + str(postPNG-postProjectFile) + " seconds")
 
 print("Total map2loop time is " + str(time.time()-start))
 

@@ -27,8 +27,8 @@ Item {
         roi.updateMinEasting(project.minEasting)
         roi.updateMaxNorthing(project.maxNorthing)
         roi.updateMinNorthing(project.minNorthing)
-        roi.updateMinDepth(project.minDepth)
-        roi.updateMaxDepth(project.maxDepth)
+        roi.updateTopExtent(project.topExtent)
+        roi.updateBotExtent(project.botExtent)
         roi.updateZone()
     }
 

@@ -34,8 +34,8 @@ class ProjectManagement : public QQuickItem
     Q_PROPERTY (unsigned int spacingX MEMBER m_spacingX NOTIFY spacingXChanged)
     Q_PROPERTY (unsigned int spacingY MEMBER m_spacingY NOTIFY spacingYChanged)
     Q_PROPERTY (unsigned int spacingZ MEMBER m_spacingZ NOTIFY spacingZChanged)
-    Q_PROPERTY (double minDepth MEMBER m_minDepth NOTIFY minDepthChanged)
-    Q_PROPERTY (double maxDepth MEMBER m_maxDepth NOTIFY maxDepthChanged)
+    Q_PROPERTY (double botExtent MEMBER m_botExtent NOTIFY botExtentChanged)
+    Q_PROPERTY (double topExtent MEMBER m_topExtent NOTIFY topExtentChanged)
     Q_PROPERTY (bool inUtm MEMBER m_inUtm NOTIFY inUtmChanged)
     Q_PROPERTY (int mainIndex MEMBER m_mainIndex NOTIFY mainIndexChanged)
     Q_PROPERTY (bool extentsChanged MEMBER m_extentsChanged NOTIFY extentsChangedChanged)
@@ -69,8 +69,8 @@ class ProjectManagement : public QQuickItem
         void spacingXChanged();
         void spacingYChanged();
         void spacingZChanged();
-        void minDepthChanged();
-        void maxDepthChanged();
+        void botExtentChanged();
+        void topExtentChanged();
         void inUtmChanged();
         void mainIndexChanged();
         void extentsChangedChanged();
@@ -134,8 +134,8 @@ public Q_SLOTS:
         double m_maxEasting;
         int m_utmZone;
         int m_utmNorthSouth;
-        double m_minDepth;
-        double m_maxDepth;
+        double m_botExtent;
+        double m_topExtent;
         unsigned int m_spacingX;
         unsigned int m_spacingY;
         unsigned int m_spacingZ;

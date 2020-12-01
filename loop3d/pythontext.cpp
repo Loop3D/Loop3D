@@ -70,7 +70,7 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
             ProjectManagement* proj = ProjectManagement::instance();
             xsteps = static_cast<int>((proj->m_maxEasting - proj->m_minEasting) / proj->m_spacingX)+1;
             ysteps = static_cast<int>((proj->m_maxNorthing - proj->m_minNorthing) / proj->m_spacingY)+1;
-            zsteps = static_cast<int>((proj->m_maxDepth - proj->m_minDepth) / proj->m_spacingZ)+1;
+            zsteps = static_cast<int>((proj->m_topExtent - proj->m_botExtent) / proj->m_spacingZ)+1;
             structureUrl = replaceKeywords(proj->m_structureUrl);
             geologyUrl = replaceKeywords(proj->m_geologyUrl);
             mindepUrl = replaceKeywords(proj->m_mindepUrl);
@@ -113,7 +113,7 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
                 if (proj->getStModel()) proj->getStModel()->loadData(result,
                             static_cast<float>(proj->m_minEasting), static_cast<float>(proj->m_maxEasting), xsteps,
                             static_cast<float>(proj->m_minNorthing), static_cast<float>(proj->m_maxNorthing), ysteps,
-                            static_cast<float>(proj->m_minDepth),static_cast<float>(proj->m_maxDepth),zsteps);
+                            static_cast<float>(proj->m_topExtent),static_cast<float>(proj->m_botExtent),zsteps);
             } else {
                 qFatal("No global project pointer (NEED TO FIX THIS NOW!)");
             }

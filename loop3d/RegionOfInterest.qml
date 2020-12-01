@@ -17,8 +17,8 @@ Item {
     function updateMaxNorthing(val) { maxNorthingEdit.update(val) }
     function updateMinEasting(val) { minEastingEdit.update(val) }
     function updateMaxEasting(val) { maxEastingEdit.update(val) }
-    function updateMinDepth(val) { minDepthEdit.update(val) }
-    function updateMaxDepth(val) { maxDepthEdit.update(val) }
+    function updateTopExtent(val) { topExtentEdit.update(val) }
+    function updateBotExtent(val) { botExtentEdit.update(val) }
     function updateZone() { utmZoneEdit.text = project.utmZone }
 
     Text {
@@ -256,27 +256,27 @@ Item {
 
         // Region of Interest Depth extents
         RoiExtents {
-            id: minDepthEdit
+            id: topExtentEdit
             x: (path.x2 + path.x3)/2 - 45
             y: (path.y0 + path.y1)/2 - 10
             height: 40
             width: 90
-            property real text: project.minDepth
-            property string name: "Min"
+            property real text: project.topExtent
+            property string name: "Top"
             onTextChanged: {
-                project.minDepth = text
+                project.topExtent = text
             }
         }
         RoiExtents {
-            id: maxDepthEdit
+            id: botExtentEdit
             x: (path.x2 + path.x3)/2 - 45
             y: (path.y2 + path.y3)/2 - 10
             height: 40
             width: 90
-            property real text: project.maxDepth
-            property string name: "Max"
+            property real text: project.botExtent
+            property string name: "Bottom"
             onTextChanged: {
-                project.maxDepth = text
+                project.botExtent = text
             }
         }
 
@@ -583,10 +583,10 @@ Item {
         color: "#000000"
         text: "Approx. Dimensions (m) = " + (project.maxEasting - project.minEasting).toFixed(0) +
               " x " + (project.maxNorthing - project.minNorthing).toFixed(0) +
-              " x " + (project.maxDepth - project.minDepth).toFixed(0) +
+              " x " + (project.topExtent - project.botExtent).toFixed(0) +
               "\n Grid Size = "  + ((project.maxEasting - project.minEasting)/project.spacingX).toFixed(0) +
               " x " + ((project.maxNorthing - project.minNorthing)/project.spacingY).toFixed(0) +
-              " x " + ((project.maxDepth - project.minDepth)/project.spacingZ).toFixed(0)
+              " x " + ((project.topExtent - project.botExtent)/project.spacingZ).toFixed(0)
     }
 
     // Dialog box for unlocking extents
