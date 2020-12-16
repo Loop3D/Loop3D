@@ -118,6 +118,14 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
                 qFatal("No global project pointer (NEED TO FIX THIS NOW!)");
             }
         }
+        if (locals.contains("errors")) {
+            std::cout << locals["errors"].cast<std::string>() << std::endl;
+            if (ProjectManagement::instance()) {
+                ProjectManagement* proj = ProjectManagement::instance();
+                proj->m_pythonErrors = QString(locals["errors"].cast<std::string>().c_str());
+                proj->pythonErrorsChanged();
+            }
+        }
         qDebug() << "Finished python code exec in file " << name;
     } catch (std::exception& e) {
         qDebug() << e.what();

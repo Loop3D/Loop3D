@@ -32,6 +32,20 @@ Item {
         roi.updateZone()
     }
 
+    function runExtractData() {
+        project.saveProject()
+        project.pythonErrors = ""
+        dcPythonText.run(dcTextArea.text,project.filename)
+        project.reloadProject()
+        if (project.pythonErrors) {
+            console.log(project.pythonErrors)
+            pythonErrorDialog.open()
+        } else {
+            bar.currentIndex = 1
+            dmTab.reloadMap()
+        }
+    }
+
     // re-centre the map function from geodetic extents
     function reCentreMap() {
         mapCentreLatitude = (project.minLatitude + project.maxLatitude) / 2
@@ -347,8 +361,8 @@ Item {
                     }
                     DataSourceModel {
                         id: dataSourceModel
-                        property string dsfilename: "loop3d/DataSource.conf"
-//                        property string dsfilename: "DataSource.conf"
+//                        property string dsfilename: "loop3d/DataSource.conf"
+                        property string dsfilename: "DataSource.conf"
                         dataSources: dataSourceList
                         Component.onCompleted: {
                             loadDataSources(dsfilename)
@@ -461,13 +475,7 @@ Item {
                         text: "Extract Data"
                         onPressed: {
                             if (!project.hasFilename()) fileDialogSave.open()
-                            else {
-                                project.saveProject()
-                                dcPythonText.run(dcTextArea.text,project.filename)
-                                project.reloadProject()
-                                bar.currentIndex = 1
-                                dmTab.reloadMap()
-                            }
+                            else runExtractData()
                         }
                     }
                 }
@@ -507,13 +515,7 @@ Item {
                         onPressed: {
                             // TODO: remove file open when finished testing textures
                             if (!project.hasFilename()) fileDialogSave.open()
-                            else {
-                                project.saveProject()
-                                dcPythonText.run(dcTextArea.text,project.filename)
-                                project.reloadProject()
-                                bar.currentIndex = 1
-                                dmTab.reloadMap()
-                            }
+                            else runExtractData()
                         }
                     }
                 }

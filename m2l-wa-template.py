@@ -26,42 +26,42 @@ bbox = {"minx": boundaries[0], "maxx": boundaries[1], "miny": boundaries[2],
         "maxy": boundaries[3], "base": boundaries[4], "top": boundaries[5]}
 bboxStr=str(bbox["minx"])+","+str(bbox["miny"])+","+str(bbox["maxx"])+","+str(bbox["maxy"])
 
-start = time.time()
-proj = Project(
-    geology_file=geology_url,
-    fault_file=fault_url,
-    fold_file=fold_url,
-    structure_file=structure_url,
-    mindep_file=mindep_url,
-    metadata=metadata
-)
-postInit = time.time()               
-print("MAP2LOOP Project init took " + str(postInit-start) + " seconds")
+errors = ""
+try:
+    start = time.time()
+    proj = Project(
+        geology_file=geology_url,
+        fault_file=fault_url,
+        fold_file=fold_url,
+        structure_file=structure_url,
+        mindep_file=mindep_url,
+        metadata=metadata
+    )
+    postInit = time.time()               
+    print("MAP2LOOP Project init took " + str(postInit-start) + " seconds")
 
-proj.update_config(
-    out_dir=m2l_data_dir,
-    overwrite="true",
-    bbox_3d=bbox,
-    proj_crs=proj_crs,
-    loopFilename=loopFilename,
-    quiet='all'  # Options are 'None', 'no-figures', 'all'
-)
-postConfig = time.time()
-print("MAP2LOOP Project config took " + str(postConfig-postInit) + " seconds")
+    proj.update_config(
+        out_dir=m2l_data_dir,
+        overwrite="true",
+        bbox_3d=bbox,
+        proj_crs=proj_crs,
+        loopFilename=loopFilename,
+        quiet='all'  # Options are 'None', 'no-figures', 'all'
+    )
+    postConfig = time.time()
+    print("MAP2LOOP Project config took " + str(postConfig-postInit) + " seconds")
 
-proj.run()
-postRun = time.time()
-print("MAP2LOOP Project run took " + str(postRun-postConfig) + " seconds")
+    proj.run()
+    postRun = time.time()
+    print("MAP2LOOP Project run took " + str(postRun-postConfig) + " seconds")
 
-proj.config.update_projectfile()
-postProjectFile = time.time()
-print("MAP2LOOP Project File Upload took " + str(postProjectFile-postRun) + " seconds")
+    proj.config.update_projectfile()
+    postProjectFile = time.time()
+    print("MAP2LOOP Project File Upload took " + str(postProjectFile-postRun) + " seconds")
 
-# proj.config.export_png()
-# postPNG = time.time()
-# print("MAP2LOOP PNG export took " + str(postPNG-postProjectFile) + " seconds")
-
-print("Total map2loop time is " + str(time.time()-start))
+    print("Total map2loop time is " + str(time.time()-start))
+except Exception as e:
+    errors += "PythonError: " + str(e)
 
 df = pandas.DataFrame(data=bbox,index=[0])
 df = df.rename(columns={"base":"lower","top":"upper"})

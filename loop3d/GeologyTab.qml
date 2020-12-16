@@ -7,9 +7,24 @@ import loop3d.eventmodel 1.0
 Item {
     id: geologyTab
     property int totalPermutations: 0
+    property bool useLavavu: false
     function calcPerms() { totalPermutations = eventList.calcPermutations() }
 
     function repaint() { mycanvas.requestPaint() }
+
+    function runModel() {
+        project.saveProject()
+        project.setUseLavavu(useLavavu)
+        project.pythonErrors = ""
+        pythonText.run(textArea.text,project.filename,false)
+        project.reloadProject()
+        if (project.pythonErrors) {
+            console.log(project.pythonErrors)
+            pythonErrorDialog.open()
+        } else {
+            bar.currentIndex = 4
+        }
+    }
 
     Rectangle {
         border.color: "#ffffff"
@@ -415,11 +430,8 @@ Item {
                             // TODO: remove file open when finished testing textures
                             if (!project.hasFilename()) fileDialogOpen.open()
                             else {
-                                project.saveProject()
-                                project.setUseLavavu(false)
-                                pythonText.run(textArea.text,project.filename,false)
-                                project.reloadProject()
-                                bar.currentIndex = 4
+                                useLavavu = false
+                                runModel()
                             }
                         }
                     }
@@ -434,11 +446,8 @@ Item {
                             // TODO: remove file open when finished testing textures
                             if (!project.hasFilename()) fileDialogOpen.open()
                             else {
-                                project.saveProject()
-                                project.setUseLavavu(true)
-                                pythonText.run(textArea.text,project.filename,false)
-                                project.reloadProject()
-                                bar.currentIndex = 4
+                                useLavavu = true
+                                runModel()
                             }
                         }
                     }
@@ -480,11 +489,8 @@ Item {
                         onPressed: {
                             if (!project.hasFilename()) fileDialogSave.open()
                             else {
-                                project.saveProject()
-                                project.setUseLavavu(false)
-                                pythonText.run(textArea.text,project.filename,false)
-                                bar.currentIndex = 4
-                                project.reloadProject()
+                                useLavavu = false
+                                runModel()
                             }
                         }
                     }
@@ -498,11 +504,8 @@ Item {
                         onPressed: {
                             if (!project.hasFilename()) fileDialogSave.open()
                             else {
-                                project.saveProject()
-                                project.setUseLavavu(true)
-                                pythonText.run(textArea.text,project.filename,false)
-                                bar.currentIndex = 4
-                                project.reloadProject()
+                                useLavavu = true
+                                runModel()
                             }
                         }
                     }

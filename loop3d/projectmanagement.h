@@ -50,6 +50,7 @@ class ProjectManagement : public QQuickItem
     Q_PROPERTY (unsigned int activeState MEMBER m_activeState WRITE setActiveState NOTIFY activeStateChanged)
     Q_PROPERTY (QString activeStateName MEMBER m_activeStateName NOTIFY activeStateNameChanged)
     Q_PROPERTY (bool useLavavu MEMBER m_useLavavu WRITE setUseLavavu NOTIFY useLavavuChanged)
+    Q_PROPERTY (QString pythonErrors MEMBER m_pythonErrors NOTIFY pythonErrorsChanged)
 
     Q_SIGNALS:
         void filenameChanged();
@@ -85,6 +86,7 @@ class ProjectManagement : public QQuickItem
         void activeStateChanged();
         void activeStateNameChanged();
         void useLavavuChanged();
+        void pythonErrorsChanged();
 
 public Q_SLOTS:
         void setLockedExtents(bool val) { m_lockedExtents = val; lockedExtentsChanged();}
@@ -162,6 +164,8 @@ public Q_SLOTS:
         std::string m_foldUrl;
         std::string m_mindepUrl;
         std::string m_metadataUrl;
+
+        QString m_pythonErrors;
 
     private:
         ProjectManagement();

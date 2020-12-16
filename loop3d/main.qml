@@ -492,4 +492,11 @@ Item {
         icon: StandardIcon.Question
         text: "Loop3D\n\nVersion: " + mainWindow.version
     }
+
+    MessageDialog {
+        id: pythonErrorDialog
+        title: "An exception has been thrown by the python code"
+        text: project.pythonErrors
+        icon: StandardIcon.Warning
+    }
 }
