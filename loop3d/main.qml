@@ -449,7 +449,7 @@ Item {
         onAccepted: {
             // Load file here
             if (!project.loadProject(fileDialogOpen.fileUrl)) {
-                console.log("Open Project Action - Open " + fileDialogOpen.fileUrl)
+//                console.log("Open Project Action - Open " + fileDialogOpen.fileUrl)
                 notifyText.text = "Loaded project from " + fileDialogOpen.fileUrl
                 dcTab.inUTM = project.inUtm
                 project.setLockedExtents(true)
@@ -479,7 +479,7 @@ Item {
             // Save file here
             if (!project.saveProject(fileDialogSave.fileUrl)) {
                 project.setLockedExtents(true)
-                console.log("Save Project Action - Save to " + fileDialogSave.fileUrl)
+//                console.log("Save Project Action - Save to " + fileDialogSave.fileUrl)
                 notifyText.text = "Saved project to " + fileDialogSave.fileUrl
             }
         }
@@ -496,7 +496,7 @@ Item {
     MessageDialog {
         id: pythonErrorDialog
         title: "An exception has been thrown by the python code"
-        text: project.pythonErrors
+        text: project.pythonErrors + '\nSee the console log for the stacetrace'
         icon: StandardIcon.Warning
     }
 }

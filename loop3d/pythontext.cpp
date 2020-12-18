@@ -26,7 +26,7 @@ void PythonText::setFilename(QString in)
 {
     m_filename = in;
     QString content;
-    qDebug() << "Trying to load python source file " << m_filename;
+    qDebug() << "Loop: Loading python source file " << m_filename;
     if (m_filename != "") {
         try {
             QFile file(m_filename);
@@ -77,14 +77,14 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
             faultUrl = replaceKeywords(proj->m_faultUrl);
             foldUrl = replaceKeywords(proj->m_foldUrl);
             metadataUrl = replaceKeywords(proj->m_metadataUrl);
-            std::cout << "structure = " << structureUrl << std::endl;
-            std::cout << "geology   = " << geologyUrl << std::endl;
-            std::cout << "mindep    = " << mindepUrl << std::endl;
-            std::cout << "fault     = " << faultUrl << std::endl;
-            std::cout << "fold      = " << foldUrl << std::endl;
-            std::cout << "meta      = " << metadataUrl << std::endl;
+            qDebug() << "structure = " << structureUrl.substr(0,structureUrl.find_first_of('?')).c_str();
+            qDebug() << "geology   = " << geologyUrl.substr(0,geologyUrl.find_first_of('?')).c_str();
+            qDebug() << "mindep    = " << mindepUrl.substr(0,mindepUrl.find_first_of('?')).c_str();
+            qDebug() << "fault     = " << faultUrl.substr(0,faultUrl.find_first_of('?')).c_str();
+            qDebug() << "fold      = " << foldUrl.substr(0,foldUrl.find_first_of('?')).c_str();
+            qDebug() << "meta      = " << metadataUrl.substr(0,metadataUrl.find_first_of('?')).c_str();
         }
-        qDebug() << "Trying to load file " << name;
+        qDebug() << "Loop: Loading python script file named: " << name;
         auto locals = py::dict("loopFilename"_a = name.toStdString().c_str());
         locals["xsteps"] = xsteps;
         locals["ysteps"] = ysteps;
@@ -96,7 +96,6 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
         locals["fold_url"] = foldUrl;
         locals["metadata"] = metadataUrl;
         locals["use_lavavu"] = (ProjectManagement::instance()->m_useLavavu ? true : false);
-//        qDebug() << xsteps << " " << ysteps << " " << zsteps;
         py::exec(code.toStdString().c_str(),py::globals(),locals);
 
         if (useResult) {
@@ -126,7 +125,7 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
                 proj->pythonErrorsChanged();
             }
         }
-        qDebug() << "Finished python code exec in file " << name;
+        qDebug() << "Loop: Finished python code exec in file " << name;
     } catch (std::exception& e) {
         qDebug() << e.what();
         qDebug() << "Failed to run python code";

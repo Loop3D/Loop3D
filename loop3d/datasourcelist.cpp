@@ -22,7 +22,7 @@ void DataSourceList::loadDataSources(QString resourceFile)
 {
     resourceFilename = resourceFile;
     std::ifstream dataFile;
-    qDebug() << "Trying to open file " << resourceFile;
+    qDebug() << "Loop: Opening data source configuration file " << resourceFile;
     dataFile.open(resourceFilename.toStdString(), std::ios::in);
     if (dataFile.is_open()) {
         std::string line;

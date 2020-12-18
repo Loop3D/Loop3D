@@ -53,11 +53,8 @@ try:
         fault_params=fault_params,
         foliation_params=foliation_params
         )
-except Exception as e:
-    errors += "PythonError: " + str(e)
 
-if (use_lavavu):
-    try:
+    if (use_lavavu):
         view = LavaVuModelViewer(model,vertical_exaggeration=1) 
         view.nsteps = numpy.array([200,200,200])
         view.add_model(cmap='tab20')
@@ -65,10 +62,7 @@ if (use_lavavu):
         view.add_model_surfaces()
         view.add_isosurface(model.get_feature_by_name("supergroup_0"),nslices=5)
         view.interactive()  
-    except Exception as e:
-        errors += "PythonError: " + str(e)
 
-try:
     xsteps = int((boundaries[1]-boundaries[0]) / stepsizes[0])+1
     ysteps = int((boundaries[3]-boundaries[2]) / stepsizes[1])+1
     zsteps = int((boundaries[5]-boundaries[4]) / stepsizes[2])+1
@@ -125,7 +119,7 @@ try:
     if option == 2:
         result = sfs[0]
 except Exception as e:
-    errors += "PythonError: " + str(e)
+    errors += "PythonError: \n" + traceback.format_exc() + '\n' + repr(e)
 
 resp = LoopProjectFile.Set(loopFilename,"strModel",data=numpy.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
 

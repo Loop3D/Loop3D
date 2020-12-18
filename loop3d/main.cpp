@@ -36,24 +36,29 @@ void setupOpenGLVersion(void)
     QSurfaceFormat::setDefaultFormat(fmt);
 }
 
+// Default message handler to be called to bypass all other warnings.
+static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler(nullptr);
+// custom Message Handler to remove spam messages
+void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString & msg);
+
 int main(int argc, char *argv[])
 {
-    QTextStream out (stdout);
-    out << "Starting pybind11 interpreter\n";
+//    std::cout << "Starting pybind11 interpreter\n" << std::endl;
     try {
         py::initialize_interpreter();
-        out << "Interpreter loaded, trying a python file\n";
+//        std::cout << "Interpreter loaded, trying a python file" << std::endl;
 
         py::eval_file(".\\setupPython.py");
-        out << "Python interpreter and setup environment file successfully ran\n";
+//        std::cout << "Python interpreter and setup environment file successfully ran" << std::endl;
     } catch (std::exception& e) {
-        out << e.what();
-        out << "Python file DID NOT successfully ran\n";
+        std::cout << e.what() << std::endl;
+        std::cout << "Python file DID NOT successfully ran" << std::endl;
     }
 
     setupOpenGLVersion();
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
+    qInstallMessageHandler(customMessageHandler);
 
     app.setOrganizationName("Loop");
     app.setApplicationName("Loop");
@@ -101,8 +106,27 @@ int main(int argc, char *argv[])
     view.show();
     QObject::connect(view.rootContext()->engine(),SIGNAL(quit()),qApp,SLOT(quit()));
 
-    out << "Starting qt app exec\n";
+    std::cout << "Starting Loop GUI ..." << std::endl;
     int res = app.exec();
     py::finalize_interpreter();
     return res;
 }
+
+void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString & msg)
+{
+    switch (type) {
+        case QtWarningMsg:
+            if (msg.contains("QML Image: Cannot open:")); // GUI will often try to open invalid images
+            else if (msg.contains("QGeoTileProviderOsm: Tileserver disabled at ")); // Spam from Qml Map
+            else if (msg.contains("QGeoTileFetcherOsm: all providers resolved"));   // Spam from Qml Map
+            else if (msg.contains("QWindowsWindow::setGeometry: Unable to set geometry"));   // Resize issue on map resize
+            else {
+                (*QT_DEFAULT_MESSAGE_HANDLER)(type, context, msg); // bypass and display all other warnings
+            }
+            break;
+        default:    // Call the default handler.
+            (*QT_DEFAULT_MESSAGE_HANDLER)(type, context, msg);
+            break;
+    }
+}
+

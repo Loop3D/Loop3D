@@ -76,7 +76,7 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
         // Clear data structures
         m_values.clear();
 
-        qDebug() << "Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
+        qDebug() << "Loop: Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
         // Allocate memory for textures
         if (m_valueData) free(m_valueData);
         m_valueData = static_cast<float*>(malloc(sizeof(float)*m_totalPoints));
@@ -125,7 +125,7 @@ int StructuralModel::saveToFile(QString filename)
     dataShape.push_back(m_height);
     dataShape.push_back(m_depth);
     LoopProjectFileResponse resp = {0,""};
-    resp = LoopProjectFile::SetStructuralModel(name.toStdString(),data,dataShape,0,true);
+    resp = LoopProjectFile::SetStructuralModel(name.toStdString(),data,dataShape,0,false);
     if (resp.errorCode) {
         qDebug() << resp.errorMessage.c_str();
         return 1;
@@ -156,15 +156,15 @@ int StructuralModel::loadFromFile(QString filename)
         std::vector<float> data;
         std::vector<int> dataShape;
         LoopProjectFileResponse resp = {0,""};
-        resp = LoopProjectFile::GetStructuralModel(name.toStdString(),data,dataShape,0,true);
+        resp = LoopProjectFile::GetStructuralModel(name.toStdString(),data,dataShape,0,false);
         if (resp.errorCode) {
-            qDebug() << resp.errorMessage.c_str();
+            qDebug() << "LoopProjectFile: " << resp.errorMessage.c_str();
         } else {
             m_width = dataShape[0];
             m_height = dataShape[1];
             m_depth = dataShape[2];
             m_totalPoints = m_width * m_height * m_depth;
-            qDebug() << "Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
+            qDebug() << "Loop: Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
             m_totalTetra = (m_width-1) * (m_height-1) * (m_depth-1) * 5;
             if (m_valueData) free(m_valueData);
             m_valueData = static_cast<float*>(malloc(sizeof(float)*m_totalPoints));
@@ -213,7 +213,7 @@ void StructuralModel::createBasicTestStructure(unsigned int size)
         m_totalPoints = m_width * m_height * m_depth;
         m_totalTetra = (m_width-1) * (m_height-1) * (m_depth-1) * 5;
 
-        qDebug() << "Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
+//        qDebug() << "Loop: Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
         // Allocate memory for textures
         if (m_valueData) free(m_valueData);
         m_valueData = static_cast<float*>(malloc(sizeof(float)*m_height*m_width*m_depth));
@@ -266,7 +266,7 @@ void StructuralModel::updateStructureDataInViewer()
 int StructuralModel::loadTextures()
 {
     if (m_dataChanged) {
-        qDebug() << "Setting up textures for displays";
+//        qDebug() << "Loop: Setting up textures for displays";
         ProjectManagement* project =  ProjectManagement::instance();
         openGLContext = project->getQmlQuickView()->openglContext();
         if (openGLContext == nullptr) return 0;

@@ -8,11 +8,11 @@ EventList::EventList(QObject *parent) : QObject(parent)
 
 void EventList::clearList()
 {
-    qDebug() << "Clearing event list";
+    qDebug() << "Loop: Clearing event list";
     preItemReset();
     events.clear();
     postItemReset();
-    qDebug() << "Cleared event list";
+    qDebug() << "Loop: Cleared event list";
 }
 
 int EventList::loadFromFile(QString filename)
@@ -33,7 +33,7 @@ int EventList::loadFromFile(QString filename)
 
     preItemReset();
     std::vector<LoopProjectFile::FaultEvent> faultEvents;
-    LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,true);
+    LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,false);
     if (faultEvents.size()) {
         for (auto it=faultEvents.begin();it!=faultEvents.end();it++) {
             std::shared_ptr<LoopProjectFile::FaultEvent> event = std::make_shared<LoopProjectFile::FaultEvent>(std::move(*it));
@@ -41,7 +41,7 @@ int EventList::loadFromFile(QString filename)
         }
     }
     std::vector<LoopProjectFile::FoldEvent> foldEvents;
-    LoopProjectFile::GetFoldEvents(name.toStdString(),foldEvents,true);
+    LoopProjectFile::GetFoldEvents(name.toStdString(),foldEvents,false);
     if (foldEvents.size()) {
         for (auto it=foldEvents.begin();it!=foldEvents.end();it++) {
             std::shared_ptr<LoopProjectFile::FoldEvent> event = std::make_shared<LoopProjectFile::FoldEvent>(std::move(*it));
@@ -49,7 +49,7 @@ int EventList::loadFromFile(QString filename)
         }
     }
     std::vector<LoopProjectFile::FoliationEvent> foliationEvents;
-    LoopProjectFile::GetFoliationEvents(name.toStdString(),foliationEvents,true);
+    LoopProjectFile::GetFoliationEvents(name.toStdString(),foliationEvents,false);
     if (foliationEvents.size()) {
         for (auto it=foliationEvents.begin();it!=foliationEvents.end();it++) {
             std::shared_ptr<LoopProjectFile::FoliationEvent> event = std::make_shared<LoopProjectFile::FoliationEvent>(std::move(*it));
@@ -57,7 +57,7 @@ int EventList::loadFromFile(QString filename)
         }
     }
     std::vector<LoopProjectFile::DiscontinuityEvent> discontinuityEvents;
-    LoopProjectFile::GetDiscontinuityEvents(name.toStdString(),discontinuityEvents,true);
+    LoopProjectFile::GetDiscontinuityEvents(name.toStdString(),discontinuityEvents,false);
     if (discontinuityEvents.size()) {
         for (auto it=discontinuityEvents.begin();it!=discontinuityEvents.end();it++) {
             std::shared_ptr<LoopProjectFile::DiscontinuityEvent> event = std::make_shared<LoopProjectFile::DiscontinuityEvent>(std::move(*it));
@@ -65,7 +65,7 @@ int EventList::loadFromFile(QString filename)
         }
     }
     std::vector<LoopProjectFile::StratigraphicLayer> stratigraphicLayers;
-    LoopProjectFile::GetStratigraphicLayers(name.toStdString(),stratigraphicLayers,true);
+    LoopProjectFile::GetStratigraphicLayers(name.toStdString(),stratigraphicLayers,false);
     if (stratigraphicLayers.size()) {
         for (auto it=stratigraphicLayers.begin();it!=stratigraphicLayers.end();it++) {
             std::shared_ptr<LoopProjectFile::StratigraphicLayer> layer = std::make_shared<LoopProjectFile::StratigraphicLayer>(std::move(*it));
@@ -114,11 +114,11 @@ int EventList::saveToFile(QString filename)
             std::cout << "UNIDENTIFIED type for event " << (*it)->name << std::endl;
         }
     }
-    if (faultEvents.size()) LoopProjectFile::SetFaultEvents(name.toStdString(),faultEvents,true);
-    if (foldEvents.size()) LoopProjectFile::SetFoldEvents(name.toStdString(),foldEvents,true);
-    if (foliationEvents.size()) LoopProjectFile::SetFoliationEvents(name.toStdString(),foliationEvents,true);
-    if (discontinuityEvents.size()) LoopProjectFile::SetDiscontinuityEvents(name.toStdString(),discontinuityEvents,true);
-    if (stratigraphicLayers.size()) LoopProjectFile::SetStratigraphicLayers(name.toStdString(),stratigraphicLayers,true);
+    if (faultEvents.size()) LoopProjectFile::SetFaultEvents(name.toStdString(),faultEvents,false);
+    if (foldEvents.size()) LoopProjectFile::SetFoldEvents(name.toStdString(),foldEvents,false);
+    if (foliationEvents.size()) LoopProjectFile::SetFoliationEvents(name.toStdString(),foliationEvents,false);
+    if (discontinuityEvents.size()) LoopProjectFile::SetDiscontinuityEvents(name.toStdString(),discontinuityEvents,false);
+    if (stratigraphicLayers.size()) LoopProjectFile::SetStratigraphicLayers(name.toStdString(),stratigraphicLayers,false);
 
     return result;
 }

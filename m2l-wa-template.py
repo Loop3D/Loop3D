@@ -2,6 +2,7 @@ from map2loop.project import Project
 import LoopProjectFile
 import time
 import pandas
+import traceback
 
 # Accept loopFilename from python state otherwise default
 if ("loopFilename" not in vars() and "loopFilename" not in globals()):
@@ -61,7 +62,7 @@ try:
 
     print("Total map2loop time is " + str(time.time()-start))
 except Exception as e:
-    errors += "PythonError: " + str(e)
+    errors += "PythonError: \n" + traceback.format_exc() + '\n' + repr(e)
 
 df = pandas.DataFrame(data=bbox,index=[0])
 df = df.rename(columns={"base":"lower","top":"upper"})

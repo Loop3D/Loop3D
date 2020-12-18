@@ -8,11 +8,11 @@ ObservationList::ObservationList(QObject *parent) : QObject(parent)
 
 void ObservationList::clearList()
 {
-    qDebug() << "Clearing observation list";
+    qDebug() << "Loop: Clearing observation list";
     preItemReset();
     observations.clear();
     postItemReset();
-    qDebug() << "Cleared observation list";
+    qDebug() << "Loop: Cleared observation list";
 }
 
 int ObservationList::loadFromFile(QString filename)
@@ -33,7 +33,7 @@ int ObservationList::loadFromFile(QString filename)
 
     preItemReset();
     std::vector<LoopProjectFile::FaultObservation> faultObservations;
-    LoopProjectFile::GetFaultObservations(name.toStdString(),faultObservations,true);
+    LoopProjectFile::GetFaultObservations(name.toStdString(),faultObservations,false);
     if (faultObservations.size()) {
         for (auto it=faultObservations.begin();it!=faultObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::FaultObservation> observation = std::make_shared<LoopProjectFile::FaultObservation>(std::move(*it));
@@ -43,7 +43,7 @@ int ObservationList::loadFromFile(QString filename)
         }
     }
     std::vector<LoopProjectFile::FoldObservation> foldObservations;
-    LoopProjectFile::GetFoldObservations(name.toStdString(),foldObservations,true);
+    LoopProjectFile::GetFoldObservations(name.toStdString(),foldObservations,false);
     if (foldObservations.size()) {
         for (auto it=foldObservations.begin();it!=foldObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::FoldObservation> observation = std::make_shared<LoopProjectFile::FoldObservation>(std::move(*it));
@@ -52,7 +52,7 @@ int ObservationList::loadFromFile(QString filename)
         }
     }
     std::vector<LoopProjectFile::FoliationObservation> foliationObservations;
-    LoopProjectFile::GetFoliationObservations(name.toStdString(),foliationObservations,true);
+    LoopProjectFile::GetFoliationObservations(name.toStdString(),foliationObservations,false);
     if (foliationObservations.size()) {
         for (auto it=foliationObservations.begin();it!=foliationObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::FoliationObservation> observation = std::make_shared<LoopProjectFile::FoliationObservation>(std::move(*it));
@@ -62,7 +62,7 @@ int ObservationList::loadFromFile(QString filename)
         }
     }
     std::vector<LoopProjectFile::DiscontinuityObservation> discontinuityObservations;
-    LoopProjectFile::GetDiscontinuityObservations(name.toStdString(),discontinuityObservations,true);
+    LoopProjectFile::GetDiscontinuityObservations(name.toStdString(),discontinuityObservations,false);
     if (discontinuityObservations.size()) {
         for (auto it=discontinuityObservations.begin();it!=discontinuityObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::DiscontinuityObservation> observation = std::make_shared<LoopProjectFile::DiscontinuityObservation>(std::move(*it));
@@ -72,7 +72,7 @@ int ObservationList::loadFromFile(QString filename)
         }
     }
     std::vector<LoopProjectFile::StratigraphicObservation> stratigraphicObservations;
-    LoopProjectFile::GetStratigraphicObservations(name.toStdString(),stratigraphicObservations,true);
+    LoopProjectFile::GetStratigraphicObservations(name.toStdString(),stratigraphicObservations,false);
     if (stratigraphicObservations.size()) {
         for (auto it=stratigraphicObservations.begin();it!=stratigraphicObservations.end();it++) {
             std::shared_ptr<LoopProjectFile::StratigraphicObservation> observation = std::make_shared<LoopProjectFile::StratigraphicObservation>(std::move(*it));
@@ -122,11 +122,11 @@ int ObservationList::saveToFile(QString filename)
             std::cout << "UNIDENTIFIED type for observation of event " << (*it)->eventId << std::endl;
         }
     }
-    if (faultObservations.size()) LoopProjectFile::SetFaultObservations(name.toStdString(),faultObservations,true);
-    if (foldObservations.size()) LoopProjectFile::SetFoldObservations(name.toStdString(),foldObservations,true);
-    if (foliationObservations.size()) LoopProjectFile::SetFoliationObservations(name.toStdString(),foliationObservations,true);
-    if (discontinuityObservations.size()) LoopProjectFile::SetDiscontinuityObservations(name.toStdString(),discontinuityObservations,true);
-    if (stratigraphicObservations.size()) LoopProjectFile::SetStratigraphicObservations(name.toStdString(),stratigraphicObservations,true);
+    if (faultObservations.size()) LoopProjectFile::SetFaultObservations(name.toStdString(),faultObservations,false);
+    if (foldObservations.size()) LoopProjectFile::SetFoldObservations(name.toStdString(),foldObservations,false);
+    if (foliationObservations.size()) LoopProjectFile::SetFoliationObservations(name.toStdString(),foliationObservations,false);
+    if (discontinuityObservations.size()) LoopProjectFile::SetDiscontinuityObservations(name.toStdString(),discontinuityObservations,false);
+    if (stratigraphicObservations.size()) LoopProjectFile::SetStratigraphicObservations(name.toStdString(),stratigraphicObservations,false);
 
     return result;
 }

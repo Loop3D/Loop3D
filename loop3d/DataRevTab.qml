@@ -10,7 +10,7 @@ Item {
     // Main area for data review tab
     function reloadMap() {
         map.source = ""
-        map.source = project.filename + ".png"
+        map.source = project.filename === "" ? "" : project.filename + ".png"
     }
     Rectangle {
         border.color: "#ffffff"
@@ -222,7 +222,7 @@ Item {
             // Also somewhere on this page there should be a stratigraphic column showing the colours and names of the strata
             Image {
                 id: map
-                source: project.filename + ".png"
+                source: (project.filename === "" ? "" : project.filename + ".png")
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
 
@@ -247,11 +247,7 @@ Item {
             anchors.right: parent.right
             anchors.margins: 10
             text: "Reload"
-            onPressed: { reloadMap()
-//                map.source = ""
-//                map.source = project.filename + ".png"
-            }
-
+            onPressed: reloadMap()
         }
     }
 }

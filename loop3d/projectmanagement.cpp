@@ -163,7 +163,7 @@ int ProjectManagement::saveProject(QString filename)
     extents.spacingY = m_spacingY;
     extents.spacingZ = m_spacingZ;
     extents.workingFormat = m_inUtm;
-    resp = LoopProjectFile::SetExtents(name.toStdString(),extents,true);
+    resp = LoopProjectFile::SetExtents(name.toStdString(),extents,false);
     if (resp.errorCode) {
         qDebug() << resp.errorMessage.c_str();
         return 1;
@@ -209,7 +209,7 @@ int ProjectManagement::loadProject(QString filename)
 
     LoopProjectFileResponse resp = {0,""};
     LoopProjectFile::LoopExtents extents;
-    resp = LoopProjectFile::GetExtents(name.toStdString(),extents,true);
+    resp = LoopProjectFile::GetExtents(name.toStdString(),extents,false);
     if (resp.errorCode) {
         qDebug() << resp.errorMessage.c_str();
         return 1;
