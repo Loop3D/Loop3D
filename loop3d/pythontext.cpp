@@ -66,6 +66,8 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
         std::string faultUrl = "";
         std::string foldUrl = "";
         std::string metadataUrl = "";
+        qDebug() << "Loop: Loading python script file named: " << name;
+        auto locals = py::dict("loopFilename"_a = name.toStdString().c_str());
         if (ProjectManagement::instance()) {
             ProjectManagement* proj = ProjectManagement::instance();
             xsteps = static_cast<int>((proj->m_maxEasting - proj->m_minEasting) / proj->m_spacingX)+1;
@@ -77,15 +79,18 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
             faultUrl = replaceKeywords(proj->m_faultUrl);
             foldUrl = replaceKeywords(proj->m_foldUrl);
             metadataUrl = replaceKeywords(proj->m_metadataUrl);
+            std::string m2lDataDirName = proj->m_filename.toStdString();
+            m2lDataDirName = m2lDataDirName.substr(m2lDataDirName.find_last_of('/')+1) + "_m2l_data";
             qDebug() << "structure = " << structureUrl.substr(0,structureUrl.find_first_of('?')).c_str();
             qDebug() << "geology   = " << geologyUrl.substr(0,geologyUrl.find_first_of('?')).c_str();
             qDebug() << "mindep    = " << mindepUrl.substr(0,mindepUrl.find_first_of('?')).c_str();
             qDebug() << "fault     = " << faultUrl.substr(0,faultUrl.find_first_of('?')).c_str();
             qDebug() << "fold      = " << foldUrl.substr(0,foldUrl.find_first_of('?')).c_str();
             qDebug() << "meta      = " << metadataUrl.substr(0,metadataUrl.find_first_of('?')).c_str();
+            locals["use_lavavu"] = proj->m_useLavavu ? true : false;
+            qDebug() << "m2l_data_dir = " << m2lDataDirName.c_str();
+            locals["m2l_data_dir"] = m2lDataDirName;
         }
-        qDebug() << "Loop: Loading python script file named: " << name;
-        auto locals = py::dict("loopFilename"_a = name.toStdString().c_str());
         locals["xsteps"] = xsteps;
         locals["ysteps"] = ysteps;
         locals["zsteps"] = zsteps;
@@ -95,7 +100,6 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
         locals["fault_url"] = faultUrl;
         locals["fold_url"] = foldUrl;
         locals["metadata"] = metadataUrl;
-        locals["use_lavavu"] = (ProjectManagement::instance()->m_useLavavu ? true : false);
         py::exec(code.toStdString().c_str(),py::globals(),locals);
 
         if (useResult) {

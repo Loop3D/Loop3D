@@ -166,6 +166,7 @@ public Q_SLOTS:
         std::string m_metadataUrl;
 
         QString m_pythonErrors;
+        QString m_filename;
 
     private:
         ProjectManagement();
@@ -175,7 +176,6 @@ public Q_SLOTS:
         double m_mapCentreLongitude;
         QString m_utmNorthSouthStr;
 
-        QString m_filename;
         QQuickView *m_qmlView;
 
         StructuralModel stModel;

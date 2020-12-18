@@ -3,12 +3,26 @@ import LoopProjectFile
 import time
 import pandas
 import traceback
+import os
 
 # Accept loopFilename from python state otherwise default
 if ("loopFilename" not in vars() and "loopFilename" not in globals()):
     loopFilename = "default.loop3d"
 if ("m2l_data_dir" not in vars() and "m2l_data_dir" not in globals()):
     m2l_data_dir = "m2l_data"
+
+if(not os.path.isdir(m2l_data_dir)):
+    os.mkdir(m2l_data_dir)
+if(not os.path.isdir(m2l_data_dir + "/tmp")):
+    os.mkdir(m2l_data_dir + "/tmp")
+if(not os.path.isdir(m2l_data_dir + "/output")):
+    os.mkdir(m2l_data_dir + "/output")
+if(not os.path.isdir(m2l_data_dir + "/dtm")):
+    os.mkdir(m2l_data_dir + "/dtm")
+if(not os.path.isdir(m2l_data_dir + "/vtk")):
+    os.mkdir(m2l_data_dir + "/vtk")
+if(not os.path.isdir(m2l_data_dir + "/graph")):
+    os.mkdir(m2l_data_dir + "/graph")
 
 # Set default values for boundaries and projection
 proj_crs = {"init": "EPSG:28350"}
@@ -61,9 +75,10 @@ try:
     print("MAP2LOOP Project File Upload took " + str(postProjectFile-postRun) + " seconds")
 
     print("Total map2loop time is " + str(time.time()-start))
+
+    df = pandas.DataFrame(data=bbox,index=[0])
+    df = df.rename(columns={"base":"lower","top":"upper"})
+    df.to_csv(m2l_data_dir+"/tmp/bbox.csv",index=False)
+
 except Exception as e:
     errors += "PythonError: \n" + traceback.format_exc() + '\n' + repr(e)
-
-df = pandas.DataFrame(data=bbox,index=[0])
-df = df.rename(columns={"base":"lower","top":"upper"})
-df.to_csv(m2l_data_dir+"/tmp/bbox.csv",index=False)
