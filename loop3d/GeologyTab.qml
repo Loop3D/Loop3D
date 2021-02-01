@@ -317,6 +317,7 @@ Item {
             color: "#bbbbbb"
 
             StackLayout {
+                id: stackGL
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -419,37 +420,17 @@ Item {
                             text: detailsView.currentIndex >= 0 ? eventsModel.dataIndexed(detailsView.currentIndex,"maxAge").toPrecision(5) : ""
                         }
                     }
-                    Button {
-                        id: createModel
-                        anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        height: 80
-                        width: 140
-                        text: "Create Model"
-                        onPressed: {
-                            // TODO: remove file open when finished testing textures
-                            if (!project.hasFilename()) fileDialogOpen.open()
-                            else {
-                                useLavavu = false
-                                runModel()
-                            }
-                        }
-                    }
-                    Button {
-                        id: createModelLavavu
-                        anchors.bottom: parent.bottom
-                        anchors.right: createModel.left
-                        height: 80
-                        width: 200
-                        text: "Create Lavavu Model"
-                        onPressed: {
-                            // TODO: remove file open when finished testing textures
-                            if (!project.hasFilename()) fileDialogOpen.open()
-                            else {
-                                useLavavu = true
-                                runModel()
-                            }
-                        }
+                }
+
+                Rectangle {
+                    id: optionsTab
+                    color: "#bbbbbb"
+                    TextField {
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        height: 56
+                        width: 100
+                        text: "5000"
                     }
                 }
 
@@ -479,49 +460,7 @@ Item {
                             }
                         }
                     }
-                    Button {
-                        id: runCode
-                        anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        height: 80
-                        width: 140
-                        text: "Create Model"
-                        onPressed: {
-                            if (!project.hasFilename()) fileDialogSave.open()
-                            else {
-                                useLavavu = false
-                                runModel()
-                            }
-                        }
-                    }
-                    Button {
-                        id: runCodeLavavu
-                        anchors.bottom: parent.bottom
-                        anchors.right: runCode.left
-                        height: 80
-                        width: 200
-                        text: "Create Lavavu Model"
-                        onPressed: {
-                            if (!project.hasFilename()) fileDialogSave.open()
-                            else {
-                                useLavavu = true
-                                runModel()
-                            }
-                        }
-                    }
                 }
-
-                Rectangle {
-                    id: resultsTab
-                    color: "#bbbbbb"
-                    Text {
-                        anchors.fill: parent
-                        text: "Once run visualisation of model"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                }
-
             }
             TabBar {
                 id: gtDetailsBar
@@ -530,8 +469,39 @@ Item {
                 anchors.left: parent.left
                 padding: 4
                 TabButton { text: 'Details' }
+                TabButton { text: 'Options' }
                 TabButton { text: 'Python Code' }
-//                TabButton { text: 'Results' }
+            }
+
+            Button {
+                id: runCode
+                anchors.bottom: stackGL.bottom
+                anchors.right: stackGL.right
+                height: 80
+                width: 140
+                text: "Create Model"
+                onPressed: {
+                    if (!project.hasFilename()) fileDialogSave.open()
+                    else {
+                        useLavavu = false
+                        runModel()
+                    }
+                }
+            }
+            Button {
+                id: runCodeLavavu
+                anchors.bottom: stackGL.bottom
+                anchors.right: runCode.left
+                height: 80
+                width: 200
+                text: "Create Lavavu Model"
+                onPressed: {
+                    if (!project.hasFilename()) fileDialogSave.open()
+                    else {
+                        useLavavu = true
+                        runModel()
+                    }
+                }
             }
         }
     }

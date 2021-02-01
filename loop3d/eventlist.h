@@ -45,7 +45,7 @@ class EventList : public QObject {
         void postItemReset();
 
     public Q_SLOTS:
-        bool appendItem(int eventID, QString name, double minAge, double maxAge, LoopProjectFile::EventType type, int rank=0, bool isActive=true);
+        bool appendItem(int eventID, QString name, QString supergroup, double minAge, double maxAge, LoopProjectFile::EventType type, int rank=0, bool isActive=true);
         bool removeItem(int index);
 
     private:

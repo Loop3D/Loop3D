@@ -9,7 +9,7 @@ CONFIG += c++11 no_keywords
 
 win32 {
     CONFIG(release, debug|release) {
-        CONFIG += console
+#        CONFIG += console
 #        DEFINES += QT_NO_DEBUG_OUTPUT
     }
 }
@@ -60,6 +60,7 @@ SOURCES += \
         eventlist.cpp \
         eventmodel.cpp \
         eventpermutation.cpp \
+        m2lconfig.cpp \
         main.cpp \
         observationlist.cpp \
         observationmodel.cpp \
@@ -93,6 +94,7 @@ HEADERS += \
     eventlist.h \
     eventmodel.h \
     eventpermutation.h \
+    m2lconfig.h \
     observationlist.h \
     observationmodel.h \
     projectmanagement.h \

@@ -1,22 +1,20 @@
 from LoopStructural import GeologicalModel
 from LoopStructural.visualisation import LavaVuModelViewer
 from LoopStructural.modelling.features.geological_feature import GeologicalFeature
+from LoopStructural.utils import build_model, process_map2loop
 import LoopProjectFile
 import numpy
+import traceback
 
 skip_faults = False
 
-if ('use_lavavu' not in vars() and 'use_lavavu' not in globals()):
-    use_lavavu = False
+def findGlobalVariable(varName, defaultValue):
+    if (varName not in vars() and varName not in globals()):
+        globals()[varName] = defaultValue
 
-if ('m2l_data_dir' not in vars() and 'm2l_data_dir' not in globals()):
-    m2l_data_dir = "m2l_data/"
-
-# Check filename
-if ('loopFilename' not in vars() and 'loopFilename' not in globals()):
-    loopFilename = "default.loop3d"
-else:
-    print("Opening loop project file: " + loopFilename)
+findGlobalVariable('use_lavavu',False)
+findGlobalVariable('m2lDataDir',"m2l_data/")
+findGlobalVariable('loopFilename',"default.loop3d")
 
 # UTM boundary is [minEasting, maxEasting, minNorthing, maxNorthing, minDepth, maxDepth]
 resp = LoopProjectFile.Get(loopFilename,"extents")
@@ -46,9 +44,11 @@ foliation_params = {'interpolatortype':'PLI' , # 'interpolatortype':'PLI',
     'damp':True}
 
 errors = ""
-try:    
-    model, m2l_data = GeologicalModel.from_map2loop_directory(
-        m2l_data_dir,
+try:
+    dictt = {'skip_faults':skip_faults,'fault_params':fault_params,'foliation_params':foliation_params}
+    m2l_data = process_map2loop(m2lDataDir,dictt)
+    model = build_model(m2l_data,
+    # model, m2l_data = GeologicalModel.from_map2loop_directory(m2lDataDir,
         skip_faults=skip_faults,
         fault_params=fault_params,
         foliation_params=foliation_params
@@ -118,10 +118,11 @@ try:
 
     if option == 2:
         result = sfs[0]
+
+    resp = LoopProjectFile.Set(loopFilename,"strModel",data=numpy.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
 except Exception as e:
     errors += "PythonError: \n" + traceback.format_exc() + '\n' + repr(e)
 
-resp = LoopProjectFile.Set(loopFilename,"strModel",data=numpy.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
 
 # Let me know when it's all done (loudly)
 import winsound

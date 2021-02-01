@@ -154,10 +154,11 @@ void EventList::sort()
     }
 }
 
-bool EventList::appendItem(int eventID, QString name, double minAge, double maxAge, LoopProjectFile::EventType type, int rank, bool isActive)
+bool EventList::appendItem(int eventID, QString name, QString supergroup, double minAge, double maxAge, LoopProjectFile::EventType type, int rank, bool isActive)
 {
     std::shared_ptr<LoopProjectFile::Event> event = std::make_shared<LoopProjectFile::Event>();
     strncpy_s(event->name,name.toStdString().c_str(),30);
+    strncpy_s(event->supergroup,supergroup.toStdString().c_str(),30);
     event->eventId = eventID;
     event->minAge = minAge;
     event->maxAge = maxAge;

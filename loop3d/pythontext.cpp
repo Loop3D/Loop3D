@@ -88,18 +88,48 @@ void PythonText::run(QString code, QString loopFilename, bool useResult)
             qDebug() << "fold      = " << foldUrl.substr(0,foldUrl.find_first_of('?')).c_str();
             qDebug() << "meta      = " << metadataUrl.substr(0,metadataUrl.find_first_of('?')).c_str();
             locals["use_lavavu"] = proj->m_useLavavu ? true : false;
-            qDebug() << "m2l_data_dir = " << m2lDataDirName.c_str();
-            locals["m2l_data_dir"] = m2lDataDirName;
+            qDebug() << "m2lDataDir = " << m2lDataDirName.c_str();
+            locals["m2lDataDir"] = m2lDataDirName;
+            M2lConfig* m2lconf = proj->getM2lConfig();
+            pybind11::dict m2lParams;
+            m2lParams["orientation_decimate"] = m2lconf->m_orientationDecimate;
+            m2lParams["contact_decimate"] = m2lconf->m_contactDecimate;
+            m2lParams["intrusion_mode"] = m2lconf->m_intrusionMode;
+            m2lParams["interpolation_spacing"] = m2lconf->m_interpolationSpacing;
+            m2lParams["misorientation"] = m2lconf->m_misorientation;
+            m2lParams["interpolation_scheme"] = m2lconf->m_interpolationScheme.toStdString();
+            m2lParams["fault_decimate"] = m2lconf->m_faultDecimate;
+            m2lParams["min_fault_length"] = m2lconf->m_minFaultLength;
+            m2lParams["fault_dip"] = m2lconf->m_faultDip;
+            m2lParams["pluton_dip"] = m2lconf->m_plutonDip;
+            m2lParams["pluton_form"] = m2lconf->m_plutonForm.toStdString();
+            m2lParams["dist_buffer"] = m2lconf->m_distBuffer;
+            m2lParams["contact_dip"] = m2lconf->m_contactDip;
+            m2lParams["contact_orientation_decimate"] = m2lconf->m_contactOrientationDecimate;
+            m2lParams["null_scheme"] = m2lconf->m_nullScheme.toStdString();
+            m2lParams["thickness_buffer"] = m2lconf->m_thicknessBuffer;
+            m2lParams["max_thickness_allowed"] = m2lconf->m_maxThicknessAllowed;
+            m2lParams["fold_decimate"] = m2lconf->m_foldDecimate;
+            m2lParams["fat_step"] = m2lconf->m_fatStep;
+            m2lParams["close_dip"] = m2lconf->m_closeDip;
+            m2lParams["use_interpolations"] = m2lconf->m_useInterpolations ? "True" : "False";
+            m2lParams["use_fat"] = m2lconf->m_useFat ? "True" : "False";
+            locals["m2lParams"] = m2lParams;
+            locals["m2lQuietMode"] = m2lconf->m_quietMode == 0 ? "all" : (m2lconf->m_quietMode == 1 ? "no-fugures" : "None");
         }
         locals["xsteps"] = xsteps;
         locals["ysteps"] = ysteps;
         locals["zsteps"] = zsteps;
-        locals["structure_url"] = structureUrl;
-        locals["geology_url"] = geologyUrl;
-        locals["mindep_url"] = mindepUrl;
-        locals["fault_url"] = faultUrl;
-        locals["fold_url"] = foldUrl;
-        locals["metadata"] = metadataUrl;
+
+        pybind11::dict m2lFiles;
+        m2lFiles["structure_file"] = structureUrl;
+        m2lFiles["geology_file"] = geologyUrl;
+        m2lFiles["mindep_file"] = mindepUrl;
+        m2lFiles["fault_file"] = faultUrl;
+        m2lFiles["fold_file"] = foldUrl;
+        m2lFiles["metadata"] = metadataUrl;
+        locals["m2lFiles"] = m2lFiles;
+
         py::exec(code.toStdString().c_str(),py::globals(),locals);
 
         if (useResult) {

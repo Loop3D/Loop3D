@@ -175,6 +175,7 @@ int ProjectManagement::saveProject(QString filename)
     stModel.saveToFile(filename);
     eventList.saveToFile(filename);
     observationList.saveToFile(filename);
+    m2lConfig.saveToFile(filename);
 
     m_extentsChanged = false;
     m_lockedExtents = true;
@@ -243,6 +244,7 @@ int ProjectManagement::loadProject(QString filename)
     stModel.loadFromFile(filename);
     eventList.loadFromFile(filename);
     observationList.loadFromFile(filename);
+    m2lConfig.loadFromFile(filename);
 
     m_extentsChanged = false;
     m_lockedExtents = true;

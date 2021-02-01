@@ -9,6 +9,7 @@
 #include "eventpermutation.h"
 #include "eventlist.h"
 #include "observationlist.h"
+#include "m2lconfig.h"
 
 #include "LoopProjectFileUtils.h"
 #include "LoopProjectFile.h"
@@ -120,6 +121,7 @@ public Q_SLOTS:
         StructuralModel* getStModel() { return &stModel; }
         EventList* getEventList() { return &eventList; }
         ObservationList* getObservationList() { return &observationList; }
+        M2lConfig* getM2lConfig() { return &m2lConfig; }
         QQuickView* getQmlQuickView() { return m_qmlView; }
         void setQmlQuickView(QQuickView* view) {
             m_qmlView = view;
@@ -183,6 +185,7 @@ public Q_SLOTS:
         std::map<int,EventPermutation*> permutationMap;
         EventList eventList;
         ObservationList observationList;
+        M2lConfig m2lConfig;
 };
 
 #endif // PROJECTMANAGEMENT_H

@@ -5,24 +5,29 @@ import pandas
 import traceback
 import os
 
-# Accept loopFilename from python state otherwise default
-if ("loopFilename" not in vars() and "loopFilename" not in globals()):
-    loopFilename = "default.loop3d"
-if ("m2l_data_dir" not in vars() and "m2l_data_dir" not in globals()):
-    m2l_data_dir = "m2l_data"
+def findGlobalVariable(varName, defaultValue):
+    if (varName not in vars() and varName not in globals()):
+        globals()[varName] = defaultValue
 
-if(not os.path.isdir(m2l_data_dir)):
-    os.mkdir(m2l_data_dir)
-if(not os.path.isdir(m2l_data_dir + "/tmp")):
-    os.mkdir(m2l_data_dir + "/tmp")
-if(not os.path.isdir(m2l_data_dir + "/output")):
-    os.mkdir(m2l_data_dir + "/output")
-if(not os.path.isdir(m2l_data_dir + "/dtm")):
-    os.mkdir(m2l_data_dir + "/dtm")
-if(not os.path.isdir(m2l_data_dir + "/vtk")):
-    os.mkdir(m2l_data_dir + "/vtk")
-if(not os.path.isdir(m2l_data_dir + "/graph")):
-    os.mkdir(m2l_data_dir + "/graph")
+# Accept loopFilename and m2lDataDir from python state otherwise default
+findGlobalVariable("loopFilename","default.loop3d")
+findGlobalVariable("m2lDataDir","m2l_data")
+findGlobalVariable("m2lParams",{})
+findGlobalVariable("m2lFiles",{})
+findGlobalVariable("m2lQuietMode",'all')
+
+if(not os.path.isdir(m2lDataDir)):
+    os.mkdir(m2lDataDir)
+if(not os.path.isdir(m2lDataDir + "/tmp")):
+    os.mkdir(m2lDataDir + "/tmp")
+if(not os.path.isdir(m2lDataDir + "/output")):
+    os.mkdir(m2lDataDir + "/output")
+if(not os.path.isdir(m2lDataDir + "/dtm")):
+    os.mkdir(m2lDataDir + "/dtm")
+if(not os.path.isdir(m2lDataDir + "/vtk")):
+    os.mkdir(m2lDataDir + "/vtk")
+if(not os.path.isdir(m2lDataDir + "/graph")):
+    os.mkdir(m2lDataDir + "/graph")
 
 # Set default values for boundaries and projection
 proj_crs = {"init": "EPSG:28350"}
@@ -44,29 +49,23 @@ bboxStr=str(bbox["minx"])+","+str(bbox["miny"])+","+str(bbox["maxx"])+","+str(bb
 errors = ""
 try:
     start = time.time()
-    proj = Project(
-        geology_file=geology_url,
-        fault_file=fault_url,
-        fold_file=fold_url,
-        structure_file=structure_url,
-        mindep_file=mindep_url,
-        metadata=metadata
-    )
+    proj = Project(**m2lFiles)
     postInit = time.time()               
     print("MAP2LOOP Project init took " + str(postInit-start) + " seconds")
 
     proj.update_config(
-        out_dir=m2l_data_dir,
+        out_dir=m2lDataDir,
         overwrite="true",
         bbox_3d=bbox,
         proj_crs=proj_crs,
         loopFilename=loopFilename,
-        quiet='all'  # Options are 'None', 'no-figures', 'all'
+        quiet=m2lQuietMode  # Options are 'None', 'no-figures', 'all'
     )
     postConfig = time.time()
     print("MAP2LOOP Project config took " + str(postConfig-postInit) + " seconds")
 
-    proj.run()
+    print("Min Fault Length is " + str(m2lParams["min_fault_length"]))
+    proj.run(**m2lParams)
     postRun = time.time()
     print("MAP2LOOP Project run took " + str(postRun-postConfig) + " seconds")
 
@@ -78,7 +77,7 @@ try:
 
     df = pandas.DataFrame(data=bbox,index=[0])
     df = df.rename(columns={"base":"lower","top":"upper"})
-    df.to_csv(m2l_data_dir+"/tmp/bbox.csv",index=False)
+    df.to_csv(m2lDataDir+"/tmp/bbox.csv",index=False)
 
 except Exception as e:
     errors += "PythonError: \n" + traceback.format_exc() + '\n' + repr(e)

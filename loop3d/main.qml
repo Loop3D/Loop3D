@@ -6,6 +6,7 @@ import QtQuick.Dialogs 1.2
 import loop3d.projectmanagement 1.0
 import loop3d.eventmodel 1.0
 import loop3d.observationmodel 1.0
+import loop3d.m2lconfig 1.0
 import QtQuick.Scene3D 2.14
 //import Qt3D.Input 2.14
 
