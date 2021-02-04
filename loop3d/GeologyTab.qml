@@ -3,6 +3,7 @@ import QtQuick.Controls 2.14
 import QtQuick.Layouts 1.14
 import loop3d.pythontext 1.0
 import loop3d.eventmodel 1.0
+import loop3d.lsconfig 1.0
 
 Item {
     id: geologyTab
@@ -423,14 +424,119 @@ Item {
                 }
 
                 Rectangle {
-                    id: optionsTab
+                    id: glOptionsTab
                     color: "#bbbbbb"
-                    TextField {
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        height: 56
-                        width: 100
-                        text: "5000"
+                    Flickable {
+                        anchors.fill: parent
+                        contentHeight: glOptionsGrid.height
+                        clip: true
+                        GridLayout {
+                            id: glOptionsGrid
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.margins: 5
+                            columns: 2
+                            rowSpacing: 2
+                            Label {
+                                text: "Foliation Options"
+                                font.bold: true
+                                color: "black"
+                                Layout.columnSpan: 2
+                            }
+                            Label { text: "Interpolator Type" }
+                            ComboBox {
+                                Layout.minimumWidth: 200
+                                model: ["PLI","something else"]
+                                flat: true
+                                currentIndex: lsConfig.foliationInterpolator
+                                onCurrentIndexChanged: lsConfig.foliationInterpolator = currentIndex
+                            }
+                            Label { text: "Number of Elements" }
+                            TextField {
+                                Layout.fillHeight: true
+                                placeholderText: lsConfig.foliationNumElements
+                                onTextChanged: lsConfig.foliationNumElements = text
+                                validator: IntValidator { bottom: 0; top: 1000000 }
+                            }
+                            Label { text: "Buffer" }
+                            TextField {
+                                Layout.fillHeight: true
+                                placeholderText: lsConfig.foliationBuffer
+                                onTextChanged: lsConfig.foliationBuffer = text
+                                validator: RegExpValidator { regExp : /-?[0-9]+\.[0-9]+/ }
+                            }
+                            Label { text: "Solver" }
+                            ComboBox {
+                                Layout.minimumWidth: 200
+                                model: ["pyamg","cg","lu"]
+                                flat: true
+                                currentIndex: lsConfig.foliationSolver
+                                onCurrentIndexChanged: lsConfig.foliationSolver = currentIndex
+                            }
+                            Label { text: "Damp" }
+                            TextField {
+                                Layout.fillHeight: true
+                                placeholderText: lsConfig.foliationDamp
+                                onTextChanged: lsConfig.foliationDamp = text
+                                validator: IntValidator { bottom: 0; top: 100 }
+                            }
+                            Label {
+                                text: "Fault Options"
+                                font.bold: true
+                                color: "black"
+                                Layout.columnSpan: 2
+                            }
+                            Label { text: "Interpolator Type" }
+                            ComboBox {
+                                Layout.minimumWidth: 200
+                                model: ["FDI","something else"]
+                                flat: true
+                                currentIndex: lsConfig.faultInterpolator
+                                onCurrentIndexChanged: lsConfig.faultInterpolator = currentIndex
+                            }
+                            Label { text: "Number of Elements" }
+                            TextField {
+                                Layout.fillHeight: true
+                                placeholderText: lsConfig.faultNumElements
+                                onTextChanged: lsConfig.faultNumElements = text
+                                validator: IntValidator { bottom: 0; top: 1000000 }
+                            }
+                            Label { text: "Data Region" }
+                            TextField {
+                                Layout.fillHeight: true
+                                placeholderText: lsConfig.faultDataRegion
+                                onTextChanged: lsConfig.faultDataRegion = text
+                                validator: RegExpValidator { regExp : /-?[0-9]+\.[0-9]+/ }
+                            }
+                            Label { text: "Solver" }
+                            ComboBox {
+                                Layout.minimumWidth: 200
+                                model: ["pyamg","cg","lu"]
+                                flat: true
+                                currentIndex: lsConfig.faultSolver
+                                onCurrentIndexChanged: lsConfig.faultSolver = currentIndex
+                            }
+                            Label { text: "CPW" }
+                            TextField {
+                                Layout.fillHeight: true
+                                placeholderText: lsConfig.faultCpw
+                                onTextChanged: lsConfig.faultCpw = text
+                                validator: IntValidator { bottom: 0; top: 100 }
+                            }
+                            Label { text: "NPW" }
+                            TextField {
+                                Layout.fillHeight: true
+                                placeholderText: lsConfig.faultNpw
+                                onTextChanged: lsConfig.faultNpw = text
+                                validator: IntValidator { bottom: 0; top: 1000 }
+                            }
+                            Label { text: ""; Layout.columnSpan: 2; }
+                            Label { text: ""; Layout.columnSpan: 2; }
+                            Label { text: ""; Layout.columnSpan: 2; }
+                            Label { text: ""; Layout.columnSpan: 2; }
+                            Label { text: ""; Layout.columnSpan: 2; }
+                        }
                     }
                 }
 

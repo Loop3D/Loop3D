@@ -43,6 +43,10 @@ Q_SIGNALS:
         bool appendGroup(QString name, QString group);
         bool removeItem(int index);
 
+    public:
+        void setListFromTags(QString tags);
+        QString getTagsFromList(void);
+
     private:
         QString resourceFilename;
         QVector<DataSourceItem> dataSources;

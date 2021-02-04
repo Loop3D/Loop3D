@@ -43,6 +43,20 @@ ProjectManagement::ProjectManagement():
 
 }
 
+bool ProjectManagement::setActiveState(QString state)
+{
+    bool changed = false;
+    if (state == "WA")       { m_activeState = 1; m_activeStateName = "WA";  changed = true; }
+    else if (state == "SA")  { m_activeState = 2; m_activeStateName = "SA";  changed = true; }
+    else if (state == "NT")  { m_activeState = 3; m_activeStateName = "NT";  changed = true; }
+    else if (state == "QLD") { m_activeState = 4; m_activeStateName = "QLD"; changed = true; }
+    else if (state == "NSW") { m_activeState = 5; m_activeStateName = "NSW"; changed = true; }
+    else if (state == "VIC") { m_activeState = 6; m_activeStateName = "VIC"; changed = true; }
+    else if (state == "TAS") { m_activeState = 7; m_activeStateName = "TAS"; changed = true; }
+    if (changed) { activeStateChanged(); activeStateNameChanged(); }
+    return changed;
+}
+
 void ProjectManagement::clearProject(bool clearExtents)
 {
     if (clearExtents) {
@@ -169,16 +183,29 @@ int ProjectManagement::saveProject(QString filename)
         return 1;
     }
 
-    m_filename = filename;
-    filenameChanged();
+    LoopProjectFile::DataCollectionSources sources;
+    strncpy_s(sources.structureUrl,m_structureUrl.c_str(),200);
+    strncpy_s(sources.geologyUrl, m_geologyUrl.c_str(),200);
+    strncpy_s(sources.faultUrl, m_faultUrl.c_str(),200);
+    strncpy_s(sources.foldUrl, m_foldUrl.c_str(),200);
+    strncpy_s(sources.mindepUrl, m_mindepUrl.c_str(),200);
+    strncpy_s(sources.metadataUrl, m_metadataUrl.c_str(),200);
+    strncpy_s(sources.sourceTags, dataSourceList.getTagsFromList().toStdString().c_str(),200);
+    resp = LoopProjectFile::SetDataCollectionSources(name.toStdString(),sources,false);
+    if (resp.errorCode) {
+        qDebug() << resp.errorMessage.c_str();
+    }
 
     stModel.saveToFile(filename);
     eventList.saveToFile(filename);
     observationList.saveToFile(filename);
     m2lConfig.saveToFile(filename);
+    lsConfig.saveToFile(filename);
 
     m_extentsChanged = false;
     m_lockedExtents = true;
+    m_filename = filename;
+    filenameChanged();
     lockedExtentsChanged();
     return 0;
 }
@@ -237,17 +264,32 @@ int ProjectManagement::loadProject(QString filename)
     spacingXChanged(); spacingYChanged(); spacingZChanged();
     inUtmChanged();
     // Data file all working so save filename
-    m_filename = filename;
-    filenameChanged();
+
+    LoopProjectFile::DataCollectionSources sources;
+    resp = LoopProjectFile::GetDataCollectionSources(name.toStdString(),sources,false);
+    if (resp.errorCode) {
+        qDebug() << resp.errorMessage.c_str();
+    } else {
+        m_structureUrl = sources.structureUrl;
+        m_geologyUrl = sources.geologyUrl;
+        m_faultUrl = sources.faultUrl;
+        m_foldUrl = sources.foldUrl;
+        m_mindepUrl = sources.mindepUrl;
+        m_metadataUrl = sources.metadataUrl;
+        dataSourceList.setListFromTags(sources.sourceTags);
+    }
 
     // Load structural data
     stModel.loadFromFile(filename);
     eventList.loadFromFile(filename);
     observationList.loadFromFile(filename);
     m2lConfig.loadFromFile(filename);
+    lsConfig.loadFromFile(filename);
 
     m_extentsChanged = false;
     m_lockedExtents = true;
+    m_filename = filename;
+    filenameChanged();
     lockedExtentsChanged();
     return 0;
 }

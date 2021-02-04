@@ -60,6 +60,7 @@ SOURCES += \
         eventlist.cpp \
         eventmodel.cpp \
         eventpermutation.cpp \
+        lsconfig.cpp \
         m2lconfig.cpp \
         main.cpp \
         observationlist.cpp \
@@ -94,6 +95,7 @@ HEADERS += \
     eventlist.h \
     eventmodel.h \
     eventpermutation.h \
+    lsconfig.h \
     m2lconfig.h \
     observationlist.h \
     observationmodel.h \

@@ -12,7 +12,7 @@ def findGlobalVariable(varName, defaultValue):
     if (varName not in vars() and varName not in globals()):
         globals()[varName] = defaultValue
 
-findGlobalVariable('use_lavavu',False)
+findGlobalVariable('useLavavu',False)
 findGlobalVariable('m2lDataDir',"m2l_data/")
 findGlobalVariable('loopFilename',"default.loop3d")
 

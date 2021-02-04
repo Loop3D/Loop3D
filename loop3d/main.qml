@@ -461,6 +461,7 @@ Item {
                 geologyTab.calcPerms()
                 viewer.resetView()
                 viewer.resetCrossSection()
+                dcTab.refreshSourceModel()
             } else {
                 notifyText.text = "ERROR loading project " + fileDialogOpen.fileUrl
             }

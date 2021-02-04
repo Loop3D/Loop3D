@@ -19,6 +19,10 @@ Item {
         reCentreMap()
     }
 
+    function refreshSourceModel() {
+        dataSourceModel.refreshModel()
+    }
+
     function roiReproject() {
         roi.updateMinLatitude(project.minLatitude)
         roi.updateMaxLatitude(project.maxLatitude)

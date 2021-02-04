@@ -16,6 +16,7 @@
 #include "observationmodel.h"
 #include "observationlist.h"
 #include "m2lconfig.h"
+#include "lsconfig.h"
 
 namespace py = pybind11;
 
@@ -65,7 +66,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("Loop");
     app.setOrganizationDomain("loop3d.org");
 
-    DataSourceList dataSourceList;
+//    DataSourceList dataSourceList;
     L3DViewer* viewer = L3DViewer::instance();
 
     ProjectManagement* project = ProjectManagement::instance();
@@ -86,6 +87,8 @@ int main(int argc, char *argv[])
                                                QStringLiteral("ObservationList should not be created in QML"));
     qmlRegisterUncreatableType<M2lConfig>("loop3d.m2lconfig",1,0,"M2lConfig",
                                                QStringLiteral("M2lConfig should not be created in QML"));
+    qmlRegisterUncreatableType<LSConfig>("loop3d.lsconfig",1,0,"LSConfig",
+                                               QStringLiteral("LSConfig should not be created in QML"));
 
     qmlRegisterType<PythonText>("loop3d.pythontext",1,0,"PythonText");
     qmlRegisterType<LL>("loop3d.utmconverter",1,0,"LL");
@@ -96,13 +99,15 @@ int main(int argc, char *argv[])
     qmlRegisterType<EventModel>("loop3d.eventmodel",1,0,"EventModel");
     qmlRegisterType<ObservationModel>("loop3d.observationmodel",1,0,"ObservationModel");
     qmlRegisterType<M2lConfig>("loop3d.m2lconfig",1,0,"M2lConfig");
+    qmlRegisterType<LSConfig>("loop3d.lsconfig",1,0,"LSConfig");
 
     QQuickView view;
     project->setQmlQuickView(&view);
-    view.rootContext()->setContextProperty(QStringLiteral("dataSourceList"), &dataSourceList);
+    view.rootContext()->setContextProperty(QStringLiteral("dataSourceList"), project->getDataSourceList());
     view.rootContext()->setContextProperty(QStringLiteral("eventList"), project->getEventList());
     view.rootContext()->setContextProperty(QStringLiteral("observationList"), project->getObservationList());
     view.rootContext()->setContextProperty(QStringLiteral("m2lConfig"), project->getM2lConfig());
+    view.rootContext()->setContextProperty(QStringLiteral("lsConfig"), project->getLSConfig());
     view.rootContext()->setContextProperty(QStringLiteral("project"), project);
     view.rootContext()->setContextProperty(QStringLiteral("viewer"), viewer);
     view.rootContext()->setContextProperty(QStringLiteral("workingDir"), QString(QDir::currentPath()));

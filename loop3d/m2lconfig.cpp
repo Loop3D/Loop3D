@@ -8,6 +8,9 @@ M2lConfig::M2lConfig()
 }
 
 void M2lConfig::reset(void) {
+    m_quietMode = 0;
+    m_deposits = "Fe,Cu,Au,NONE";
+    m_dtb = "";
     m_orientationDecimate = 0;
     m_contactDecimate = 5;
     m_intrusionMode = 0;
@@ -30,7 +33,6 @@ void M2lConfig::reset(void) {
     m_closeDip = -999;
     m_useInterpolations = false;
     m_useFat = true;
-    m_quietMode = 0;
 }
 
 int M2lConfig::saveToFile(QString filename)
@@ -48,6 +50,9 @@ int M2lConfig::saveToFile(QString filename)
 #endif
 
     LoopProjectFile::DataCollectionConfiguration config;
+    config.quietMode = m_quietMode;
+    strncpy_s(config.deposits,m_deposits.toStdString().c_str(),30);
+    strncpy_s(config.dtb,m_dtb.toStdString().c_str(),30);
     config.orientationDecimate = m_orientationDecimate;
     config.contactDecimate = m_contactDecimate;
     config.intrusionMode = m_intrusionMode;

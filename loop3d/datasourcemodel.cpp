@@ -235,6 +235,12 @@ void DataSourceModel::selectItemById(QString id, bool value)
     }
 }
 
+void DataSourceModel::refreshModel()
+{
+    beginResetModel();
+    endResetModel();
+}
+
 DataSourceList *DataSourceModel::getDataSources() const
 {
     return dataSources;

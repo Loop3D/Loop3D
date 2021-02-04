@@ -3,6 +3,7 @@
 #include "tokenise.h"
 #include <QDebug>
 #include <netcdf>
+#include "projectmanagement.h"
 
 DataSourceList::DataSourceList(QObject *parent) : QObject(parent)
 {
@@ -109,6 +110,30 @@ bool DataSourceList::removeItem(int index)
     dataSources.removeAt(index);
     postItemRemoved();
     return true;
+}
+
+void DataSourceList::setListFromTags(QString tags)
+{
+    QStringList tagList = tags.split(",");
+    for (auto it=dataSources.begin();it!=dataSources.end();++it) {
+        if (it->id != "" && tagList.contains(it->id)) it->selected = true;
+        else it->selected = false;
+    }
+    ProjectManagement* proj = ProjectManagement::instance();
+    if (proj) {
+        for (auto it=tagList.begin();it!=tagList.end();++it) {
+            if (proj->setActiveState(*it)) return;
+        }
+    }
+}
+
+QString DataSourceList::getTagsFromList()
+{
+    QString tags = "";
+    for (auto it=dataSources.begin();it!=dataSources.end();++it) {
+        if (it->selected) tags += it->id + ",";
+    }
+    return tags;
 }
 
 QVector<DataSourceItem> DataSourceList::getDataSources() const

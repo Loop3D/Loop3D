@@ -7,9 +7,11 @@
 #include "utmconverter.h"
 #include "structuralmodel.h"
 #include "eventpermutation.h"
+#include "datasourcelist.h"
 #include "eventlist.h"
 #include "observationlist.h"
 #include "m2lconfig.h"
+#include "lsconfig.h"
 
 #include "LoopProjectFileUtils.h"
 #include "LoopProjectFile.h"
@@ -92,6 +94,7 @@ class ProjectManagement : public QQuickItem
 public Q_SLOTS:
         void setLockedExtents(bool val) { m_lockedExtents = val; lockedExtentsChanged();}
         void setActiveState(unsigned int val) { m_activeState = val; activeStateChanged();}
+        bool setActiveState(QString state);
         void setUseLavavu(bool val) { m_useLavavu = val; useLavavuChanged();}
 
     public:
@@ -122,6 +125,8 @@ public Q_SLOTS:
         EventList* getEventList() { return &eventList; }
         ObservationList* getObservationList() { return &observationList; }
         M2lConfig* getM2lConfig() { return &m2lConfig; }
+        DataSourceList* getDataSourceList() { return &dataSourceList; }
+        LSConfig* getLSConfig() { return &lsConfig; }
         QQuickView* getQmlQuickView() { return m_qmlView; }
         void setQmlQuickView(QQuickView* view) {
             m_qmlView = view;
@@ -186,6 +191,8 @@ public Q_SLOTS:
         EventList eventList;
         ObservationList observationList;
         M2lConfig m2lConfig;
+        LSConfig lsConfig;
+        DataSourceList dataSourceList;
 };
 
 #endif // PROJECTMANAGEMENT_H

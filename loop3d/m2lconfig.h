@@ -8,6 +8,9 @@ class M2lConfig : public QQuickItem
 {
     Q_OBJECT
 
+    Q_PROPERTY (int quietMode MEMBER m_quietMode NOTIFY quietModeChanged)
+    Q_PROPERTY (QString deposits MEMBER m_deposits NOTIFY depositsChanged)
+    Q_PROPERTY (QString dtb MEMBER m_dtb NOTIFY dtbChanged)
     Q_PROPERTY (int orientationDecimate MEMBER m_orientationDecimate NOTIFY orientationDecimateChanged)
     Q_PROPERTY (int contactDecimate MEMBER m_contactDecimate NOTIFY contactDecimateChanged)
     Q_PROPERTY (int intrusionMode MEMBER m_intrusionMode NOTIFY intrusionModeChanged)
@@ -30,9 +33,11 @@ class M2lConfig : public QQuickItem
     Q_PROPERTY (double closeDip MEMBER m_closeDip NOTIFY closeDipChanged)
     Q_PROPERTY (bool useInterpolations MEMBER m_useInterpolations NOTIFY useInterpolationsChanged)
     Q_PROPERTY (bool useFat MEMBER m_useFat NOTIFY useFatChanged)
-    Q_PROPERTY (int quietMode MEMBER m_quietMode NOTIFY quietModeChanged)
 
     Q_SIGNALS:
+        void quietModeChanged();
+        void depositsChanged();
+        void dtbChanged();
         void orientationDecimateChanged();
         void contactDecimateChanged();
         void intrusionModeChanged();
@@ -55,7 +60,6 @@ class M2lConfig : public QQuickItem
         void closeDipChanged();
         void useInterpolationsChanged();
         void useFatChanged();
-        void quietModeChanged();
 
     public Q_SLOTS:
 
@@ -66,6 +70,9 @@ class M2lConfig : public QQuickItem
         int loadFromFile(QString filename = "");
 //        Q_INVOKABLE void clearProject(bool clearExtents);
 
+        int m_quietMode;
+        QString m_deposits;
+        QString m_dtb;
         int m_orientationDecimate;
         int m_contactDecimate;
         int m_intrusionMode;
@@ -88,7 +95,6 @@ class M2lConfig : public QQuickItem
         double m_closeDip;
         bool m_useInterpolations;
         bool m_useFat;
-        int m_quietMode;
 };
 
 #endif // M2LCONFIG_H

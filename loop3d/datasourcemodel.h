@@ -50,6 +50,7 @@ public:
     Q_INVOKABLE void loadDataSources(QVariant filename);
     Q_INVOKABLE void selectItem(int index, bool value);
     Q_INVOKABLE void selectItemById(QString id, bool value);
+    Q_INVOKABLE void refreshModel(void);
 
 private:
     DataSourceList *dataSources;
