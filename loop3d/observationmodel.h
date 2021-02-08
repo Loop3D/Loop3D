@@ -52,6 +52,7 @@ public:
     void setObservations(ObservationList *value);
     Q_INVOKABLE LoopProjectFile::Observation get(int index) const;
     Q_INVOKABLE int findObservationByID(int eventID);
+    Q_INVOKABLE void refreshModel(void);
 
 Q_SIGNALS:
     void observationsChanged();

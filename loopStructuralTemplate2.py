@@ -4,6 +4,7 @@ from LoopStructural.modelling.features.geological_feature import GeologicalFeatu
 from LoopStructural.utils import build_model, process_map2loop
 import LoopProjectFile
 import numpy
+import time
 import traceback
 
 skip_faults = False
@@ -43,16 +44,26 @@ foliation_params = {'interpolatortype':'PLI' , # 'interpolatortype':'PLI',
     'solver':solver,
     'damp':True}
 
+resp = LoopProjectFile.Get(loopFilename,"structuralModelsConfig")
+if not resp["errorFlag"]:
+    fault_params = resp['value'][0]
+    foliation_params = resp['value'][1]
+
 errors = ""
 try:
+    start = time.time()
     dictt = {'skip_faults':skip_faults,'fault_params':fault_params,'foliation_params':foliation_params}
     m2l_data = process_map2loop(m2lDataDir,dictt)
+    postInit = time.time()               
+    print("LOOPSTRUCTURAL process_map2loop took " + str(postInit-start) + " seconds")
     model = build_model(m2l_data,
     # model, m2l_data = GeologicalModel.from_map2loop_directory(m2lDataDir,
         skip_faults=skip_faults,
         fault_params=fault_params,
         foliation_params=foliation_params
         )
+    postModel = time.time()
+    print("LOOPSTRUCTURAL build_model took " + str(postModel-postInit) + " seconds")
 
     if (use_lavavu):
         view = LavaVuModelViewer(model,vertical_exaggeration=1) 
@@ -62,7 +73,10 @@ try:
         view.add_model_surfaces()
         view.add_isosurface(model.get_feature_by_name("supergroup_0"),nslices=5)
         view.interactive()  
+        postLavavu = time.time()
+        print("LOOPSTRUCTURAL lavavu took " + str(postLavavu-postModel) + " seconds")
 
+    preEval = time.time()
     xsteps = int((boundaries[1]-boundaries[0]) / stepsizes[0])+1
     ysteps = int((boundaries[3]-boundaries[2]) / stepsizes[1])+1
     zsteps = int((boundaries[5]-boundaries[4]) / stepsizes[2])+1
@@ -118,6 +132,9 @@ try:
 
     if option == 2:
         result = sfs[0]
+    postEval = time.time()
+    print("LOOPSTRUCTURAL evaluate_value took " + str((postEval-preEval)/60) + " minutes")
+    print("LOOPSTRUCTURAL total calcs took " + str((postEval-start)/60) + " minutes")
 
     resp = LoopProjectFile.Set(loopFilename,"strModel",data=numpy.reshape(result,(xsteps,ysteps,zsteps)),verbose=False)
 except Exception as e:

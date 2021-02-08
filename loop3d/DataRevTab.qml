@@ -12,6 +12,12 @@ Item {
         map.source = ""
         map.source = project.filename === "" ? "" : project.filename + ".png"
     }
+
+    function refreshModels() {
+        eventsModel.refreshModel()
+        observationsModel.refreshModel()
+    }
+
     Rectangle {
         border.color: "#ffffff"
         border.width: 0

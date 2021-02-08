@@ -107,8 +107,8 @@ HEADERS += \
     utmconverter.h
 
 DISTFILES += \
+    ../DataSource.conf \
     ../test.py \
-    DataSource.conf \
     isosurface.frag \
     isosurface.vert \
     qtquickcontrols2.conf

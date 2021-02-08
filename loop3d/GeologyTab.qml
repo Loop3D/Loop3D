@@ -13,6 +13,11 @@ Item {
 
     function repaint() { mycanvas.requestPaint() }
 
+    function refreshModels() {
+        eventsModel.refreshModel()
+        observationsModel.refreshModel()
+    }
+
     function runModel() {
         project.saveProject()
         project.setUseLavavu(useLavavu)

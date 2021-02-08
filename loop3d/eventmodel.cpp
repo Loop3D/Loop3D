@@ -387,6 +387,12 @@ int EventModel::findEventByID(int eventId)
     return -1;
 }
 
+void EventModel::refreshModel()
+{
+    beginResetModel();
+    endResetModel();
+}
+
 
 int EventModel::countPBlocks(void) const
 {

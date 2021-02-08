@@ -54,8 +54,17 @@ void PythonText::setFilename(QString in)
 
 void PythonText::run(QString code, QString loopFilename, bool useResult)
 {
-    QStringList list = loopFilename.split(QRegExp("///"));
-    QString name = (list.length() > 1 ? list[1] : list[0]);
+    QStringList list;
+    QString name;
+    // Find last '/' of the first set of '/'s as in file:/// or url:///
+#ifdef _WIN32
+    list = loopFilename.split(QRegExp("///"));
+    name = (list.length() > 1 ? list[1] : list[0]);
+#elif __linux__
+    list = loopFilename.split(QRegExp("///"));
+    name = "/" + (list.length() > 1 ? list[1] : list[0]);
+#endif
+
     try {
         int xsteps = 50;
         int ysteps = 50;

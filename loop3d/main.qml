@@ -459,9 +459,11 @@ Item {
                 project.flowChoiceMade = true
                 geologyTab.repaint()
                 geologyTab.calcPerms()
+                geologyTab.refreshModels()
                 viewer.resetView()
                 viewer.resetCrossSection()
                 dcTab.refreshSourceModel()
+                dmTab.refreshModels()
             } else {
                 notifyText.text = "ERROR loading project " + fileDialogOpen.fileUrl
             }

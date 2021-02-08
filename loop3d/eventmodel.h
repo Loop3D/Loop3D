@@ -64,6 +64,7 @@ public:
     Q_INVOKABLE LoopProjectFile::Event get(int index) const;
     Q_INVOKABLE void sortEvents(void);
     Q_INVOKABLE int findEventByID(int eventID);
+    Q_INVOKABLE void refreshModel(void);
 
 //    Q_INVOKABLE void loadEvents(QVariant filename);
 

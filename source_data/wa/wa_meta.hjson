@@ -1,0 +1,50 @@
+{
+    #Orientations
+      "d": "dip",                  #field that contains dip information
+      "dd": "dip_dir",             #field that contains dip direction information
+      "sf": 'feature',             #field that contains information on type of structure
+      "bedding": 'Bed',            #text to search for in field defined by sf code to show that this is a bedding measurement
+      "otype": 'dip direction',            #flag to determine measurement convention (currently 'strike' or 'dip direction')
+      "bo": "type",             #field that contains type of foliation
+      "btype": 'Beoi',            #text to search for in field defined by bo code to show that this is an overturned bedding measurement
+    #Stratigraphy
+      "g": 'group_',               #field that contains coarser stratigraphic coding
+      "g2": 'supergroup',              #field that contains alternate coarser stratigraphic coding if 'g' is blank
+      "c": 'code',                 #field that contains finer stratigraphic coding
+      "ds": 'descriptn',           #field that contains information about lithology
+      "u": 'unitname',             #field that contains alternate stratigraphic coding (not used??)
+      "r1": 'rocktype1',           #field that contains  extra lithology information
+      "r2": 'rocktype2',           #field that contains even more lithology information
+      "sill": 'sill',              #text to search for in field defined by ds code to show that this is a sill
+      "intrusive": 'intrusive',    #text to search for in field defined by ds code to show that this is an intrusion
+      "volcanic": 'volcanic',      #text to search for in field defined by ds code to show that this is an volv=canic (not intrusion)
+    #Mineral Deposits
+      "msc": 'site_code',          #field that contains site code of deposit
+      "msn": 'short_name',         #field that contains short name of deposit
+      "mst": 'site_type_',         #field that contains site type of deposit
+      "mtc": 'target_com',         #field that contains target commodity of deposit
+      "mscm": 'site_commo',        #field that contains site commodity of deposit
+      "mcom": 'commodity_',        #field that contains commodity group of deposit
+      "minf": 'Infrastructure',    #text to search for in field defined by mst code that shows site to ignore
+    #Timing
+      "min": 'min_age_ma',         #field that contains minimum age of unit defined by ccode
+      "max": 'max_age_ma',         #field that contains maximum age of unit defined by ccode
+    #faults and folds
+      "f": 'feature',              #field that contains information on type of structure
+      "fault": 'Fault',            #text to search for in field defined by f code to show that this is a fault
+      "ff": 'feature',              #field that contains information on type of structure
+      "fold": 'Fold axial trace',  #text to search for in field defined by f code to show that this is a fold axial trace
+      "fdip": 'dip',               # field for numeric fault dip value
+      "fdipnull": '0',         # text to search for in field defined by fdip to show that this has no known dip
+      "fdipdir": 'dip_dir',        # field for text fault dip direction value 
+      "fdipdir_flag": 'alpha',        # flag for text fault dip direction type num e.g. 045 or alpha e.g. southeast    
+      "fdipest": 'dip_est',        # field for text fault dip estimate value
+      "fdipest_vals": 'gentle,moderate,steep',        # text to search for in field defined by fdipest to give fault dip estimate in increasing steepness
+      "n": 'fname',                 #field that contains information on name of fault (not used??)
+      "t": 'type',                 #field that contains information on type of fold
+      "syn": 'syncline',           #text to search for in field defined by t to show that this is a syncline
+    #ids
+      "o": 'objectid',             #field that contains unique id of geometry object
+      "gi": 'geopnt_id'            #field that contains unique id of structure point
+      "deposit_dist": 500
+}

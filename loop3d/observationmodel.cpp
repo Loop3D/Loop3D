@@ -350,3 +350,9 @@ int ObservationModel::findObservationByID(int eventId)
     return -1;
 }
 
+void ObservationModel::refreshModel()
+{
+    beginResetModel();
+    endResetModel();
+}
+
