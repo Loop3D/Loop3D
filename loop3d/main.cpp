@@ -45,16 +45,12 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 int main(int argc, char *argv[])
 {
-//    std::cout << "Starting pybind11 interpreter\n" << std::endl;
     try {
         py::initialize_interpreter();
-//        std::cout << "Interpreter loaded, trying a python file" << std::endl;
-
         py::eval_file(".\\setupPython.py");
-//        std::cout << "Python interpreter and setup environment file successfully ran" << std::endl;
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
-        std::cout << "Python file DID NOT successfully ran" << std::endl;
+        std::cout << "Python file setupPython.py DID NOT successfully ran" << std::endl;
     }
 
     setupOpenGLVersion();
@@ -66,7 +62,6 @@ int main(int argc, char *argv[])
     app.setApplicationName("Loop");
     app.setOrganizationDomain("loop3d.org");
 
-//    DataSourceList dataSourceList;
     L3DViewer* viewer = L3DViewer::instance();
 
     ProjectManagement* project = ProjectManagement::instance();
@@ -115,6 +110,8 @@ int main(int argc, char *argv[])
     view.setSource(QUrl("qrc:///main.qml"));
     view.show();
     QObject::connect(view.rootContext()->engine(),SIGNAL(quit()),qApp,SLOT(quit()));
+    QObject::connect(project,SIGNAL(finishedMap2Loop()),view.rootObject(),SLOT(extractDataCompleted()));
+    QObject::connect(project,SIGNAL(finishedGeologyModel()),view.rootObject(),SLOT(geologyModelCompleted()));
 
     std::cout << "Starting Loop GUI ..." << std::endl;
     int res = app.exec();

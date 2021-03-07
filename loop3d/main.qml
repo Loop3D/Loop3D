@@ -1,6 +1,7 @@
 import QtQuick 2.14
 //import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.14
 import QtQuick.Dialogs 1.2
 import loop3d.projectmanagement 1.0
@@ -11,16 +12,36 @@ import QtQuick.Scene3D 2.14
 //import Qt3D.Input 2.14
 
 Item {
-    width: 1024
-    height: 768
+    width: 1280
+    height: 960
     id: mainWindow
     property int myBorders: 6
-    property string version: "0.0.5"
+    property string version: "0.0.9"
     property bool confirmOnQuit: false
     property string headingFontStyle: "Arial"
     property int headingFontSize: 14
     property string defaultFontStyle: "Arial"
     property int defaultFontSize: 12
+
+    function extractDataCompleted() {
+        console.log("Extracted Data Completed called")
+        geologyTab.refreshModels()
+        dcTab.refreshSourceModel()
+        dmTab.refreshModels()
+        dcTab.finishedExtractData()
+    }
+    function geologyModelCompleted() {
+        console.log("Geology Model Completed called")
+        geologyTab.refreshModels()
+        dcTab.refreshSourceModel()
+        dmTab.refreshModels()
+        geologyTab.finishedModel()
+    }
+
+    function createModelCompleted() {
+        console.log("Create Model Completed called")
+    }
+
     Scene3D {
         id: mainScene3D
         anchors.fill: parent
@@ -135,6 +156,7 @@ Item {
     }
 
     StackLayout {
+        id: coreLayout
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -167,6 +189,52 @@ Item {
                 font.pointSize: 11
                 padding: 4
             }
+        }
+    }
+
+    Rectangle {
+        id: progressIndicator
+        visible: project.pythonInProgress > 0
+        height: 40 + project.pythonProgressTextLineCount * 20
+        anchors.bottom: footer.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 4
+
+        color: "#80000000"
+        ProgressBar {
+            id: pythonProgress
+            height: 30
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            value: project.pythonInProgress
+            contentItem: Rectangle {
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: 1
+                width: parent.visualPosition * parent.width
+                height: 5
+                radius: 10
+                color: "green"
+                SequentialAnimation on color {
+                    ColorAnimation { to: "limegreen"; duration: 2000 }
+                    ColorAnimation { to: "green"; duration: 2000 }
+                    loops: Animation.Infinite
+                }
+                onHeightChanged: height = 15
+            }
+        }
+        Text {
+            id: pythonProgressText
+            padding: 4
+            font.pointSize: 11
+            color: "white"
+            height: 30
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: progressIndicator.top
+            text: "Python Script Progress: " + project.pythonProgressText
         }
     }
 

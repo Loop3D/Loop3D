@@ -54,6 +54,9 @@ class ProjectManagement : public QQuickItem
     Q_PROPERTY (QString activeStateName MEMBER m_activeStateName NOTIFY activeStateNameChanged)
     Q_PROPERTY (bool useLavavu MEMBER m_useLavavu WRITE setUseLavavu NOTIFY useLavavuChanged)
     Q_PROPERTY (QString pythonErrors MEMBER m_pythonErrors NOTIFY pythonErrorsChanged)
+    Q_PROPERTY (double pythonInProgress MEMBER m_pythonInProgress NOTIFY pythonInProgressChanged)
+    Q_PROPERTY (QString pythonProgressText MEMBER m_pythonProgressText NOTIFY pythonProgressTextChanged)
+    Q_PROPERTY (int pythonProgressTextLineCount MEMBER m_pythonProgressTextLineCount NOTIFY pythonProgressTextLineCountChanged)
 
     Q_SIGNALS:
         void filenameChanged();
@@ -90,6 +93,13 @@ class ProjectManagement : public QQuickItem
         void activeStateNameChanged();
         void useLavavuChanged();
         void pythonErrorsChanged();
+        void pythonInProgressChanged();
+        void pythonProgressTextChanged();
+        void pythonProgressTextLineCountChanged();
+
+        void finishedMap2Loop();
+        void finishedLoopStructural();
+        void finishedGeologyModel();
 
 public Q_SLOTS:
         void setLockedExtents(bool val) { m_lockedExtents = val; lockedExtentsChanged();}
@@ -174,6 +184,9 @@ public Q_SLOTS:
 
         QString m_pythonErrors;
         QString m_filename;
+        double m_pythonInProgress;
+        QString m_pythonProgressText;
+        int m_pythonProgressTextLineCount;
 
     private:
         ProjectManagement();

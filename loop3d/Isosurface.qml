@@ -349,19 +349,19 @@ Scene3DView {
                 ]
             }
         }
-        Entity {
-            components: [
-                SphereMesh { radius: 50 },
-                Transform { translation: Qt.vector3d(viewer.structureXMax-viewer.structureXMin,
-                                                     viewer.structureYMax-viewer.structureYMin,
-                                                     viewer.structureZMax-viewer.structureZMin) },
-                DiffuseSpecularMaterial {
-                    ambient: "#555555"
-                    diffuse: "#ee0000"
-                    specular: "#00ee00"
-                }
-            ]
-        }
+//        Entity {
+//            components: [
+//                SphereMesh { radius: 50 },
+//                Transform { translation: Qt.vector3d(viewer.structureXMax-viewer.structureXMin,
+//                                                     viewer.structureYMax-viewer.structureYMin,
+//                                                     viewer.structureZMax-viewer.structureZMin) },
+//                DiffuseSpecularMaterial {
+//                    ambient: "#555555"
+//                    diffuse: "#ee0000"
+//                    specular: "#00ee00"
+//                }
+//            ]
+//        }
         NodeInstantiator {
             id: observations
             enabled: bar.currentIndex == 4

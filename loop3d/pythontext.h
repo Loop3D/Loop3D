@@ -3,11 +3,18 @@
 
 #include <QQuickTextDocument>
 #include <QDebug>
+#include <QThread>
 #include "pythonhighlighter.h"
 
 #include <iostream>
 #include <exception>
+#include <pybind11/embed.h>
 
+class PythonTextWorkerThread : public QThread
+{
+    Q_OBJECT
+    void run() override;
+};
 
 class PythonText : public QObject
 {
@@ -29,17 +36,30 @@ class PythonText : public QObject
         QString filename() { return m_filename; }
         void setFilename(QString in);
 
-        Q_INVOKABLE void run(QString code, QString loopFilename="", bool useResult=false);
+        void setThreadRunning(bool running) { m_threadRunning = running; }
+        bool isThreadRunning(void) { return m_threadRunning; }
+
+        Q_INVOKABLE void run(QString code, QString loopFilename="", QString loopStage="DataCollection");
 
     Q_SIGNALS:
         void pythonCodeChanged();
         void filenameChanged();
 
+    public Q_SLOTS:
+//        void runCodeThread(void);
+        void postCode(void);
+
+    public:
+        QString m_code;
+        pybind11::dict m_locals;
     private:
+        bool m_threadRunning;
+        QString m_threadRunningStage;
         QString m_pythonCode;
         QString m_filename;
         PythonHighlighter* pythonHighlighter;
         std::string replaceKeywords(std::string);
+        PythonTextWorkerThread m_pollingThread;
 };
 
 #endif // PYTHONTEXT_H

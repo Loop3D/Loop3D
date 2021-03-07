@@ -13,3 +13,5 @@ import gc
 #import lavavu
 import netCDF4
 from netCDF4 import Dataset
+from map2loop.project import Project
+import gdal

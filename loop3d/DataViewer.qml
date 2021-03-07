@@ -295,7 +295,7 @@ Item {
                 anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.margins: mainWindow.myBorders
-                width: 80
+                width: 160
                 color: "transparent"
                 Button {
                     id: miscButton1
@@ -309,11 +309,12 @@ Item {
                         misc1 = !misc1
                         viewer.miscToggle1 = misc1
                     }
-                    text: "Misc1"
+                    text: "Options " + (viewer.miscToggle1 ? "ON" : "OFF")
                 }
                 Button {
                     id: miscButton2
                     property var misc2: 0
+                    visible: viewer.miscToggle1
                     anchors.top: miscButton1.bottom
                     anchors.right: parent.right
                     anchors.margins: 4
@@ -323,11 +324,12 @@ Item {
                         misc2 = !misc2
                         viewer.miscToggle2 = misc2
                     }
-                    text: "Misc2"
+                    text: "Labels " + (viewer.miscToggle2 ? "ON" : "OFF")
                 }
                 Button {
                     id: miscButton3
                     property var misc3: 0
+                    visible: viewer.miscToggle1
                     anchors.top: miscButton2.bottom
                     anchors.right: parent.right
                     anchors.margins: 4
@@ -338,11 +340,12 @@ Item {
                         viewer.miscToggle3 = misc3
                         viewer.resetCrossSection()
                     }
-                    text: "Misc3"
+                    text: "Slicing " + (viewer.miscToggle3 ? "ON" : "OFF")
                 }
                 Button {
                     id: miscButton4
                     property var misc4: 0
+                    visible: viewer.miscToggle1
                     anchors.top: miscButton3.bottom
                     anchors.right: parent.right
                     anchors.margins: 4
@@ -353,11 +356,12 @@ Item {
                         viewer.invertedView = misc4
                         viewer.miscToggle4 = misc4
                     }
-                    text: "Misc4"
+                    text: "Invert Depth " + (!viewer.miscToggle4 ? "ON" : "OFF")
                 }
                 Button {
                     id: miscButton5
                     property var misc5: 0
+                    visible: viewer.miscToggle1
                     anchors.top: miscButton4.bottom
                     anchors.right: parent.right
                     anchors.margins: 4
@@ -368,7 +372,7 @@ Item {
                         viewer.miscToggle5 = misc5
                         project.reloadProject()
                     }
-                    text: "Misc5"
+                    text: "Reload Project"
                 }
             }
     }

@@ -98,6 +98,7 @@ int M2lConfig::loadFromFile(QString filename)
     LoopProjectFileResponse resp = LoopProjectFile::GetDataCollectionConfiguration(name.toStdString(),config,false);
 
     if (resp.errorCode == 0) {
+        m_quietMode = config.quietMode;
         m_orientationDecimate = config.orientationDecimate;
         m_contactDecimate = config.contactDecimate;
         m_intrusionMode = config.intrusionMode;
@@ -121,6 +122,7 @@ int M2lConfig::loadFromFile(QString filename)
         m_useInterpolations = config.useInterpolations;
         m_useFat = config.useFat;
 
+        quietModeChanged();
         orientationDecimateChanged();
         contactDecimateChanged();
         intrusionModeChanged();

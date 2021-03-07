@@ -40,8 +40,11 @@ Item {
     function runExtractData() {
         project.saveProject()
         project.pythonErrors = ""
-        dcPythonText.run(dcTextArea.text,project.filename)
-        project.reloadProject()
+        project.pythonInProgress = 0.01
+        dcPythonText.run(dcTextArea.text,project.filename,"DataCollection")
+    }
+
+    function finishedExtractData() {
         if (project.pythonErrors) {
             console.log(project.pythonErrors)
             pythonErrorDialog.open()
@@ -125,7 +128,6 @@ Item {
                 onPressed: {
                     lastX = mouse.x
                     lastY = mouse.y
-//                    console.log("pressed")
                     if (mouse.button === Qt.RightButton && !project.lockedExtents) {
                         project.utmZone = 0
                         startPos.coordinate = mapUnderlayer.toCoordinate(Qt.point(mouseX, mouseY))
@@ -135,7 +137,6 @@ Item {
                     }
                 }
                 onReleased: {
-//                    console.log("released")
                     if (mouse.button === Qt.RightButton && !project.lockedExtents) {
                         endPos.coordinate = mapUnderlayer.toCoordinate(Qt.point(mouseX, mouseY))
                         roiReproject()
@@ -367,7 +368,6 @@ Item {
                     }
                     DataSourceModel {
                         id: dataSourceModel
-//                        property string dsfilename: "loop3d/DataSource.conf"
                         property string dsfilename: "DataSource.conf"
                         dataSources: dataSourceList
                         Component.onCompleted: {
@@ -668,7 +668,7 @@ Item {
                             selectByMouse: true
                             PythonText {
                                 id: dcPythonText
-                                filename: "m2l-wa-template.py"
+                                filename: "processMap2Loop.py"
                                 Component.onCompleted: {
                                     textDocToHighlight = dcTextArea.textDocument
                                     // Use select all and text addition to trigger immediate highlighting

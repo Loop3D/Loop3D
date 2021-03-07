@@ -128,10 +128,10 @@ L3DViewer::L3DViewer()
     m_minScalarValue = 0.0;
     m_maxScalarValue = 1.0;
     m_numIsosurfaces = 1;
-    m_miscToggle1 = true;
+    m_miscToggle1 = false;
     m_miscToggle2 = false;
     m_miscToggle3 = false;
-    m_miscToggle4 = false;
+    m_miscToggle4 = true;
     m_miscToggle5 = false;
     m_structureXMin = 0.0f;
     m_structureXMax = 1.0f;

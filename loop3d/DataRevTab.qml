@@ -240,13 +240,13 @@ Item {
             anchors.margins: mainWindow.myBorders
             width: parent.width / 2 - mainWindow.myBorders - 1
             color: "#bbbbbb"
-            Text {
-                anchors.fill: parent
-                verticalAlignment: Text.AlignTop
-                horizontalAlignment: Text.AlignHCenter
-                text: "(TO BE REPLACED) Map of Region of Interest\nAdd all observations as an overlay so they are selectable and toggled on/off\nHighlight selected event in event log and on map" +
-                "\nNeed a place to show structural information of event, fault area\n of displacement, etc (see Map2Loop notebooks for examples of these diagrams)"
-            }
+//            Text {
+//                anchors.fill: parent
+//                verticalAlignment: Text.AlignTop
+//                horizontalAlignment: Text.AlignHCenter
+//                text: "(TO BE REPLACED) Map of Region of Interest\nAdd all observations as an overlay so they are selectable and toggled on/off\nHighlight selected event in event log and on map" +
+//                "\nNeed a place to show structural information of event, fault area\n of displacement, etc (see Map2Loop notebooks for examples of these diagrams)"
+//            }
         }
         Button {
             anchors.top: parent.top

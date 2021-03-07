@@ -22,7 +22,10 @@ Item {
         project.saveProject()
         project.setUseLavavu(useLavavu)
         project.pythonErrors = ""
-        pythonText.run(textArea.text,project.filename,false)
+        pythonText.run(textArea.text,project.filename,"GeologyModel")
+    }
+
+    function finishedModel() {
         project.reloadProject()
         if (project.pythonErrors) {
             console.log(project.pythonErrors)
@@ -30,6 +33,7 @@ Item {
         } else {
             bar.currentIndex = 4
         }
+
     }
 
     Rectangle {
@@ -561,7 +565,7 @@ Item {
                             selectByMouse: true
                             PythonText {
                                 id: pythonText
-                                filename: "loopStructuralTemplate2.py"
+                                filename: "processLoopStructural.py"
                                 Component.onCompleted: {
                                     textDocToHighlight = textArea.textDocument
                                     // Use select all and text addition to trigger immediate highlighting
