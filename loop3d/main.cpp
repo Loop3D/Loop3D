@@ -47,10 +47,10 @@ int main(int argc, char *argv[])
 {
     try {
         py::initialize_interpreter();
-        py::eval_file(".\\setupPython.py");
+        py::eval_file("setupPython.py");
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
-        std::cout << "Python file setupPython.py DID NOT successfully ran" << std::endl;
+        std::cout << "Python file setupPython.py DID NOT successfully run" << std::endl;
     }
 
     setupOpenGLVersion();

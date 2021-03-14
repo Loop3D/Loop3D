@@ -26,7 +26,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 linux {
+    INCLUDEPATH += $$(PYTHONPATH)/include $$(PYTHONPATH)/include/python3.7m
     INCLUDEPATH += ~/.local/include/python3.7m /usr/include/python3.7m
+    INCLUDEPATH += $$(LOOPPROJECTFILECPP)
+    TARGET = runLoop3D
 } else :win32 {
     INCLUDEPATH += $$(VCPKGINSTALL)/include
     INCLUDEPATH += $$(PYTHONHOME)/include
@@ -36,6 +39,7 @@ linux {
 
 linux {
     LIBS += -lpython3.7m -lnetcdf -lnetcdf_c++4
+    LIBS += -lLoopProjectFileCpp
 } else :win32 {
     LIBS += -L$$(LOOPPROJECTFILECPP)
     CONFIG(debug, debug|release) {
