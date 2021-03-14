@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QVector>
 //#include <netcdf>
+#include <memory>
 
 #include "LoopProjectFileUtils.h"
 #include "LoopProjectFile.h"
