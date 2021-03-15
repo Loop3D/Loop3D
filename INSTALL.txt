@@ -1,0 +1,12 @@
+For the python environment needed to run map2loop and LoopStructural scripts:
+
+	conda install -c loop3d map2loop loopStructural
+
+Also install Qt5 Open Source:
+
+	https://www.qt.io/download
+
+Download and compile loop3d code using the loop3d.pro project file.
+
+Note a LPGL version binary of the GUI for Windows 10 will soon be available (check again soon).
+	
