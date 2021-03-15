@@ -14,7 +14,7 @@ Item {
     height: 768
     id: mainWindow
     property int myBorders: 6
-    property string version: "0.0.9"
+    property string version: "0.1.0"
     property bool confirmOnQuit: false
     property string headingFontStyle: "Arial"
     property int headingFontSize: 14

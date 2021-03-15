@@ -253,7 +253,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 Modules under the LGPL 3.0 License
 ----------------------------------
-lavavu : LGPL-3 © 2009-2017 Monash University
+lavavu : © 2009-2017 Monash University
+qt5 :    © 2018 The Qt Company Ltd. and other contributors
 
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
