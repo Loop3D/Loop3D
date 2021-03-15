@@ -1,0 +1,628 @@
+Individual dependencies are licensed as per the licenses listed below.
+
+Modules under the Apache 2.0 License
+------------------------------------
+aiohttp :           © 2021 Nikolay Kim
+async-timeout :     © 2016-2020 aio-libs collaboration
+bleach :            © 2014-2017 Mozilla Foundation
+Cython :            © 2009-2021 Robert Bradshaw, Stefan Behnel, Dag Seljebotn, Greg Ewing, et al.
+multidict :         © 2016-2017 Andrew Svetlov
+packaging :         © 2019-2021 Donald Stufft and individual contributors, 
+prometheus-client : © 2014-2020 Brian Brazil
+pyOpenSSL :         © 2011-2021 The pyOpenSSL developers
+requests :          © 2011-2020 Kenneth Reitz
+tornado :           © 2013-2021 Facebook
+yarl :              © 2016-2018 Andrew Svetlov and aio-libs team
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Modules under the BSD License
+-----------------------------
+affine :           © 2014 Sean C. Gillies
+cryptography :     © 2014-2021 The Python Cryptographic Authority and individual contributors
+cytoolz :          © 2014 Erik Welch
+descartes :        © 2017 Sean C. Gillies
+Fiona :            © 2007 Sean C. Gillies
+olefile :          © 2005-2020 Philippe Lagadec
+OWSLib :           © 2006 Ancient World Mapping Center
+pybind11 :         © 2016 Wenzel Jakob
+pybind11-global :  © 2016 Wenzel Jakob
+pycparser :        © 2008-2020 Eli Bendersky
+PySocks :          © 2006 Dan-Haim
+rasterio :         © 2013 MapBox
+Shapely :          © 2007 Sean C. Gillies
+toolz :            © 2013 Matthew Rocklin
+webencodings :     © 2012 Simon Sapin
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the copyright holder nor the names of
+      its contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+Modules under the BSD 2-Clause License
+--------------------------------------
+decorator :    © 2005-2020 Michele Simionato
+imageio :      © 2014-2020 imageio contributors
+nest-asyncio : © 2018-2020 Ewald de Wit
+Pygments :     © 2006-2021 Georg Brandl, Tim Hatch, Armin Ronacher and developers
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Modules under the BSD 3-Clause License
+--------------------------------------
+simpervisor :          © 2018 Yuvi Panda
+jupyter-server-proxy : © 2017 Ryan Lovett & Yuvi Panda, Data Science 8
+cloudpickle :          © 2015-2021 Cloudpipe © 2015 Cloudpickle © 2012 Regents of the University of California © 2009 PiCloud, Inc
+click :                © 2014 Pallets
+idna :                 © 2013-2021, Kim Davies
+Jinja2 :               © 2007 Pallets, Armin Ronacher
+joblib :               © 2008-2016 The joblib developers
+MarkupSafe :           © 2010 Pallets, Armin Ronacher
+networkx :             © 2004-2021 NetworkX Developers, Aric Hagberg, Dan Schult, Pieter Swart
+pandocfilters :        © 2013 John MacFarlane
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Modules under the BSD 3-Clause "New" License
+--------------------------------------------
+backcall :            © 2014 Thomas Kluyver
+click-plugins :       © 2015-2019 Kevin Wurster, Sean Gillies
+cligj :               © 2014 Mapbox
+colorama :            © 2010 Jonathan Hartley
+cycler :              © 2015 matplotlib project
+dask :                © 2014-2018 Anaconda, Inc. and contributors
+python-dateutil :     © 2015-  Paul Ganssle and dateutil contributors
+geopandas :           © 2013-2016 GeoPandas developers
+imagecodecs :         © 2008-2021 Christoph Gohlke
+ipykernel :           © 2001- IPython Development Team
+ipython :             © 2011- IPython Development Team
+ipython-genutils :    © 2001- IPython Development Team
+jupyter-client :      © 2020- Jupyter Development Team
+jupyter-core :        © 2020- Jupyter Development Team
+jupyterlab-pygments : © 2020- Jupyter Development Team
+kiwisolver :          © 2013 Nucleic Development Team
+pooch :               © 2018 The Pooch Developers
+pyzmq :               © 2009-2012 Brian Granger, Min Ragan-Kelley
+mistune :             © 2014 Hsiaoming Yang
+nbclient :            © 2020- Jupyter Development Team
+nbconvert :           © 2020- Jupyter Development Team
+nbformat :            © 2020- Jupyter Development Team
+notebook :            © 2020- Jupyter Development Team
+numpy :               © 2005-2021 NumPy Developers
+pandas :              © 2008-2011, AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData Development Team
+prompt-toolkit :      © 2014 Jonathan Slenders
+pyevtk :              © 2010-2016 Paulo Herrera
+scikit-image :        © 2019 The scikit-image team
+scikit-learn :        © 2007-2020 The scikit-learn developers
+scipy :               © 2001-2002 Enthought 2003-2019 SciPy Developers
+Send2Trash :          © 2017 Virgil Dupras
+terminado :           © 2014- Jupyter Development Team
+testpath :            © 2015 Jupyter Development Team
+tifffile :            © 2008-2021 Christoph Gohlke
+threadpoolctl :       © 2019 Thomas Moreau and threadpoolctl contributors
+traitlets :           © 2001-NOW IPython Development Team
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Modules under the HPND License
+------------------------------
+Pillow : HPND © 2010-2021 Alex Clark and contributors 
+
+Like PIL, Pillow is licensed under the open source HPND License:
+
+By obtaining, using, and/or copying this software and/or its associated
+documentation, you agree that you have read, understood, and will comply
+with the following terms and conditions:
+
+Permission to use, copy, modify, and distribute this software and its
+associated documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appears in all copies, and that
+both that copyright notice and this permission notice appear in supporting
+documentation, and that the name of Secret Labs AB or the author not be
+used in advertising or publicity pertaining to distribution of the software
+without specific, written prior permission.
+
+SECRET LABS AB AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
+IN NO EVENT SHALL SECRET LABS AB OR THE AUTHOR BE LIABLE FOR ANY SPECIAL,
+INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+
+Modules under the LGPL 2.1 License
+----------------------------------
+chardet : LGPL © 2012-2021 Mark Pilgrim
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+Modules under the LGPL 3.0 License
+----------------------------------
+lavavu : LGPL-3 © 2009-2017 Monash University
+
+                   GNU LESSER GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+
+  This version of the GNU Lesser General Public License incorporates
+the terms and conditions of version 3 of the GNU General Public
+License, supplemented by the additional permissions listed below.
+
+  0. Additional Definitions.
+
+  As used herein, "this License" refers to version 3 of the GNU Lesser
+General Public License, and the "GNU GPL" refers to version 3 of the GNU
+General Public License.
+
+  "The Library" refers to a covered work governed by this License,
+other than an Application or a Combined Work as defined below.
+
+  An "Application" is any work that makes use of an interface provided
+by the Library, but which is not otherwise based on the Library.
+Defining a subclass of a class defined by the Library is deemed a mode
+of using an interface provided by the Library.
+
+  A "Combined Work" is a work produced by combining or linking an
+Application with the Library.  The particular version of the Library
+with which the Combined Work was made is also called the "Linked
+Version".
+
+  The "Minimal Corresponding Source" for a Combined Work means the
+Corresponding Source for the Combined Work, excluding any source code
+for portions of the Combined Work that, considered in isolation, are
+based on the Application, and not on the Linked Version.
+
+  The "Corresponding Application Code" for a Combined Work means the
+object code and/or source code for the Application, including any data
+and utility programs needed for reproducing the Combined Work from the
+Application, but excluding the System Libraries of the Combined Work.
+
+  1. Exception to Section 3 of the GNU GPL.
+
+  You may convey a covered work under sections 3 and 4 of this License
+without being bound by section 3 of the GNU GPL.
+
+  2. Conveying Modified Versions.
+
+  If you modify a copy of the Library, and, in your modifications, a
+facility refers to a function or data to be supplied by an Application
+that uses the facility (other than as an argument passed when the
+facility is invoked), then you may convey a copy of the modified
+version:
+
+   a) under this License, provided that you make a good faith effort to
+   ensure that, in the event an Application does not supply the
+   function or data, the facility still operates, and performs
+   whatever part of its purpose remains meaningful, or
+
+   b) under the GNU GPL, with none of the additional permissions of
+   this License applicable to that copy.
+
+  3. Object Code Incorporating Material from Library Header Files.
+
+  The object code form of an Application may incorporate material from
+a header file that is part of the Library.  You may convey such object
+code under terms of your choice, provided that, if the incorporated
+material is not limited to numerical parameters, data structure
+layouts and accessors, or small macros, inline functions and templates
+(ten or fewer lines in length), you do both of the following:
+
+   a) Give prominent notice with each copy of the object code that the
+   Library is used in it and that the Library and its use are
+   covered by this License.
+
+   b) Accompany the object code with a copy of the GNU GPL and this license
+   document.
+
+  4. Combined Works.
+
+  You may convey a Combined Work under terms of your choice that,
+taken together, effectively do not restrict modification of the
+portions of the Library contained in the Combined Work and reverse
+engineering for debugging such modifications, if you also do each of
+the following:
+
+   a) Give prominent notice with each copy of the Combined Work that
+   the Library is used in it and that the Library and its use are
+   covered by this License.
+
+   b) Accompany the Combined Work with a copy of the GNU GPL and this license
+   document.
+
+   c) For a Combined Work that displays copyright notices during
+   execution, include the copyright notice for the Library among
+   these notices, as well as a reference directing the user to the
+   copies of the GNU GPL and this license document.
+
+   d) Do one of the following:
+
+       0) Convey the Minimal Corresponding Source under the terms of this
+       License, and the Corresponding Application Code in a form
+       suitable for, and under terms that permit, the user to
+       recombine or relink the Application with a modified version of
+       the Linked Version to produce a modified Combined Work, in the
+       manner specified by section 6 of the GNU GPL for conveying
+       Corresponding Source.
+
+       1) Use a suitable shared library mechanism for linking with the
+       Library.  A suitable mechanism is one that (a) uses at run time
+       a copy of the Library already present on the user's computer
+       system, and (b) will operate properly with a modified version
+       of the Library that is interface-compatible with the Linked
+       Version.
+
+   e) Provide Installation Information, but only if you would otherwise
+   be required to provide such information under section 6 of the
+   GNU GPL, and only to the extent that such information is
+   necessary to install and execute a modified version of the
+   Combined Work produced by recombining or relinking the
+   Application with a modified version of the Linked Version. (If
+   you use option 4d0, the Installation Information must accompany
+   the Minimal Corresponding Source and Corresponding Application
+   Code. If you use option 4d1, you must provide the Installation
+   Information in the manner specified by section 6 of the GNU GPL
+   for conveying Corresponding Source.)
+
+  5. Combined Libraries.
+
+  You may place library facilities that are a work based on the
+Library side by side in a single library together with other library
+facilities that are not Applications and are not covered by this
+License, and convey such a combined library under terms of your
+choice, if you do both of the following:
+
+   a) Accompany the combined library with a copy of the same work based
+   on the Library, uncombined with any other library facilities,
+   conveyed under the terms of this License.
+
+   b) Give prominent notice with the combined library that part of it
+   is a work based on the Library, and explaining where to find the
+   accompanying uncombined form of the same work.
+
+  6. Revised Versions of the GNU Lesser General Public License.
+
+  The Free Software Foundation may publish revised and/or new versions
+of the GNU Lesser General Public License from time to time. Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.
+
+  Each version is given a distinguishing version number. If the
+Library as you received it specifies that a certain numbered version
+of the GNU Lesser General Public License "or any later version"
+applies to it, you have the option of following the terms and
+conditions either of that published version or of any later version
+published by the Free Software Foundation. If the Library as you
+received it does not specify a version number of the GNU Lesser
+General Public License, you may choose any version of the GNU Lesser
+General Public License ever published by the Free Software Foundation.
+
+  If the Library as you received it specifies that a proxy can decide
+whether future versions of the GNU Lesser General Public License shall
+apply, that proxy's public statement of acceptance of any version is
+permanent authorization for you to choose that version for the
+Library.
+
+
+Modules under the MIT License
+-----------------------------
+appdirs :          © 2010 ActiveState Software Inc.
+argon2-cffi :      © 2015 Hynek Schlawack
+async-generator :  © 2016 Nathaniel J. Smith
+attrs :            © 2015 Hynek Schlawack
+beautifulsoup4 :   © 1996-2021 Leonard Richardson
+brotlipy :         © 2015 Cory Benfield
+cffi :             © 2012-2018 Armin Rigo, Maciej Fijalkowski
+cftime v1.4.0:     © 2018-2021 Jeff Whitaker
+entrypoints :      © 2015 Thomas Kluyver and contributors
+hjson :            © 2006 Bob Ippolito 2015 Christian Zangl
+jedi :             © 2013 David Halter and others
+jsonschema :       © 2013 Julian Berman
+LoopProjectFile :  © 2018-2021 Monash University, Roy Thomson
+LoopStructural :   © 2020 Lachlan Grose
+map2loop :         © 2019-2021 Mark Jessell, Yohan de Rose
+map2model :        © 2020 Loop, Mark Jessell, Yohan de Rose
+mplstereonet :     © 2012 Joe Kington
+munch :            © 2010 David Schoonover
+netCDF4 :          © 2008 Jeffrey Whitaker
+parso :            © 2013-2017 David Halter
+pickleshare :      © 2016 Ville Vainio
+pip :              © 2008-2021 The pip developers
+pyamg :            © 2008-2015 PyAMG Developers
+pyparsing :        © 2003-2019  Paul T. McGuire
+pyproj :           © 2006-2018 Jeffrey Whitaker 2019-2021 Open source contributors
+pyrsistent :       © 2019 Tobias Gustafsson
+pytz :             © 2008 Stuart Bishop
+PyWavelets :       © 2006-2012 Filip Wasilewski 2012-2020 The PyWavelets Developers
+pywinpty :         © 2017 Spyder IDE
+PyYAML :           © 2006-2016 Kirill Simonov 2017-2021 Ingy döt Net
+Rtree :            © 2018 Sean C. Gillies, Howard Butler and contributors
+setuptools :       © 2006-2021 Python Packaging Authority
+six :              © 2010-2020 Benjamin Peterson
+snuggs :           © 2014 Mapbox
+soupsieve :        © 2018-2021 Isaac Muse
+urllib3 :          © 2008-2020 Andrey Petrov and contributors
+wcwidth :          © 2014 Jeff Quast
+wheel :            © 2012-2014 Daniel Holth
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Modules under the MPL-2.0 License
+---------------------------------
+certifi : © 2011-2020 Kenneth Reitz
+tqdm :    © 2013 noamraph
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
+Modules under the PSF 2.0 License
+---------------------------------
+defusedxml :        © 2013-2021 Christian Heimes
+pywin32 :           © 2005-2021 Mark Hammond (et al)
+typing-extensions : © 2001-2021 Guido van Rossum, Jukka Lehtosalo, Lukasz Langa, Michael Lee
+wincertstore :      © 2013-2014 Christian Heimes
+
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+
+1. This LICENSE AGREEMENT is between the Python Software Foundation
+("PSF"), and the Individual or Organization ("Licensee") accessing and
+otherwise using this software ("Python") in source or binary form and
+its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, PSF
+hereby grants Licensee a nonexclusive, royalty-free, world-wide
+license to reproduce, analyze, test, perform and/or display publicly,
+prepare derivative works, distribute, and otherwise use Python
+alone or in any derivative version, provided, however, that PSF's
+License Agreement and PSF's notice of copyright, i.e., "Copyright (c)
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Python Software Foundation; 
+All Rights Reserved" are retained in Python alone or in any derivative 
+version prepared by Licensee.
+
+3. In the event Licensee prepares a derivative work that is based on
+or incorporates Python or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python.
+
+4. PSF is making Python available to Licensee on an "AS IS"
+basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7. Nothing in this License Agreement shall be deemed to create any
+relationship of agency, partnership, or joint venture between PSF and
+Licensee.  This License Agreement does not grant permission to use PSF
+trademarks or trade name in a trademark sense to endorse or promote
+products or services of Licensee, or any third party.
+
+8. By copying, installing or otherwise using Python, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+Module release Public Domain
+----------------------------
+win-inet-pton : © 2018 Ryan Vennell
+
+GDAL lies under its own license
+-------------------------------
+GDAL : © 1998-2021 Frank Warmerdam, Even Rouault, and others
+
+This software released into the public domain. Anyone is free to copy,
+modify, publish, use, compile, sell, or distribute this software,
+either in source code form or as a compiled binary, for any purpose,
+commercial or non-commercial, and by any means.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the “Software”),
+to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+The full licensing terms are available in the LICENSE.TXT
+(https://raw.githubusercontent.com/OSGeo/gdal/master/gdal/LICENSE.TXT) file.
+
+Matplotlib lies under its own license
+-------------------------------------
+matplotlib : © 2013-2021 Matplotlib Development Team
+
+1. This LICENSE AGREEMENT is between the Matplotlib Development Team ("MDT"),
+and the Individual or Organization ("Licensee") accessing and otherwise using
+matplotlib software in source or binary form and its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, MDT hereby
+grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce,
+analyze, test, perform and/or display publicly, prepare derivative works,
+distribute, and otherwise use matplotlib 3.3.4 alone or in any derivative
+version, provided, however, that MDT's License Agreement and MDT's notice of
+copyright, i.e., "Copyright (c) 2012-2013 Matplotlib Development Team; All
+Rights Reserved" are retained in matplotlib 3.3.4 alone or in any derivative
+version prepared by Licensee.
+
+3. In the event Licensee prepares a derivative work that is based on or
+incorporates matplotlib 3.3.4 or any part thereof, and wants to make the
+derivative work available to others as provided herein, then Licensee hereby
+agrees to include in any such work a brief summary of the changes made to
+matplotlib 3.3.4.
+
+4. MDT is making matplotlib 3.3.4 available to Licensee on an "AS IS" basis.
+MDT MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF
+EXAMPLE, BUT NOT LIMITATION, MDT MAKES NO AND DISCLAIMS ANY REPRESENTATION
+OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT
+THE USE OF MATPLOTLIB 3.3.4 WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. MDT SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF MATPLOTLIB 3.3.4
+FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF
+MODIFYING, DISTRIBUTING, OR OTHERWISE USING MATPLOTLIB 3.3.4, OR ANY DERIVATIVE
+THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material breach
+of its terms and conditions.
+
+7. Nothing in this License Agreement shall be deemed to create any relationship
+of agency, partnership, or joint venture between MDT and Licensee. This License
+Agreement does not grant permission to use MDT trademarks or trade name in a
+trademark sense to endorse or promote products or services of Licensee, or any
+third party.
+
+8. By copying, installing or otherwise using matplotlib 3.3.4, Licensee agrees
+to be bound by the terms and conditions of this License Agreement.

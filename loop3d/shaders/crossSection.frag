@@ -33,6 +33,10 @@ uniform float miscToggle2;
 uniform float miscToggle3;
 uniform float miscToggle4;
 uniform float miscToggle5;
+uniform float colourSteps[100];
+uniform float colourRedOptions[100];
+uniform float colourGreenOptions[100];
+uniform float colourBlueOptions[100];
 
 out vec4 FragColour;
 
@@ -48,6 +52,18 @@ vec3 getSpectrumColour(float val)
     vec3 lower = spectrum[segment];
     vec3 upper = spectrum[segment+1];
     return vec3(mix(lower,upper,(val-0.2*segment)*5.0));
+}
+
+vec3 getColourFromSteps(float val)
+{
+    vec3 colour = vec3(colourRedOptions[0],colourGreenOptions[0],colourBlueOptions[0]);
+    for (int i=0;i<100;i++) {
+        if (val > colourSteps[i]) {
+            colour = vec3(colourRedOptions[i],colourGreenOptions[i],colourBlueOptions[i]);
+            break;
+        }
+    }
+    return colour;
 }
 
 void main()
@@ -69,6 +85,8 @@ void main()
     if (positionNormalised.y > ysize) alpha = 0.0;
     if (positionNormalised.z > zsize) alpha = 0.0;
     vec3 colour = getSpectrumColour(normalisedVal) * 0.7 + 0.1;
+
+    if (miscToggle5 > 0.0) colour = getColourFromSteps(value);
 
     FragColour = vec4(colour,alpha);
 }

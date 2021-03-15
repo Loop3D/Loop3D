@@ -57,6 +57,7 @@ class ProjectManagement : public QQuickItem
     Q_PROPERTY (double pythonInProgress MEMBER m_pythonInProgress NOTIFY pythonInProgressChanged)
     Q_PROPERTY (QString pythonProgressText MEMBER m_pythonProgressText NOTIFY pythonProgressTextChanged)
     Q_PROPERTY (int pythonProgressTextLineCount MEMBER m_pythonProgressTextLineCount NOTIFY pythonProgressTextLineCountChanged)
+    Q_PROPERTY (unsigned long long totalPermutations MEMBER m_totalPermutations NOTIFY totalPermutationsChanged)
 
     Q_SIGNALS:
         void filenameChanged();
@@ -96,6 +97,7 @@ class ProjectManagement : public QQuickItem
         void pythonInProgressChanged();
         void pythonProgressTextChanged();
         void pythonProgressTextLineCountChanged();
+        void totalPermutationsChanged();
 
         void finishedMap2Loop();
         void finishedLoopStructural();
@@ -181,6 +183,7 @@ public Q_SLOTS:
         std::string m_foldUrl;
         std::string m_mindepUrl;
         std::string m_metadataUrl;
+        unsigned long long m_totalPermutations;
 
         QString m_pythonErrors;
         QString m_filename;

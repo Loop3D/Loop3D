@@ -6,7 +6,6 @@
 #include <QtQuick/QQuickItem>
 #include <QVector3D>
 
-
 class L3DViewer : public QQuickItem
 {
     Q_OBJECT
@@ -40,6 +39,10 @@ class L3DViewer : public QQuickItem
     Q_PROPERTY (unsigned int structureYSize MEMBER m_structureYSize NOTIFY structureYSizeChanged)
     Q_PROPERTY (unsigned int structureZSize MEMBER m_structureZSize NOTIFY structureZSizeChanged)
     Q_PROPERTY (unsigned int structureNumberTetraPerIsosurface MEMBER m_structureNumberTetraPerIsosurface NOTIFY structureNumberTetraPerIsosurfaceChanged)
+    Q_PROPERTY (QList<float> colourSteps MEMBER m_colourSteps NOTIFY colourStepsChanged)
+    Q_PROPERTY (QList<float> colourRedOptions MEMBER m_colourRedOptions NOTIFY colourRedOptionsChanged)
+    Q_PROPERTY (QList<float> colourGreenOptions MEMBER m_colourGreenOptions NOTIFY colourGreenOptionsChanged)
+    Q_PROPERTY (QList<float> colourBlueOptions MEMBER m_colourBlueOptions NOTIFY colourBlueOptionsChanged)
 
     Q_PROPERTY (float csPositionX MEMBER m_csPositionX NOTIFY csPositionXChanged)
     Q_PROPERTY (float csPositionY MEMBER m_csPositionY NOTIFY csPositionYChanged)
@@ -77,6 +80,10 @@ Q_SIGNALS:
     void structureYSizeChanged();
     void structureZSizeChanged();
     void structureNumberTetraPerIsosurfaceChanged();
+    void colourStepsChanged();
+    void colourRedOptionsChanged();
+    void colourGreenOptionsChanged();
+    void colourBlueOptionsChanged();
 
     void csPositionXChanged();
     void csPositionYChanged();
@@ -92,11 +99,17 @@ public Q_SLOTS:
     void pan(float horizontalFactor, float verticalFactor);
     void rotate(float horizontalFactor, float verticalFactor);
     void resetView(void);
+    void resetColours(void);
     void resetCrossSection(void);
     void handleKeyEvent(int key, int modifiers);
 
 public:
     Q_INVOKABLE bool setIsovalue(int index, float value);
+    Q_INVOKABLE bool setColourStep(int index, float value);
+    Q_INVOKABLE bool setColourOption(int index, QVector3D value);
+    Q_INVOKABLE bool setColourRedOption(int index, float value);
+    Q_INVOKABLE bool setColourGreenOption(int index, float value);
+    Q_INVOKABLE bool setColourBlueOption(int index, float value);
     static L3DViewer* instance() {
         if (!m_instance) m_instance = new L3DViewer;
         return m_instance;
@@ -133,6 +146,10 @@ public:
     unsigned int m_structureYSize;
     unsigned int m_structureZSize;
     unsigned int m_structureNumberTetraPerIsosurface;
+    QList<float> m_colourSteps;
+    QList<float> m_colourRedOptions;
+    QList<float> m_colourGreenOptions;
+    QList<float> m_colourBlueOptions;
 
     float m_csPositionX;
     float m_csPositionY;

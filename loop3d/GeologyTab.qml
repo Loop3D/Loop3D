@@ -7,9 +7,8 @@ import loop3d.lsconfig 1.0
 
 Item {
     id: geologyTab
-    property int totalPermutations: 0
-    property bool useLavavu: false
-    function calcPerms() { totalPermutations = eventList.calcPermutations() }
+//    property bool useLavavu: false
+    function calcPerms() { project.totalPermutations = eventList.calcPermutations() }
 
     function repaint() { mycanvas.requestPaint() }
 
@@ -20,7 +19,7 @@ Item {
 
     function runModel() {
         project.saveProject()
-        project.setUseLavavu(useLavavu)
+//        project.useLavavu = useLavavu
         project.pythonErrors = ""
         pythonText.run(textArea.text,project.filename,"GeologyModel")
     }
@@ -29,9 +28,13 @@ Item {
         project.reloadProject()
         if (project.pythonErrors) {
             console.log(project.pythonErrors)
-            pythonErrorDialog.open()
+//            pythonErrorDialog.open()
         } else {
             bar.currentIndex = 4
+            if (project.useLavavu) {
+                notifyText.text = "Lavavu viewer currently not implemented"
+                concole.log("Lavavu viewer currently not implemented")
+            }
         }
 
     }
@@ -133,10 +136,10 @@ Item {
 
                         onClicked: {
                             isActive = !isActive
-                            eventsModel.sortEvents()
                             calcPerms()
                             mycanvas.clearCanvas()
                             mycanvas.requestPaint()
+                            eventsModel.sortEvents()
                         }
                     }
                 }
@@ -163,8 +166,8 @@ Item {
                 onPaint: {
                     clearCanvas();
                     var ctx = getContext("2d");
-                    var globalMinAge = 1000.0;
-                    var globalMaxAge = -1000.0;
+                    var globalMinAge = 5000.0;
+                    var globalMaxAge = -5000.0;
                     var i = 0;
                     for (i = 0; i < eventsModel.rowCount(); i++) {
                         if (eventsModel.dataIndexed(i,"isActive")) {
@@ -176,6 +179,7 @@ Item {
                     }
                     globalMinAge = Math.floor(globalMinAge);
                     globalMaxAge = Math.ceil(globalMaxAge);
+                    ageScale = 280.0 / (globalMaxAge - globalMinAge);
                     var globalAgeRange = globalMaxAge - globalMinAge;
                     drawTimelineScale(ctx,globalMinAge,globalMaxAge);
 
@@ -190,7 +194,7 @@ Item {
                                             perms > 20 ? "#aa3333" :
                                             perms > 5  ? "#00efef" :
                                             "#00aa00";
-                            ctx.translate(100-eventWidth,(1+pBlockMinAge-globalMinAge)*ageScale);
+                            ctx.translate(100-eventWidth,40.0+(pBlockMinAge-globalMinAge)*ageScale);
                             ctx.fillRect(0,0,rankWidth*maxRank+2*eventWidth,(pBlockMaxAge - pBlockMinAge) * ageScale);
                             ctx.restore();
                         }
@@ -207,7 +211,7 @@ Item {
                             var maxAge = eventsModel.dataIndexed(i,"maxAge");
                             var minAge = eventsModel.dataIndexed(i,"minAge");
                             var avgAge = (minAge+maxAge)/2;
-                            ctx.translate(100+eventsModel.dataIndexed(i,"rank")*rankWidth,(1+avgAge-globalMinAge)*ageScale);
+                            ctx.translate(100+eventsModel.dataIndexed(i,"rank")*rankWidth,40.0+(avgAge-globalMinAge)*ageScale);
                             ctx.beginPath();
                             ctx.moveTo(          0,(minAge-avgAge)*ageScale);
                             ctx.lineTo(-(ageWidth+eventWidth/2),(minAge-avgAge)*ageScale);
@@ -233,8 +237,8 @@ Item {
                     ctx.save();
                     ctx.lineWidth = 2;
                     ctx.beginPath();
-                    ctx.moveTo(50,ageScale);
-                    for (var i=1.0;i<8.0;i+=1.0) {
+                    ctx.moveTo(50,40.0+ageScale);
+                    for (var i=1.0+globalMinAge;i<1.0+globalMaxAge;i+=(globalMaxAge-globalMinAge)/7.0) {
                         ctx.lineTo(50,i*ageScale);
                         ctx.lineTo(51,i*ageScale);
                         ctx.lineTo(50,i*ageScale);
@@ -243,15 +247,15 @@ Item {
                     ctx.fillStyle = "#000000";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
-                    for (var j=0;j<7;j++) {
+                    for (var j=globalMinAge;j<globalMaxAge;j+=(globalMaxAge-globalMinAge)/7.0) {
 //                        ctx.fillText(j+" Ma",30,j*ageScale);
-                        ctx.fillText((j+globalMinAge)+" -",30,(j+1)*ageScale);
+                        ctx.fillText((j)+" -",30,(j+1)*ageScale);
                     }
                     ctx.restore();
                 }
                 function whichSelected(x,y) {
-                    var globalMinAge = 1000.0;
-                    var globalMaxAge = -1000.0;
+                    var globalMinAge = 5000.0;
+                    var globalMaxAge = -5000.0;
                     var i = 0;
                     for (i = 0; i < eventsModel.rowCount(); i++) {
                         if (eventsModel.dataIndexed(i,"isActive")) {
@@ -267,7 +271,7 @@ Item {
                     var dist = 1000.0;
                     var index = -1;
                     for (i=0;i<eventsModel.rowCount();i++) {
-                        var age = y/ ageScale + globalMinAge - 1;
+                        var age = y/ ageScale + globalMinAge - 40/ageScale;
                         var rank = ((x - 100) / rankWidth);
                         var avgAge = (eventsModel.dataIndexed(i,"minAge") + eventsModel.dataIndexed(i,"maxAge")) / 2.0;
                         if (eventsModel.dataIndexed(i,"isActive")
@@ -312,7 +316,7 @@ Item {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 height: 20
-                text: "Total Permutations: " + totalPermutations
+                text: "Total Permutations: " + project.totalPermutations
             }
         }
 
@@ -389,10 +393,10 @@ Item {
                             onEditingFinished: {
                                 var eventID = eventsModel.dataIndexed(detailsView.currentIndex,"eventID")
                                 eventsModel.setDataIndexed(detailsView.currentIndex,text,"minAge")
-                                eventsModel.sortEvents()
                                 calcPerms()
                                 mycanvas.clearCanvas()
                                 detailsView.currentIndex = eventsModel.findEventByID(eventID)
+                                eventsModel.sortEvents()
                             }
                             selectByMouse: true
                             text: detailsView.currentIndex >= 0 ? eventsModel.dataIndexed(detailsView.currentIndex,"minAge").toPrecision(5) : ""
@@ -421,10 +425,10 @@ Item {
                             onEditingFinished: {
                                 var eventID = eventsModel.dataIndexed(detailsView.currentIndex,"eventID")
                                 eventsModel.setDataIndexed(detailsView.currentIndex,text,"maxAge")
-                                eventsModel.sortEvents()
                                 calcPerms()
                                 mycanvas.clearCanvas()
                                 detailsView.currentIndex = eventsModel.findEventByID(eventID)
+                                eventsModel.sortEvents()
                             }
                             selectByMouse: true
                             text: detailsView.currentIndex >= 0 ? eventsModel.dataIndexed(detailsView.currentIndex,"maxAge").toPrecision(5) : ""
@@ -598,26 +602,26 @@ Item {
                 onPressed: {
                     if (!project.hasFilename()) fileDialogSave.open()
                     else {
-                        useLavavu = false
+                        project.useLavavu = false
                         runModel()
                     }
                 }
             }
-            Button {
-                id: runCodeLavavu
-                anchors.bottom: stackGL.bottom
-                anchors.right: runCode.left
-                height: 80
-                width: 200
-                text: "Create Lavavu Model"
-                onPressed: {
-                    if (!project.hasFilename()) fileDialogSave.open()
-                    else {
-                        useLavavu = true
-                        runModel()
-                    }
-                }
-            }
+//            Button {
+//                id: runCodeLavavu
+//                anchors.bottom: stackGL.bottom
+//                anchors.right: runCode.left
+//                height: 80
+//                width: 200
+//                text: "Create Lavavu Model"
+//                onPressed: {
+//                    if (!project.hasFilename()) fileDialogSave.open()
+//                    else {
+//                        project.useLavavu = true
+//                        runModel()
+//                    }
+//                }
+//            }
         }
     }
 }

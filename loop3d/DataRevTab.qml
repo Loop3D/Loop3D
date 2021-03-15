@@ -151,7 +151,7 @@ Item {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 anchors.margins: mainWindow.myBorders
-                text: (observationView.selectedEntityType == 0 ? "ID\t(East/North/Alt)\tDipDir\tDip\tDipPol\tDisplacement\tVal" : "")
+                text: (observationView.selectedEntityType == 0 ? "ID\t(East/North/Alt)\tDipDir\tDip\tDipPol\tDispl\tVal" : "")
                     + (observationView.selectedEntityType == 1 ? "ID\t(East/North/Alt)\t(AxisX/AxisY/AxisZ)\tFoliation\tWhatisFolded" : "")
                     + (observationView.selectedEntityType == 2 ? "ID\t(East/North/Alt)\tDipDir\tDip" : "")
                     + (observationView.selectedEntityType == 3 ? "ID\t(East/North/Alt)\tDipDir\tDip" : "")

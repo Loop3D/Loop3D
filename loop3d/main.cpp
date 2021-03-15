@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
         py::eval_file(".\\setupPython.py");
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
-        std::cout << "Python file setupPython.py DID NOT successfully ran" << std::endl;
+        std::cout << "Python file setupPython.py DID NOT run successfully" << std::endl;
     }
 
     setupOpenGLVersion();

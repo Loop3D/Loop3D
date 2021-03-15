@@ -47,7 +47,7 @@ Item {
     function finishedExtractData() {
         if (project.pythonErrors) {
             console.log(project.pythonErrors)
-            pythonErrorDialog.open()
+//            pythonErrorDialog.open()
         } else {
             bar.currentIndex = 1
             dmTab.reloadMap()
@@ -701,7 +701,7 @@ Item {
                     // Ensure there is a Loop Project File specified to save to before starting extraction
                     if (!project.hasFilename()) {
                         fileDialogSave.open()
-                        if (project.hasFilename()) runExtractData()
+                        waitingToExtract = true
                     } else runExtractData()
                 }
             }

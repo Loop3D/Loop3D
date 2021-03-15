@@ -61,6 +61,20 @@ void L3DViewer::resetView()
     setCameraOffsetCP(QVector3D(0.0,10.0,(m_structureYMax-m_structureYMin)*1.5f));
 }
 
+void L3DViewer::resetColours()
+{
+    for (int i=0;i<100;i++) {
+        m_colourSteps.push_back(12000.0f);
+        m_colourRedOptions.push_back(0.5f);
+        m_colourGreenOptions.push_back(0.5f);
+        m_colourBlueOptions.push_back(0.5f);
+    }
+    colourStepsChanged();
+    colourRedOptionsChanged();
+    colourGreenOptionsChanged();
+    colourBlueOptionsChanged();
+}
+
 void L3DViewer::resetCrossSection()
 {
     m_csPositionX = m_structureXMid;
@@ -97,6 +111,50 @@ bool L3DViewer::setIsovalue(int index, float value)
     return false;
 }
 
+bool L3DViewer::setColourStep(int index, float value)
+{
+    if (index < 0 || index >= m_colourSteps.size()) return true;
+    m_colourSteps[index] = value;
+    colourStepsChanged();
+    return false;
+}
+
+bool L3DViewer::setColourOption(int index, QVector3D value)
+{
+    if (index < 0 || index >= m_colourRedOptions.size()) return true;
+    m_colourRedOptions[index] = value.x();
+    m_colourGreenOptions[index] = value.y();
+    m_colourBlueOptions[index] = value.z();
+    colourRedOptionsChanged();
+    colourGreenOptionsChanged();
+    colourBlueOptionsChanged();
+    return false;
+}
+
+bool L3DViewer::setColourRedOption(int index, float value)
+{
+    if (index < 0 || index >= m_colourRedOptions.size()) return true;
+    m_colourRedOptions[index] = value;
+    colourRedOptionsChanged();
+    return false;
+}
+
+bool L3DViewer::setColourGreenOption(int index, float value)
+{
+    if (index < 0 || index >= m_colourGreenOptions.size()) return true;
+    m_colourGreenOptions[index] = value;
+    colourGreenOptionsChanged();
+    return false;
+}
+
+bool L3DViewer::setColourBlueOption(int index, float value)
+{
+    if (index < 0 || index >= m_colourBlueOptions.size()) return true;
+    m_colourBlueOptions[index] = value;
+    colourBlueOptionsChanged();
+    return false;
+}
+
 void L3DViewer::allStructureChanged()
 {
     structureXMinChanged();
@@ -124,14 +182,14 @@ void L3DViewer::allStructureChanged()
 
 L3DViewer::L3DViewer()
 {
-    m_invertedView = true;
+    m_invertedView = false;
     m_minScalarValue = 0.0;
     m_maxScalarValue = 1.0;
     m_numIsosurfaces = 1;
     m_miscToggle1 = false;
     m_miscToggle2 = false;
     m_miscToggle3 = false;
-    m_miscToggle4 = true;
+    m_miscToggle4 = false;
     m_miscToggle5 = false;
     m_structureXMin = 0.0f;
     m_structureXMax = 1.0f;
@@ -154,4 +212,6 @@ L3DViewer::L3DViewer()
     }
     resetView();
     resetCrossSection();
+    resetColours();
+    isovaluesChanged();
 }

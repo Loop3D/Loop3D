@@ -1,5 +1,4 @@
 import QtQuick 2.14
-//import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.14
@@ -9,11 +8,10 @@ import loop3d.eventmodel 1.0
 import loop3d.observationmodel 1.0
 import loop3d.m2lconfig 1.0
 import QtQuick.Scene3D 2.14
-//import Qt3D.Input 2.14
 
 Item {
-    width: 1280
-    height: 960
+    width: 1024
+    height: 768
     id: mainWindow
     property int myBorders: 6
     property string version: "0.0.9"
@@ -22,6 +20,7 @@ Item {
     property int headingFontSize: 14
     property string defaultFontStyle: "Arial"
     property int defaultFontSize: 12
+    property bool waitingToExtract: false
 
     function extractDataCompleted() {
         console.log("Extracted Data Completed called")
@@ -126,6 +125,10 @@ Item {
             Action {
                 text: qsTr("&About")
                 onTriggered: helpDialog.open()
+            }
+            Action {
+                text: qsTr("&Licensing")
+                onTriggered: licenseDialog.open()
             }
         }
     }
@@ -235,6 +238,21 @@ Item {
             anchors.right: parent.right
             anchors.top: progressIndicator.top
             text: "Python Script Progress: " + project.pythonProgressText
+        }
+        Button {
+            id: pythonClear
+            visible: project.pythonInProgress > 0
+            padding: 4
+            anchors.top: pythonProgressText.top
+            anchors.right: parent.right
+            anchors.margins: 10
+            width: 120
+            height: 30
+            text: project.pythonInProgress < 100 ? "Stop" : "Clear"
+            onPressed: {
+                project.pythonInProgress = 0
+                project.pythonProgressText = ""
+            }
         }
     }
 
@@ -553,6 +571,10 @@ Item {
                 project.setLockedExtents(true)
 //                console.log("Save Project Action - Save to " + fileDialogSave.fileUrl)
                 notifyText.text = "Saved project to " + fileDialogSave.fileUrl
+                if (waitingToExtract) {
+                    waitingToExtract = false
+                    dcTab.runExtractData()
+                }
             }
         }
     }
@@ -562,7 +584,8 @@ Item {
         id: helpDialog
         title: "Loop3D - Version " + mainWindow.version
         icon: StandardIcon.Question
-        text: "Loop3D\n\nVersion: " + mainWindow.version
+        text: "Loop3D\n\nVersion: " + mainWindow.version + "\nThis program is release under the LGPL as per the LICENSE file\ndistributed with it.\n"
+              + "\nAll dependency licenses are listed in LICENSES-Dependencies.txt"
     }
 
     MessageDialog {

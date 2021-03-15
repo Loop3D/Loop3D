@@ -127,6 +127,7 @@ void main() {
     bool above3 = tetra.val[3] > isovalue;
     int sum = int(above0) + int(above1) + int(above2) + int(above3);
     if (sum == 0 || sum == 4) {
+        normal = vec3(10.0,10.0,10.0);
         gl_Position = vec4(0.0f);
         return;
     }
@@ -147,6 +148,7 @@ void main() {
     vec3 newVertex;
     if (sum == 1 || sum == 3) {
         if (vertex.x == 3 || vertex.x == 4 || vertex.x == 5) {
+            normal = vec3(10.0,10.0,10.0);
             gl_Position = vec4(0.0f);
             return;
         }
@@ -236,7 +238,7 @@ void main() {
                                     -tetra.val[0]+tetra.val[1]+tetra.val[2]-tetra.val[3]));
         }
     }
-    if (!invertedView) newVertex.z = (zmax-zmin)-newVertex.z;
+    if (invertedView) newVertex.z = (zmax-zmin)-newVertex.z;
 
     // Add minor offset as isosurface 3d texture values are mid-cell values not vertex values
     newVertex = newVertex + vec3(xstepsize,ystepsize,0)*0.5;

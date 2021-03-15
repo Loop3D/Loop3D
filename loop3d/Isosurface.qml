@@ -102,7 +102,11 @@ Scene3DView {
                         Parameter { name: "lightPos" ; value: Qt.vector3d(0.0,0.0,500000.0) },
                         Parameter { name: "scalarField" ; value: project.getStructuralModelData() },
                         Parameter { name: "invertedView" ; value: viewer.invertedView },
-                        Parameter { name: "isovalues[0]" ; value: viewer.isovalues }
+                        Parameter { name: "isovalues[0]" ; value: viewer.isovalues },
+                        Parameter { name: "colourSteps[0]" ; value: viewer.colourSteps },
+                        Parameter { name: "colourRedOptions[0]" ; value: viewer.colourRedOptions },
+                        Parameter { name: "colourGreenOptions[0]" ; value: viewer.colourGreenOptions },
+                        Parameter { name: "colourBlueOptions[0]" ; value: viewer.colourBlueOptions }
                     ]
                     effect: Effect {
                         techniques: [
@@ -219,7 +223,11 @@ Scene3DView {
                         Parameter { name: "lightPos" ; value: Qt.vector3d(0.0,0.0,500000.0) },
                         Parameter { name: "scalarField" ; value: project.getStructuralModelData() },
                         Parameter { name: "invertedView" ; value: viewer.invertedView },
-                        Parameter { name: "isovalue[0]" ; value: viewer.isovalues }
+                        Parameter { name: "isovalue[0]" ; value: viewer.isovalues },
+                        Parameter { name: "colourSteps[0]" ; value: viewer.colourSteps },
+                        Parameter { name: "colourRedOptions[0]" ; value: viewer.colourRedOptions },
+                        Parameter { name: "colourGreenOptions[0]" ; value: viewer.colourGreenOptions },
+                        Parameter { name: "colourBlueOptions[0]" ; value: viewer.colourBlueOptions }
                     ]
                     effect: Effect {
                         techniques: [
@@ -378,11 +386,11 @@ Scene3DView {
                     Transform {
                         scale: 50.0
                          // First rotation is the dip angle and the next is the dip direction
-                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?dip:180.0-elemDip),Qt.vector3d(0.0,0.0,1.0),180.0-(elemDipDir))
+                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?180.0-elemDip:dip),Qt.vector3d(0.0,0.0,1.0),180.0-(elemDipDir))
                         translation: (viewer.invertedView ?
-                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,altitude-viewer.structureZMin)
-                          :
                            Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,viewer.structureZMax-altitude)
+                          :
+                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,altitude-viewer.structureZMin)
                           )
                     },
                     DiffuseSpecularMaterial {

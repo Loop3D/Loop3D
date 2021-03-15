@@ -374,8 +374,7 @@ LoopProjectFile::Event EventModel::get(int index) const
 void EventModel::sortEvents()
 {
     events->sort();
-    for (int i=0;i<events->getEvents().size();i++)
-        Q_EMIT dataChanged(index(i),index(i));
+    refreshModel();
 }
 
 int EventModel::findEventByID(int eventId)

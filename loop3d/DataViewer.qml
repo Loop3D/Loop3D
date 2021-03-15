@@ -199,181 +199,181 @@ Item {
                 text: "Reset View"
             }
     }
-        Rectangle {
-            id: crossSectionControls
-            visible: viewer.miscToggle3
-            anchors.bottom: parent.bottom
+    Rectangle {
+        id: crossSectionControls
+        visible: viewer.miscToggle3
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.margins: mainWindow.myBorders
+        width: 200
+        height: 150
+        color: "transparent"
+        Slider {
+            id: crossSectionXSlider
             anchors.left: parent.left
+            anchors.bottom: crossSectionYSlider.top
+            height: 30
+            width: 180
+            from: viewer.structureXMin
+            to: viewer.structureXMax
+            value: (viewer.structureXMax + viewer.structureXMin) / 2.0
+            pressed: viewer.csPositionX = value
+            Text {
+                anchors.fill: parent
+                text: viewer.miscToggle2 ? crossSectionXSlider.value : ""
+            }
+            Keys.onPressed: event.reject
+        }
+        Slider {
+            id: crossSectionYSlider
+            anchors.left: parent.left
+            anchors.bottom: crossSectionZSlider.top
+            height: 30
+            width: 180
+            from: viewer.structureYMin
+            to: viewer.structureYMax
+            value: (viewer.structureYMax + viewer.structureYMin) / 2.0
+            pressed: viewer.csPositionY = value
+            Text {
+                anchors.fill: parent
+                text: viewer.miscToggle2 ? crossSectionYSlider.value : ""
+            }
+            Keys.onPressed: event.reject
+        }
+        Slider {
+            id: crossSectionZSlider
+            anchors.left: parent.left
+            anchors.bottom: crossSectionPsiSlider.top
+            height: 30
+            width: 180
+            from: (viewer.invertedView ? viewer.structureZMin : viewer.structureZMax )
+            to: (viewer.invertedView ? viewer.structureZMax : viewer.structureZMin )
+            value: (viewer.structureZMax + viewer.structureZMin) / 2.0
+            pressed: viewer.csPositionZ = value
+            Text {
+                anchors.fill: parent
+                text: viewer.miscToggle2 ? crossSectionZSlider.value : ""
+            }
+            Keys.onPressed: event.reject
+        }
+        Slider {
+            id: crossSectionPsiSlider
+            anchors.left: parent.left
+            anchors.bottom: crossSectionThetaSlider.top
+            height: 30
+            width: 180
+            from: -180.0
+            to: 180.0
+            value: 0
+            pressed: viewer.csOrientationPsi = value
+            Text {
+                anchors.fill: parent
+                text: viewer.miscToggle2 ? crossSectionPsiSlider.value : ""
+            }
+            Keys.onPressed: event.reject
+        }
+        Slider {
+            id: crossSectionThetaSlider
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            height: 30
+            width: 180
+            from: -90.0
+            to: 90.0
+            value: 0.0
+            pressed: viewer.csOrientationTheta = value
+            Text {
+                anchors.fill: parent
+                text: viewer.miscToggle2 ? crossSectionThetaSlider.value : ""
+            }
+            Keys.onPressed: event.reject
+        }
+    }
+    Rectangle {
+            id: miscControls
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            anchors.top: parent.top
             anchors.margins: mainWindow.myBorders
-            width: 200
-            height: 150
+            width: 160
             color: "transparent"
-            Slider {
-                id: crossSectionXSlider
-                anchors.left: parent.left
-                anchors.bottom: crossSectionYSlider.top
-                height: 30
-                width: 180
-                from: viewer.structureXMin
-                to: viewer.structureXMax
-                value: (viewer.structureXMax + viewer.structureXMin) / 2.0
-                pressed: viewer.csPositionX = value
-                Text {
-                    anchors.fill: parent
-                    text: viewer.miscToggle2 ? crossSectionXSlider.value : ""
+            Button {
+                id: miscButton1
+                property var misc1: 0
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 4
+                width: parent.width
+                height: 40
+                onPressed: {
+                    misc1 = !misc1
+                    viewer.miscToggle1 = misc1
                 }
-                Keys.onPressed: event.reject
+                text: "Options " + (viewer.miscToggle1 ? "ON" : "OFF")
             }
-            Slider {
-                id: crossSectionYSlider
-                anchors.left: parent.left
-                anchors.bottom: crossSectionZSlider.top
-                height: 30
-                width: 180
-                from: viewer.structureYMin
-                to: viewer.structureYMax
-                value: (viewer.structureYMax + viewer.structureYMin) / 2.0
-                pressed: viewer.csPositionY = value
-                Text {
-                    anchors.fill: parent
-                    text: viewer.miscToggle2 ? crossSectionYSlider.value : ""
+            Button {
+                id: miscButton2
+                property var misc2: 0
+                visible: viewer.miscToggle1
+                anchors.top: miscButton1.bottom
+                anchors.right: parent.right
+                anchors.margins: 4
+                width: parent.width
+                height: 40
+                onPressed: {
+                    misc2 = !misc2
+                    viewer.miscToggle2 = misc2
                 }
-                Keys.onPressed: event.reject
+                text: "Labels " + (viewer.miscToggle2 ? "ON" : "OFF")
             }
-            Slider {
-                id: crossSectionZSlider
-                anchors.left: parent.left
-                anchors.bottom: crossSectionPsiSlider.top
-                height: 30
-                width: 180
-                from: (viewer.invertedView ? viewer.structureZMin : viewer.structureZMax )
-                to: (viewer.invertedView ? viewer.structureZMax : viewer.structureZMin )
-                value: (viewer.structureZMax + viewer.structureZMin) / 2.0
-                pressed: viewer.csPositionZ = value
-                Text {
-                    anchors.fill: parent
-                    text: viewer.miscToggle2 ? crossSectionZSlider.value : ""
+            Button {
+                id: miscButton3
+                property var misc3: 0
+                visible: viewer.miscToggle1
+                anchors.top: miscButton2.bottom
+                anchors.right: parent.right
+                anchors.margins: 4
+                width: parent.width
+                height: 40
+                onPressed: {
+                    misc3 = !misc3
+                    viewer.miscToggle3 = misc3
+                    viewer.resetCrossSection()
                 }
-                Keys.onPressed: event.reject
+                text: "Slicing " + (viewer.miscToggle3 ? "ON" : "OFF")
             }
-            Slider {
-                id: crossSectionPsiSlider
-                anchors.left: parent.left
-                anchors.bottom: crossSectionThetaSlider.top
-                height: 30
-                width: 180
-                from: -180.0
-                to: 180.0
-                value: 0
-                pressed: viewer.csOrientationPsi = value
-                Text {
-                    anchors.fill: parent
-                    text: viewer.miscToggle2 ? crossSectionPsiSlider.value : ""
+            Button {
+                id: miscButton4
+                property var misc4: 0
+                visible: viewer.miscToggle1
+                anchors.top: miscButton3.bottom
+                anchors.right: parent.right
+                anchors.margins: 4
+                width: parent.width
+                height: 40
+                onPressed: {
+                    misc4 = !misc4
+                    viewer.invertedView = misc4
+                    viewer.miscToggle4 = misc4
                 }
-                Keys.onPressed: event.reject
+                text: "Invert Depth " + (viewer.miscToggle4 ? "ON" : "OFF")
             }
-            Slider {
-                id: crossSectionThetaSlider
-                anchors.left: parent.left
-                anchors.bottom: parent.bottom
-                height: 30
-                width: 180
-                from: -90.0
-                to: 90.0
-                value: 0.0
-                pressed: viewer.csOrientationTheta = value
-                Text {
-                    anchors.fill: parent
-                    text: viewer.miscToggle2 ? crossSectionThetaSlider.value : ""
+            Button {
+                id: miscButton5
+                property var misc5: 0
+                visible: viewer.miscToggle1
+                anchors.top: miscButton4.bottom
+                anchors.right: parent.right
+                anchors.margins: 4
+                width: parent.width
+                height: 40
+                onPressed: {
+                    misc5 = !misc5
+                    viewer.miscToggle5 = misc5
+//                    project.reloadProject()
                 }
-                Keys.onPressed: event.reject
+                text: viewer.miscToggle5 ? "Spectrum Colour" : "Strata Colour"
             }
         }
-        Rectangle {
-                id: miscControls
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.margins: mainWindow.myBorders
-                width: 160
-                color: "transparent"
-                Button {
-                    id: miscButton1
-                    property var misc1: 0
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.margins: 4
-                    width: parent.width
-                    height: 40
-                    onPressed: {
-                        misc1 = !misc1
-                        viewer.miscToggle1 = misc1
-                    }
-                    text: "Options " + (viewer.miscToggle1 ? "ON" : "OFF")
-                }
-                Button {
-                    id: miscButton2
-                    property var misc2: 0
-                    visible: viewer.miscToggle1
-                    anchors.top: miscButton1.bottom
-                    anchors.right: parent.right
-                    anchors.margins: 4
-                    width: parent.width
-                    height: 40
-                    onPressed: {
-                        misc2 = !misc2
-                        viewer.miscToggle2 = misc2
-                    }
-                    text: "Labels " + (viewer.miscToggle2 ? "ON" : "OFF")
-                }
-                Button {
-                    id: miscButton3
-                    property var misc3: 0
-                    visible: viewer.miscToggle1
-                    anchors.top: miscButton2.bottom
-                    anchors.right: parent.right
-                    anchors.margins: 4
-                    width: parent.width
-                    height: 40
-                    onPressed: {
-                        misc3 = !misc3
-                        viewer.miscToggle3 = misc3
-                        viewer.resetCrossSection()
-                    }
-                    text: "Slicing " + (viewer.miscToggle3 ? "ON" : "OFF")
-                }
-                Button {
-                    id: miscButton4
-                    property var misc4: 0
-                    visible: viewer.miscToggle1
-                    anchors.top: miscButton3.bottom
-                    anchors.right: parent.right
-                    anchors.margins: 4
-                    width: parent.width
-                    height: 40
-                    onPressed: {
-                        misc4 = !misc4
-                        viewer.invertedView = misc4
-                        viewer.miscToggle4 = misc4
-                    }
-                    text: "Invert Depth " + (!viewer.miscToggle4 ? "ON" : "OFF")
-                }
-                Button {
-                    id: miscButton5
-                    property var misc5: 0
-                    visible: viewer.miscToggle1
-                    anchors.top: miscButton4.bottom
-                    anchors.right: parent.right
-                    anchors.margins: 4
-                    width: parent.width
-                    height: 40
-                    onPressed: {
-                        misc5 = !misc5
-                        viewer.miscToggle5 = misc5
-                        project.reloadProject()
-                    }
-                    text: "Reload Project"
-                }
-            }
     }
 }

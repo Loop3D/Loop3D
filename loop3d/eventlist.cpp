@@ -1,4 +1,5 @@
 #include "eventlist.h"
+#include "3dviewer.h"
 #include <QtAlgorithms>
 #include <QDebug>
 
@@ -151,6 +152,25 @@ void EventList::sort()
         minAges.push_back((*event)->minAge);
         maxAges.push_back((*event)->maxAge);
         rank++;
+    }
+
+    if (L3DViewer::instance()) {
+        L3DViewer* viewer =  L3DViewer::instance();
+        int count = 0;
+        float stratigraphicDepth = 0;
+        for (auto it=events.begin(); it!=events.end();it++) {
+            if ((*it)->type == 4  && (*it)->enabled) {
+                LoopProjectFile::StratigraphicLayer* event = static_cast<LoopProjectFile::StratigraphicLayer*>(it->get());
+                viewer->setColourStep(count,stratigraphicDepth);
+                viewer->setColourOption(count,QVector3D((
+                        (int)(unsigned char)event->colour1Red)/256.0f,
+                        ((int)(unsigned char)event->colour1Green)/256.0f,
+                        ((int)(unsigned char)event->colour1Blue)/256.0f));
+                stratigraphicDepth -= float(event->thickness);
+                count++;
+                if (count>=100) break;
+            }
+        }
     }
 }
 

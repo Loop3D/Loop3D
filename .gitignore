@@ -7,6 +7,7 @@ deploy
 *~
 *.swp
 *.swo
+*.autosave
 __pycache__
 *.xlsx
 loop3d.pro.user

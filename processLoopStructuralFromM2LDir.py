@@ -36,7 +36,7 @@ solver = 'pyamg'
 # solver = 'cg'
 # solver = 'lu'
 fault_params = {'interpolatortype':'FDI',
-    'nelements':3e4,
+    'nelements':1e5,
     'data_region':.3,
     'solver':solver,
     # overprints:overprints,
@@ -53,6 +53,9 @@ if not resp["errorFlag"]:
     fault_params = resp['value'][0]
     foliation_params = resp['value'][1]
 
+fault_params.pop('data_region',None)
+fault_params['nelements'] = 1e5
+
 def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLavavu, boundaries, stepsizes):
     def printTime(message,seconds):
         timeDiffMin = int(seconds / 60)
@@ -67,13 +70,15 @@ def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLava
         global currentProgress
         global currentProgressText
 
+        import traceback
+        import time
         from LoopStructural.visualisation import LavaVuModelViewer
         from LoopStructural.modelling.features.geological_feature import GeologicalFeature
         from LoopStructural.utils import build_model, process_map2loop
+        from LoopStructural.utils import log_to_file
+        log_to_file(str(loopFilename) + "_" + time.strftime("%Y%m%d_%H%M%S") + '_log.txt')
         import LoopProjectFile
         import numpy
-        import traceback
-        import time
 
         global m2l_data
         currentProgress = 20.0
@@ -88,8 +93,8 @@ def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLava
         currentProgress = 35.0
         currentProgressText = "LoopStructural building model"
 
+        global model
         model = build_model(m2l_data,
-        # model, m2l_data = GeologicalModel.from_map2loop_directory(m2lDataDir,
             skip_faults=skip_faults,
             fault_params=fault_params,
             foliation_params=foliation_params
@@ -100,16 +105,16 @@ def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLava
         currentProgress = 65.0
         currentProgressText = "LoopStructural showing model with Lavavu"
 
-        if (useLavavu):
-            view = LavaVuModelViewer(model,vertical_exaggeration=1)
-            view.nsteps = numpy.array([200,200,200])
-            view.add_model(cmap='tab20')
-            view.nsteps=numpy.array([50,50,50])
-            view.add_model_surfaces()
-            view.add_isosurface(model.get_feature_by_name("supergroup_0"),nslices=5)
-            view.interactive()
-            postLavavu = time.time()
-            printTime("LOOPSTRUCTURAL lavavu took ", postLavavu-postModel)
+        # if (useLavavu):
+            # view = LavaVuModelViewer(model=model,vertical_exaggeration=1,port=0)
+            # view.nsteps = numpy.array([200,200,200])
+            # view.add_model(cmap='tab20')
+            # view.nsteps=numpy.array([50,50,50])
+            # view.add_model_surfaces()
+            # view.add_isosurface(model.get_feature_by_name("supergroup_0"),nslices=5)
+            # view.interactive()
+            # postLavavu = time.time()
+            # printTime("LOOPSTRUCTURAL lavavu took ", postLavavu-postModel)
 
         currentProgress = 75.0
         currentProgressText = "LoopStructural evaluating 3D structure for storage"
@@ -149,12 +154,13 @@ def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLava
             maxvals.append(max+2000.0)
 
         result = []
-        val = sfs[-1]
-        for j in range(len(sfs[0])):
-            for i in reversed(ran):
-                if sfs[i][j] > 0:
-                    val[j] = sfs[i][j] + sum(maxvals[len(ran)-i:])
-            result.append(val[j])
+        if len(sfs)>0:
+            val = sfs[-1]
+            for j in range(len(sfs[0])):
+                for i in reversed(ran):
+                    if sfs[i][j] > 0:
+                        val[j] = sfs[i][j] + sum(maxvals[len(ran)-i:])
+                result.append(val[j])
 
         postEval = time.time()
         printTime("LOOPSTRUCTURAL evaluate_value took ", postEval-preEval)

@@ -15,7 +15,7 @@ void LSConfig::reset(void)
     m_foliationDamp = 1;
 
     m_faultInterpolator = 0;
-    m_faultNumElements = 3000;
+    m_faultNumElements = 10000;
     m_faultDataRegion = 0.3;
     m_faultSolver = 0;
     m_faultCpw = 10;

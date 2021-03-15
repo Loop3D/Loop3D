@@ -38,6 +38,7 @@ ProjectManagement::ProjectManagement():
     m_foldUrl(""),
     m_mindepUrl(""),
     m_metadataUrl(""),
+    m_totalPermutations(0),
     m_filename(""),
     m_pythonInProgress(0),
     m_pythonProgressText(""),

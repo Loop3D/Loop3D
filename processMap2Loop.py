@@ -59,7 +59,6 @@ currentProgress = 15.0
 currentProgressText = "Starting Map2Loop Project initialisation"
 
 def threadFunc(loopFilename, m2lDataDir, m2lFiles, m2lParams, m2lQuietMode, bbox, proj_crs):
-    from map2loop.project import Project
     import time
     import traceback
     import pandas
@@ -74,6 +73,8 @@ def threadFunc(loopFilename, m2lDataDir, m2lFiles, m2lParams, m2lQuietMode, bbox
         print(str(message) + str(timeDiffMin) + " minutes and " + str(timeDiffSec) + " seconds")
 
     try:
+        import map2loop
+        from map2loop.project import Project
         global currentProgress
         global currentProgressText
         start = time.time()
@@ -90,6 +91,7 @@ def threadFunc(loopFilename, m2lDataDir, m2lFiles, m2lParams, m2lQuietMode, bbox
             bbox_3d=bbox,
             proj_crs=proj_crs,
             loopFilename=loopFilename,
+            clut_path="source_data\\clutfile.csv",
             quiet=m2lQuietMode  # Options are 'None', 'no-figures', 'all'
         )
         postConfig = time.time()
@@ -106,6 +108,7 @@ def threadFunc(loopFilename, m2lDataDir, m2lFiles, m2lParams, m2lQuietMode, bbox
         currentProgressText = "Post Map2Loop Project File update"
 
         proj.config.update_projectfile()
+        proj.config.export_png()
         postProjectFile = time.time()
         printTime("MAP2LOOP Project File Upload took ", postProjectFile-postRun)
 
