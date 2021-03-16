@@ -1,12 +1,20 @@
-For the python environment needed to run map2loop and LoopStructural scripts:
+The Loop GUI depends on both a python environment as well as some C++ libraries.
 
-	conda install -c loop3d map2loop loopStructural
+For the python environment install both map2loop, LoopStructural, LoopProjectFile and pybind11 which is most easily accessible via anaconda:
 
-Also install Qt5 Open Source:
+	conda install -c loop3d -c conda-forge map2loop loopStructural loopprojectfile pybind11
+
+For the C++ environment install Qt5, loopprojectfile-cpp and netCDF-cxx4:
 
 	https://www.qt.io/download
+
+	https://github.com/Loop3D/LoopProjectFile-cpp
+
+	https://www.unidata.ucar.edu/downloads/netcdf/
+	or vcpkg install netcdf-cxx4 (windows)
+
 
 Download and compile loop3d code using the loop3d.pro project file.
 
 Note a LPGL version binary of the GUI for Windows 10 will soon be available (check again soon).
-	
+

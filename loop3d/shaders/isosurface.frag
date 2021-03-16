@@ -57,7 +57,7 @@ void main()
     float normalisedVal = clamp((isovalue - valmin)/(valmax-valmin),0.0,1.0);
     if (valmax == valmin) normalisedVal = 0.5;
     vec3 colour = getSpectrumColour(normalisedVal) * 0.7 + 0.1;
-    if (miscToggle5 > 0.0) colour = getColourFromSteps(isovalue);
+
     // Add contour lines with 5.0 stepped at 2000
     colour = mix(vec3(0.0,0.0,0.0),colour,step(5.0,abs(float(int(position.z)%2000))));
     // Add lighting
@@ -65,7 +65,11 @@ void main()
     vec3 lightDir = normalize(position - lightPos);
     colour = colour * max(abs(dot(-normal,-lightDir)),ambient);
 
-    if (miscToggle5 > 0.0) colour = getColourFromSteps(isovalue);
+    // Get colouring from strata data and add contour lines
+    if (miscToggle5 > 0.0) {
+        colour = getColourFromSteps(isovalue);
+        colour = mix(vec3(0.0,0.0,0.0),colour,step(5.0,abs(float(int(position.z)%2000))));
+    }
 
     if (difference > 2000.0 && miscToggle3 > 0.0) FragColour = vec4(0.7,0.2,0.2,1.0);
     else FragColour = vec4(colour,1.0);

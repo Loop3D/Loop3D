@@ -179,7 +179,7 @@ Item {
                     }
                     globalMinAge = Math.floor(globalMinAge);
                     globalMaxAge = Math.ceil(globalMaxAge);
-                    ageScale = 280.0 / (globalMaxAge - globalMinAge);
+                    ageScale = 240.0 / (globalMaxAge - globalMinAge);
                     var globalAgeRange = globalMaxAge - globalMinAge;
                     drawTimelineScale(ctx,globalMinAge,globalMaxAge);
 
