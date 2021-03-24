@@ -158,7 +158,7 @@ void EventList::sort()
         L3DViewer* viewer =  L3DViewer::instance();
         int count = 0;
         float stratigraphicDepth = 0;
-        for (auto it=events.begin(); it!=events.end();it++) {
+        for (auto it=events.rbegin(); it!=events.rend();it++) {
             if ((*it)->type == 4  && (*it)->enabled) {
                 LoopProjectFile::StratigraphicLayer* event = static_cast<LoopProjectFile::StratigraphicLayer*>(it->get());
                 viewer->setColourStep(count,stratigraphicDepth);

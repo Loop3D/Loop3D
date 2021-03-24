@@ -386,7 +386,7 @@ Scene3DView {
                     Transform {
                         scale: 50.0
                          // First rotation is the dip angle and the next is the dip direction
-                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?180.0-elemDip:dip),Qt.vector3d(0.0,0.0,1.0),180.0-(elemDipDir))
+                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?90.0-elemDip:90.0+elemDip),Qt.vector3d(0.0,0.0,1.0),180.0-(elemDipDir))
                         translation: (viewer.invertedView ?
                            Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,viewer.structureZMax-altitude)
                           :

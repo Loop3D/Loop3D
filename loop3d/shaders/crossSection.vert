@@ -39,6 +39,6 @@ out vec3 position;
 void main()
 {
     position = (modelMatrix * vec4(vertexPosition,1.0)).xyz;
-    if (invertedView) position.z = (zmax-zmin)-position.z;
+    if (!invertedView) position.z = (zmax-zmin)-position.z;
     gl_Position = mvp * vec4(vertexPosition,1.0);
 }
