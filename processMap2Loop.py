@@ -22,8 +22,8 @@ findGlobalVariable("m2lParams",{})
 findGlobalVariable("m2lFiles",{})
 findGlobalVariable("m2lQuietMode",'all')
 
-if(not os.path.isdir("m2lData")):
-    os.mkdir("m2lData")
+if(not os.path.isdir("m2l_data")):
+    os.mkdir("m2l_data")
 if(not os.path.isdir(m2lDataDir)):
     os.mkdir(m2lDataDir)
 if(not os.path.isdir(m2lDataDir + "/tmp")):
