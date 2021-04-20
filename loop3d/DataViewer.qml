@@ -370,9 +370,23 @@ Item {
                 onPressed: {
                     misc5 = !misc5
                     viewer.miscToggle5 = misc5
-//                    project.reloadProject()
                 }
-                text: viewer.miscToggle5 ? "Spectrum Colour" : "Strata Colour"
+                text: viewer.miscToggle5 ? "Strata Colour" : "Spectrum Colour"
+            }
+            Button {
+                id: miscButton6
+                property var misc6: 0
+                visible: viewer.miscToggle1
+                anchors.top: miscButton5.bottom
+                anchors.right: parent.right
+                anchors.margins: 4
+                width: parent.width
+                height: 40
+                onPressed: {
+                    misc6 = !misc6
+                    viewer.miscToggle6 = misc6
+                }
+                text: viewer.miscToggle6 ? "Lighting Off" : "Lighting On"
             }
         }
     }

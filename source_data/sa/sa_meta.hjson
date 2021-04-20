@@ -1,44 +1,44 @@
 {
-  d: INCLINATIO
-  dd: AZIMUTH_TR
-  sf: STRUCTURE_
+  d: inclinatio
+  dd: azimuth_tr
+  sf: structure_
   bedding: bedding
   otype: dip direction
-  bo: YOUNGING
+  bo: younging
   btype: -
-  g: PARENTNAME
-  g2: PROVINCE
-  c: STRATNAME
-  ds: STRATDESC
-  u: MAINUNIT
-  r1: No_col
-  r2: No_col
+  g: parentname
+  g2: province
+  c: stratname
+  ds: stratdesc
+  u: mainunit
+  r1: no_col
+  r2: no_col
   sill: sill
   intrusive: intrusive
   volcanic: volc
-  msc: SITE_CODE
-  msn: SHORT_NAME
-  mst: SITE_TYPE_
-  mtc: TARGET_COM
-  mscm: SITE_COMMO
-  mcom: TARGET_COM
-  minf: Cons
+  msc: site_code
+  msn: short_name
+  mst: site_type_
+  mtc: target_com
+  mscm: site_commo
+  mcom: target_com
+  minf: cons
   min: min
   max: max
   deposit_dist: 500
-  f: DESCRIPTIO
-  fault: Fault
-  ff: DESCRIPTIO
-  fold: Fold
-  fdip: No_col
+  f: descriptio
+  fault: fault
+  ff: descriptio
+  fold: fold
+  fdip: no_col
   fdipnull: "0"
-  fdipdir: No_col
+  fdipdir: no_col
   fdipdir_flag: alpha
-  fdipest: No_col
-  fdipest_vals: No_col
-  n: No_col
-  t: No_col
+  fdipest: no_col
+  fdipest_vals: no_col
+  n: no_col
+  t: no_col
   syn: syn
-  o: ID
-  gi: FIELD_STRU
+  o: id
+  gi: field_stru
 }

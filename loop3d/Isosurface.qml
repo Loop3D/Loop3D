@@ -34,10 +34,7 @@ Scene3DView {
                     clearColor: "#dddddd"
                     buffersToClear: ClearBuffers.ColorDepthBuffer
                     frustumCulling: false
-                    Viewport {
-                        id: viewport
-                        normalizedRect: Qt.rect(0,0,1,1)
-                    }
+                    viewportRect: Qt.rect(0,0,1,1)
                 }
             },
             InputSettings  { eventSource: dataViewTab }
@@ -98,6 +95,7 @@ Scene3DView {
                         Parameter { name: "miscToggle3" ; value: viewer.miscToggle3 },
                         Parameter { name: "miscToggle4" ; value: viewer.miscToggle4 },
                         Parameter { name: "miscToggle5" ; value: viewer.miscToggle5 },
+                        Parameter { name: "miscToggle6" ; value: viewer.miscToggle6 },
                         Parameter { name: "numTetraPerIso" ; value: viewer.structureNumberTetraPerIsosurface },
                         Parameter { name: "lightPos" ; value: Qt.vector3d(0.0,0.0,500000.0) },
                         Parameter { name: "scalarField" ; value: project.getStructuralModelData() },
@@ -185,7 +183,7 @@ Scene3DView {
             id: crossSectionEntity
             enabled: bar.currentIndex == 4 && viewer.miscToggle3
             property real gridSizeX: (viewer.structureXMax - viewer.structureXMin)
-            property real gridSizeY: (viewer.structureXMax - viewer.structureXMin)
+            property real gridSizeY: (viewer.structureYMax - viewer.structureYMin)
 
             components: [
                 PlaneMesh {
@@ -219,6 +217,7 @@ Scene3DView {
                         Parameter { name: "miscToggle3" ; value: viewer.miscToggle3 },
                         Parameter { name: "miscToggle4" ; value: viewer.miscToggle4 },
                         Parameter { name: "miscToggle5" ; value: viewer.miscToggle5 },
+                        Parameter { name: "miscToggle6" ; value: viewer.miscToggle6 },
                         Parameter { name: "numTetraPerIso" ; value: viewer.structureNumberTetraPerIsosurface },
                         Parameter { name: "lightPos" ; value: Qt.vector3d(0.0,0.0,500000.0) },
                         Parameter { name: "scalarField" ; value: project.getStructuralModelData() },
@@ -268,11 +267,11 @@ Scene3DView {
                     matrix: {
                         var m = Qt.matrix4x4();
                         m.rotate(180.0, Qt.vector3d(0, 0, 1))
-                        m.translate(Qt.vector3d(-(viewer.csPositionX-viewer.structureXMin + crossSectionEntity.gridSizeX * 0.0),
-                                                -(viewer.csPositionY-viewer.structureYMin + crossSectionEntity.gridSizeY * 0.0),
-                                                 (viewer.csPositionZ-viewer.structureZMin + crossSectionEntity.gridSizeX * 0.0)));
+                        m.translate(Qt.vector3d(-(viewer.csPositionX-viewer.structureXMin),
+                                                -(viewer.csPositionY-viewer.structureYMin),
+                                                 (viewer.csPositionZ-viewer.structureZMin)));
                         m.rotate(viewer.csOrientationPsi, Qt.vector3d(0, 0, 1))
-                        m.rotate(viewer.csOrientationTheta, Qt.vector3d(1, 0, 0))
+                        m.rotate(viewer.csOrientationTheta+90.0, Qt.vector3d(1, 0, 0))
 
                         return m;
                     }
@@ -370,36 +369,40 @@ Scene3DView {
 //                }
 //            ]
 //        }
-        NodeInstantiator {
-            id: observations
-            enabled: bar.currentIndex == 4
-            model: observationsModel
-            delegate: Entity {
-                id: observationEntity
-                property real elemDip: dip
-                property real elemDipDir: dipDir
-                components: [
-                    Mesh {
-                        id: up_arrow
-                        source: "qrc:/3dassets/Up_arrow_v1.obj"
-                    },
-                    Transform {
-                        scale: 50.0
-                         // First rotation is the dip angle and the next is the dip direction
-                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?90.0-elemDip:90.0+elemDip),Qt.vector3d(0.0,0.0,1.0),180.0-(elemDipDir))
-                        translation: (viewer.invertedView ?
-                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,viewer.structureZMax-altitude)
-                          :
-                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,altitude-viewer.structureZMin)
-                          )
-                    },
-                    DiffuseSpecularMaterial {
-                        ambient: "#ff9955"
-                        diffuse: "#222222"
-                        specular: "#ff0000"
-                    }
-                ]
-            }
-        }
+//        NodeInstantiator {
+//            id: observations
+//            enabled: bar.currentIndex == 4
+//            model: observationsModel
+//            delegate: Entity {
+//                id: observationEntity
+//                property real elemDip: dip
+//                property real elemDipDir: dipDir
+//                enabled: type == 4
+//                components: [
+//                    Mesh {
+//                        id: up_arrow
+//                        source: "qrc:/3dassets/strikeDip.obj"
+////                        source: "qrc:/3dassets/Up_arrow_v1.obj"
+//                    },
+//                    Transform {
+//                        scale: 50.0
+//                         // First rotation is the dip angle and the next is the dip direction
+//                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?90.0-elemDip:90.0+elemDip),
+//                                                    Qt.vector3d(0.0,0.0,1.0),180.0-(elemDipDir))
+//                        translation: (viewer.invertedView ?
+//                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,viewer.structureZMax-altitude)
+//                          :
+//                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,altitude-viewer.structureZMin)
+//                          )
+//                    },
+////                    PhongMaterial {}
+//                    DiffuseSpecularMaterial {
+//                        ambient:  "#22aa22"
+//                        diffuse:  "#22aa22"
+//                        specular: "#22aa22"
+//                    }
+//                ]
+//            }
+//        }
     }
 }

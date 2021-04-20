@@ -72,7 +72,7 @@ def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLava
 
         import traceback
         import time
-        from LoopStructural.visualisation import LavaVuModelViewer
+        # from LoopStructural.visualisation import LavaVuModelViewer
         from LoopStructural.modelling.features.geological_feature import GeologicalFeature
         from LoopStructural.utils import build_model, process_map2loop
         from LoopStructural.utils import log_to_file

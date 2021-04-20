@@ -22,6 +22,8 @@ findGlobalVariable("m2lParams",{})
 findGlobalVariable("m2lFiles",{})
 findGlobalVariable("m2lQuietMode",'all')
 
+if(not os.path.isdir("m2lData")):
+    os.mkdir("m2lData")
 if(not os.path.isdir(m2lDataDir)):
     os.mkdir(m2lDataDir)
 if(not os.path.isdir(m2lDataDir + "/tmp")):
@@ -92,6 +94,7 @@ def threadFunc(loopFilename, m2lDataDir, m2lFiles, m2lParams, m2lQuietMode, bbox
             proj_crs=proj_crs,
             loopFilename=loopFilename,
             clut_path="source_data\\clutfile.csv",
+            run_flags=m2lParams,
             quiet=m2lQuietMode  # Options are 'None', 'no-figures', 'all'
         )
         postConfig = time.time()
@@ -100,7 +103,8 @@ def threadFunc(loopFilename, m2lDataDir, m2lFiles, m2lParams, m2lQuietMode, bbox
         currentProgress = 35.0
         currentProgressText = "Map2Loop project main run process"
 
-        proj.run(**m2lParams)
+        # proj.run(**m2lParams)
+        proj.run()
         postRun = time.time()
         printTime("MAP2LOOP Project run took ", postRun-postConfig)
 

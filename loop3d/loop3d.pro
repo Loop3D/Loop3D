@@ -27,6 +27,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 linux {
     INCLUDEPATH += ~/.local/include/python3.8m /usr/include/python3.8m
+    TARGET = loop3d
 } else :win32 {
     INCLUDEPATH += $$(VCPKGINSTALL)/include
     INCLUDEPATH += $$(PYTHONHOME)/include

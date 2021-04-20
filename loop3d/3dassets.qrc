@@ -1,6 +1,6 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
+<RCC>
     <qresource prefix="/">
         <file>3dassets/Up_arrow_v1.obj</file>
+        <file>3dassets/strikeDip.obj</file>
     </qresource>
 </RCC>

@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
     setupOpenGLVersion();
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
+    app.setWindowIcon(QIcon("loop.ico"));
     qInstallMessageHandler(customMessageHandler);
 
     app.setOrganizationName("Loop");

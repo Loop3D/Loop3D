@@ -191,6 +191,7 @@ L3DViewer::L3DViewer()
     m_miscToggle3 = false;
     m_miscToggle4 = false;
     m_miscToggle5 = false;
+    m_miscToggle6 = false;
     m_structureXMin = 0.0f;
     m_structureXMax = 1.0f;
     m_structureYMin = 0.0f;

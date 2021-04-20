@@ -238,7 +238,7 @@ void main() {
                                     -tetra.val[0]+tetra.val[1]+tetra.val[2]-tetra.val[3]));
         }
     }
-    if (!invertedView) newVertex.z = (zmax-zmin)-newVertex.z;
+    if (invertedView) newVertex.z = (zmax-zmin)-newVertex.z;
 
     // Add minor offset as isosurface 3d texture values are mid-cell values not vertex values
     newVertex = newVertex + vec3(xstepsize,ystepsize,0)*0.5;

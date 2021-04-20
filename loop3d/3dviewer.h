@@ -20,6 +20,7 @@ class L3DViewer : public QQuickItem
     Q_PROPERTY (int miscToggle3 MEMBER m_miscToggle3 NOTIFY miscToggle3Changed)
     Q_PROPERTY (int miscToggle4 MEMBER m_miscToggle4 NOTIFY miscToggle4Changed)
     Q_PROPERTY (int miscToggle5 MEMBER m_miscToggle5 NOTIFY miscToggle5Changed)
+    Q_PROPERTY (int miscToggle6 MEMBER m_miscToggle6 NOTIFY miscToggle6Changed)
     Q_PROPERTY (QVector3D cameraPosition MEMBER m_cameraPosition WRITE setCameraPosition NOTIFY cameraPositionChanged)
     Q_PROPERTY (QVector3D cameraOffsetCP MEMBER m_cameraOffsetCP WRITE setCameraOffsetCP NOTIFY cameraOffsetCPChanged)
     Q_PROPERTY (QVector3D lookatPosition MEMBER m_lookatPosition WRITE setLookAtPosition NOTIFY lookatPositionChanged)
@@ -58,6 +59,7 @@ Q_SIGNALS:
     void miscToggle3Changed();
     void miscToggle4Changed();
     void miscToggle5Changed();
+    void miscToggle6Changed();
     void lightPositionChanged();
     void cameraPositionChanged();
     void cameraOffsetCPChanged();
@@ -126,6 +128,7 @@ public:
     int m_miscToggle3;
     int m_miscToggle4;
     int m_miscToggle5;
+    int m_miscToggle6;
     QVector3D m_cameraPosition;
     QVector3D m_cameraOffsetCP;
     QVector3D m_lookatPosition;

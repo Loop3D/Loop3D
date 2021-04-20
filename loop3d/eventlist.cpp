@@ -158,15 +158,16 @@ void EventList::sort()
         L3DViewer* viewer =  L3DViewer::instance();
         int count = 0;
         float stratigraphicDepth = 0;
-        for (auto it=events.rbegin(); it!=events.rend();it++) {
+        for (auto it=events.begin(); it!=events.end();it++) {
             if ((*it)->type == 4  && (*it)->enabled) {
                 LoopProjectFile::StratigraphicLayer* event = static_cast<LoopProjectFile::StratigraphicLayer*>(it->get());
-                viewer->setColourStep(count,stratigraphicDepth);
-                viewer->setColourOption(count,QVector3D((
-                        (int)(unsigned char)event->colour1Red)/256.0f,
-                        ((int)(unsigned char)event->colour1Green)/256.0f,
-                        ((int)(unsigned char)event->colour1Blue)/256.0f));
                 stratigraphicDepth -= float(event->thickness);
+                viewer->setColourStep(count,stratigraphicDepth);
+                viewer->setColourOption(count,QVector3D(
+                        ((int)(unsigned char)event->colour1Red)/256.0f,
+                        ((int)(unsigned char)event->colour1Green)/256.0f,
+                        ((int)(unsigned char)event->colour1Blue)/256.0f
+                        ));
                 count++;
                 if (count>=100) break;
             }
@@ -222,6 +223,9 @@ unsigned long long EventList::ApproxPerm(unsigned int numElements, unsigned long
             step++;
         }
     }
+    // (TODO) Fix bug divisor errors to 0
+    // divisor should not ever equal 0, perhaps overflow?
+    if (divisor == 0) return 0;
     return (unsigned long long)std::round(factorial(numElements)/divisor);
 }
 

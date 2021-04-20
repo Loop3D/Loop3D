@@ -86,7 +86,7 @@ void main()
     if (positionNormalised.z > zsize) alpha = 0.0;
     vec3 colour = getSpectrumColour(normalisedVal) * 0.7 + 0.1;
 
-    if (miscToggle5 > 0.0) colour = getColourFromSteps(value);
+    if (miscToggle5 <= 0.0) colour = getColourFromSteps(value);
 
     FragColour = vec4(colour,alpha);
 }

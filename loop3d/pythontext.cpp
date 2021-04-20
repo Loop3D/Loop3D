@@ -139,7 +139,7 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
             m_locals["useLavavu"] = proj->m_useLavavu ? true : false;
         }
         std::string m2lDataDirName = proj->m_filename.toStdString();
-        m2lDataDirName = m2lDataDirName.substr(m2lDataDirName.find_last_of('/')+1) + "_m2l_data";
+        m2lDataDirName = std::string("m2l_data/") + m2lDataDirName.substr(m2lDataDirName.find_last_of('/')+1);
 //        qDebug() << "m2lDataDir = " << m2lDataDirName.c_str();
         m_locals["m2lDataDir"] = m2lDataDirName;
     }
