@@ -1,7 +1,7 @@
 QT += quick qml
 QT += positioning
 QT += 3drender gui opengl
-QT += 3dcore 3drender 3dinput 3dquick 3dquickextras
+QT += 3dcore 3drender 3dinput
 
 QT_OPENGL=desktop
 
