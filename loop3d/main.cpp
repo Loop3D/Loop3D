@@ -18,8 +18,6 @@
 #include "m2lconfig.h"
 #include "lsconfig.h"
 
-namespace py = pybind11;
-
 void setupOpenGLVersion(void)
 {
     QSurfaceFormat fmt;
@@ -46,8 +44,8 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 int main(int argc, char *argv[])
 {
     try {
-        py::initialize_interpreter();
-        py::eval_file(".\\setupPython.py");
+        pybind11::initialize_interpreter();
+        pybind11::eval_file(".\\setupPython.py");
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
         std::cout << "Python file setupPython.py DID NOT run successfully" << std::endl;
@@ -116,7 +114,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Starting Loop GUI ..." << std::endl;
     int res = app.exec();
-    py::finalize_interpreter();
+    pybind11::finalize_interpreter();
     return res;
 }
 

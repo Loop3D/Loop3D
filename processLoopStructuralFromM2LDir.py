@@ -192,6 +192,7 @@ x = threading.Thread(target=threadFunc,
           ])
 
 try:
+    x.daemon = True
     x.start()
 except Exception as e:
     print(e)

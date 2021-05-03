@@ -7,6 +7,7 @@
 #include <QOpenGLFunctions>
 #include <QMutex>
 #include <QTexture>
+
 #include "LoopProjectFileUtils.h"
 #include "LoopProjectFile.h"
 
@@ -24,7 +25,7 @@ class StructuralModel : protected QOpenGLFunctions
         unsigned int getHeightUI() { return m_height; }
         unsigned int getDepthUI() { return m_depth; }
         bool getDataChanged() { return m_dataChanged; }
-        Qt3DRender::QSharedGLTexture* getStructuralData(void) { return m_sharedTexture; }
+        Qt3DRender::QSharedGLTexture* getStructuralDataTexture(void) { return m_sharedTexture; }
 
         void clearData(void);
         void loadData(pybind11::array_t<float> values_in,
@@ -46,7 +47,7 @@ class StructuralModel : protected QOpenGLFunctions
         unsigned int m_depth;
         unsigned int m_totalPoints;
         unsigned int m_totalTetra;
-        std::vector<float> m_values;
+//        std::vector<float> m_values;
 
         float* m_valueData;
 
@@ -59,7 +60,6 @@ class StructuralModel : protected QOpenGLFunctions
     private:
         QOpenGLTexture *valueTexture;
         Qt3DRender::QSharedGLTexture *m_sharedTexture;
-        QOpenGLContext *openGLContext;
 };
 
 #endif // STRUCTURALMODEL_H

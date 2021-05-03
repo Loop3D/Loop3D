@@ -26,7 +26,6 @@ StructuralModel::StructuralModel()
     m_valmin = 0.0;
     m_valmax = 1.0;
 
-    m_values.clear();
     m_valueData = nullptr;
     m_dataChanged = false;
     valueTexture = new QOpenGLTexture(QOpenGLTexture::Target3D);
@@ -72,10 +71,6 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
         m_totalPoints = m_width * m_height * m_depth;
         m_totalTetra = (m_width-1) * (m_height-1) * (m_depth-1) * 5;
 
-        qDebug() << "Clearing data strutures";
-        // Clear data structures
-        m_values.clear();
-
         qDebug() << "Loop: Allocating memory for textures (" << m_width << "x" << m_height << "x" << m_depth << ")";
         // Allocate memory for textures
         if (m_valueData) free(m_valueData);
@@ -88,7 +83,6 @@ void StructuralModel::loadData(pybind11::array_t<float> values_in, float xmin, f
             for (unsigned int i=0;i<values_in.size();i++) {
                 // Value Structure
                 float val = values_in.at(i);
-                m_values.push_back(val);
                 m_valueData[i] = static_cast<float>(val);
                 if (val < m_valmin) m_valmin = val;
                 if (val > m_valmax) m_valmax = val;
@@ -220,13 +214,11 @@ void StructuralModel::createBasicTestStructure(unsigned int size)
         if (!m_valueData) {
             qDebug() << "Failed to allocate memory for value texture";
         } else {
-            m_values.clear();
             for (unsigned int i=0;i<getWidthUI();i++)
                 for (unsigned int j=0;j<getHeightUI();j++)
                     for (unsigned int k=0;k<getDepthUI();k++) {
                         float val = static_cast<float>(i) / (static_cast<float>(j) + static_cast<float>(k));
                         if (val != val || isinf(val)) val = static_cast<float>(i);
-                        m_values.push_back(val);
                         m_valueData[i*getHeightUI()*getDepthUI() + j*getDepthUI() + k] = val;
                     }
             m_dataChanged = true;
@@ -251,9 +243,6 @@ void StructuralModel::updateStructureDataInViewer()
     viewer->m_structureXStepSize = (m_xmax - m_xmin) / m_width;
     viewer->m_structureYStepSize = (m_ymax - m_ymin) / m_height;
     viewer->m_structureZStepSize = (m_zmax - m_zmin) / m_depth;
-//    viewer->m_structureXMid = (m_xmax - m_xmin) / 2.0f;
-//    viewer->m_structureYMid = (m_ymax - m_ymin) / 2.0f;
-//    viewer->m_structureZMid = (m_zmax - m_zmin) / 2.0f;
     viewer->m_structureNumberTetraPerIsosurface = m_totalTetra;
     viewer->allStructureChanged();
     viewer->m_minScalarValue = m_valmin;
@@ -268,8 +257,7 @@ int StructuralModel::loadTextures()
     if (m_dataChanged) {
 //        qDebug() << "Loop: Setting up textures for displays";
         ProjectManagement* project =  ProjectManagement::instance();
-        openGLContext = project->getQmlQuickView()->openglContext();
-        if (openGLContext == nullptr) return 0;
+        if (project->getQmlQuickView()->openglContext() == nullptr) return 0;
 
         dataMutex.lock();
         {

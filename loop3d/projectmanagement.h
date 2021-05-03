@@ -20,6 +20,7 @@ class ProjectManagement : public QQuickItem
 {
     Q_OBJECT
 
+    Q_PROPERTY (bool quiting MEMBER m_quiting NOTIFY quitingChanged)
     Q_PROPERTY (QString filename MEMBER m_filename NOTIFY filenameChanged)
     Q_PROPERTY (double minLatitude MEMBER m_minLatitude NOTIFY minLatitudeChanged)
     Q_PROPERTY (double maxLatitude MEMBER m_maxLatitude NOTIFY maxLatitudeChanged)
@@ -46,6 +47,8 @@ class ProjectManagement : public QQuickItem
     Q_PROPERTY (int flowChoice MEMBER m_flowChoice NOTIFY flowChoiceChanged)
     Q_PROPERTY (int loopStructuralFlowOption MEMBER m_loopStructuralFlowOption NOTIFY loopStructuralFlowOptionChanged)
     Q_PROPERTY (int sharedTextureId MEMBER m_sharedTextureId NOTIFY sharedTextureIdChanged)
+    Q_PROPERTY (int observationsTextureId MEMBER m_observationsTextureId NOTIFY observationsTextureIdChanged)
+    Q_PROPERTY (int numObservations MEMBER m_numObservations NOTIFY numObservationsChanged)
     Q_PROPERTY (unsigned int xsize MEMBER m_xsize NOTIFY xsizeChanged)
     Q_PROPERTY (unsigned int ysize MEMBER m_ysize NOTIFY ysizeChanged)
     Q_PROPERTY (unsigned int zsize MEMBER m_zsize NOTIFY zsizeChanged)
@@ -60,6 +63,7 @@ class ProjectManagement : public QQuickItem
     Q_PROPERTY (unsigned long long totalPermutations MEMBER m_totalPermutations NOTIFY totalPermutationsChanged)
 
     Q_SIGNALS:
+        void quitingChanged();
         void filenameChanged();
         void minLatitudeChanged();
         void maxLatitudeChanged();
@@ -86,6 +90,8 @@ class ProjectManagement : public QQuickItem
         void flowChoiceChanged();
         void loopStructuralFlowOptionChanged();
         void sharedTextureIdChanged();
+        void observationsTextureIdChanged();
+        void numObservationsChanged();
         void xsizeChanged();
         void ysizeChanged();
         void zsizeChanged();
@@ -123,6 +129,7 @@ public Q_SLOTS:
         Q_INVOKABLE void convertUTMToGeodetic(void);
 
         Q_INVOKABLE Qt3DRender::QSharedGLTexture* getStructuralModelData(void);
+        Q_INVOKABLE Qt3DRender::QSharedGLTexture* getObservationData(void);
         Q_INVOKABLE void downloadData(QString url = "", QString datatype = "netCDF");
         Q_INVOKABLE void incrementFlowChoice();
         Q_INVOKABLE void decrementFlowChoice();
@@ -171,6 +178,8 @@ public Q_SLOTS:
         int m_flowChoice;
         int m_loopStructuralFlowOption;
         int m_sharedTextureId;
+        int m_observationsTextureId;
+        int m_numObservations;
         unsigned int m_activeState;
         QString m_activeStateName;
         bool m_useLavavu;
@@ -191,6 +200,7 @@ public Q_SLOTS:
         QString m_pythonProgressText;
         int m_pythonProgressTextLineCount;
 
+        bool m_quiting;
     private:
         ProjectManagement();
         static ProjectManagement* m_instance;

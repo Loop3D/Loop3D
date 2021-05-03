@@ -46,12 +46,11 @@ class PythonText : public QObject
         void filenameChanged();
 
     public Q_SLOTS:
-//        void runCodeThread(void);
         void postCode(void);
 
     public:
         QString m_code;
-        pybind11::dict m_locals;
+
     private:
         bool m_threadRunning;
         QString m_threadRunningStage;

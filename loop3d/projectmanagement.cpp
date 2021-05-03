@@ -29,6 +29,8 @@ ProjectManagement::ProjectManagement():
     m_flowChoice(1),
     m_loopStructuralFlowOption(2),
     m_sharedTextureId(0),
+    m_observationsTextureId(0),
+    m_numObservations(0),
     m_activeState(1),
     m_activeStateName("WA"),
     m_useLavavu(false),
@@ -42,9 +44,10 @@ ProjectManagement::ProjectManagement():
     m_filename(""),
     m_pythonInProgress(0),
     m_pythonProgressText(""),
-    m_pythonProgressTextLineCount(1)
+    m_pythonProgressTextLineCount(1),
+    m_quiting(false)
 {
-
+    numObservationsChanged();
 }
 
 bool ProjectManagement::setActiveState(QString state)
@@ -91,13 +94,15 @@ void ProjectManagement::clearProject(bool clearExtents)
         m_flowChoiceMade = false;
         m_flowChoice = 1;
         m_loopStructuralFlowOption = 2;
+        m_numObservations = 0;
         minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
         minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
         utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
         spacingXChanged(); spacingYChanged(); spacingZChanged(); extentsChangedChanged();
-        flowChoiceChanged(); flowChoiceMadeChanged(); loopStructuralFlowOptionChanged();
+        flowChoiceChanged(); flowChoiceMadeChanged(); loopStructuralFlowOptionChanged(); numObservationsChanged();
     }
     m_sharedTextureId = 0;
+    m_observationsTextureId = 0;
     eventList.clearList();
     observationList.clearList();
     stModel.clearData();
@@ -365,12 +370,18 @@ void ProjectManagement::convertUTMToGeodetic(void)
 void ProjectManagement::loadTextures()
 {
     if (getStModel() && getStModel()->loadTextures()) sharedTextureIdChanged();
+    if (observationList.loadTextures()) observationsTextureIdChanged();
 }
 
 Qt3DRender::QSharedGLTexture *ProjectManagement::getStructuralModelData()
 {
-    if (getStModel()) return getStModel()->getStructuralData();
+    if (getStModel()) return getStModel()->getStructuralDataTexture();
     else return nullptr;
+}
+
+Qt3DRender::QSharedGLTexture *ProjectManagement::getObservationData()
+{
+    return observationList.getObservationsTexture();
 }
 
 void ProjectManagement::checkGeodeticLimits()

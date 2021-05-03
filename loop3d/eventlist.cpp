@@ -9,11 +9,11 @@ EventList::EventList(QObject *parent) : QObject(parent)
 
 void EventList::clearList()
 {
-    qDebug() << "Loop: Clearing event list";
+//    qDebug() << "Loop: Clearing event list";
     preItemReset();
     events.clear();
     postItemReset();
-    qDebug() << "Loop: Cleared event list";
+//    qDebug() << "Loop: Cleared event list";
 }
 
 int EventList::loadFromFile(QString filename)

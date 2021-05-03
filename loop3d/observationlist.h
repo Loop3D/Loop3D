@@ -1,9 +1,12 @@
 #ifndef OBSERVATIONLIST_H
 #define OBSERVATIONLIST_H
 
-#include <QAbstractListModel>
 #include <QVector>
 //#include <netcdf>
+#include <QOpenGLTexture>
+#include <QOpenGLFunctions>
+#include <QTexture>
+#include <QMutex>
 
 #include "LoopProjectFileUtils.h"
 #include "LoopProjectFile.h"
@@ -12,13 +15,15 @@ class ObservationList : public QObject {
     Q_OBJECT
     public:
         ObservationList(QObject* parent=nullptr);
-        ~ObservationList() { observations.clear(); }
+        ~ObservationList();
 
         void clearList();
         int loadFromFile(QString filename);
         int saveToFile(QString filename);
         bool setObservationAt(int index, const LoopProjectFile::Observation& observation);
         QVector<std::shared_ptr<LoopProjectFile::Observation>> getObservations() const { return observations; }
+        Qt3DRender::QSharedGLTexture* getObservationsTexture(void) { return m_sharedTexture; }
+        int loadTextures();
 
     Q_SIGNALS:
         void preItemAppended(int start, int count);
@@ -34,6 +39,14 @@ class ObservationList : public QObject {
 
     private:
         QVector<std::shared_ptr<LoopProjectFile::Observation>> observations;
+
+        void loadData();
+        // Manage observation data into texture for display
+        QMutex dataMutex;
+        bool m_dataChanged;
+        float* m_observationsData;
+        QOpenGLTexture *observationsTexture;
+        Qt3DRender::QSharedGLTexture *m_sharedTexture;
 };
 
 #endif // ObservationLIST_H

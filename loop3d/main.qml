@@ -41,6 +41,21 @@ Item {
         console.log("Create Model Completed called")
     }
 
+    // Add a delay on exiting to ensure python processes can be
+    // terminated and cleaned up
+    Timer {
+        id: quitDelay
+        running: false
+        interval: 500
+        onTriggered: {
+            Qt.quit()
+        }
+    }
+    function cleanUpAndExit() {
+        project.quiting = true
+        quitDelay.start()
+    }
+
     Scene3D {
         id: mainScene3D
         anchors.fill: parent
@@ -116,7 +131,9 @@ Item {
                 shortcut: "Ctrl+Q"
                 onTriggered: {
                     if (confirmOnQuit) messageDialogQuit.open()
-                    else Qt.quit()
+                    else {
+                        cleanUpAndExit()
+                    }
                 }
             }
         }
@@ -515,7 +532,9 @@ Item {
         icon: StandardIcon.Question
         text: "Quit? Are you sure?"
         standardButtons: StandardButton.No |StandardButton.Yes
-        onYes: Qt.quit()
+        onYes: {
+            cleanUpAndExit()
+        }
     }
 
 //    onClosing: {

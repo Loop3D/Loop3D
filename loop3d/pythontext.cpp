@@ -6,9 +6,9 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include <thread>
 
-namespace py = pybind11;
-using namespace py::literals;
+using namespace pybind11::literals;
 
 PythonText::PythonText(QObject* parent)
     : QObject(parent),
@@ -17,6 +17,7 @@ PythonText::PythonText(QObject* parent)
     m_code = "";
     m_threadRunning = false;
     m_threadRunningStage = "";
+    connect(&m_pollingThread, &PythonTextWorkerThread::finished, this, &PythonText::postCode);
 }
 
 void PythonText::setMainTextEdit(QQuickTextDocument* text)
@@ -78,7 +79,7 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
     std::string foldUrl = "";
     std::string metadataUrl = "";
     qDebug() << "Loop: Loading python script file named: " << name;
-    m_locals = py::dict("loopFilename"_a = name.toStdString().c_str());
+    pybind11::dict locals = pybind11::dict("loopFilename"_a = name.toStdString().c_str());
     if (ProjectManagement::instance()) {
         ProjectManagement* proj = ProjectManagement::instance();
         xsteps = static_cast<int>((proj->m_maxEasting - proj->m_minEasting) / proj->m_spacingX)+1;
@@ -105,7 +106,7 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
             m2lFiles["fault_file"] = faultUrl;
             m2lFiles["fold_file"] = foldUrl;
             m2lFiles["metadata"] = metadataUrl;
-            m_locals["m2lFiles"] = m2lFiles;
+            locals["m2lFiles"] = m2lFiles;
 
             M2lConfig* m2lconf = proj->getM2lConfig();
             pybind11::dict m2lParams;
@@ -131,21 +132,21 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
             m2lParams["close_dip"] = m2lconf->m_closeDip;
             m2lParams["use_interpolations"] = m2lconf->m_useInterpolations ? "True" : "False";
             m2lParams["use_fat"] = m2lconf->m_useFat ? "True" : "False";
-            m_locals["m2lParams"] = m2lParams;
-            m_locals["m2lQuietMode"] = m2lconf->m_quietMode == 0 ? "all" : (m2lconf->m_quietMode == 1 ? "no-fugures" : "None");
+            locals["m2lParams"] = m2lParams;
+            locals["m2lQuietMode"] = m2lconf->m_quietMode == 0 ? "all" : (m2lconf->m_quietMode == 1 ? "no-fugures" : "None");
 
         } else if (loopStage == "GeologyModel") {
             qDebug() << "Running Loop Structural Python Script";
-            m_locals["useLavavu"] = proj->m_useLavavu ? true : false;
+            locals["useLavavu"] = proj->m_useLavavu ? true : false;
         }
         std::string m2lDataDirName = proj->m_filename.toStdString();
         m2lDataDirName = std::string("m2l_data/") + m2lDataDirName.substr(m2lDataDirName.find_last_of('/')+1);
 //        qDebug() << "m2lDataDir = " << m2lDataDirName.c_str();
-        m_locals["m2lDataDir"] = m2lDataDirName;
+        locals["m2lDataDir"] = m2lDataDirName;
     }
-    m_locals["xsteps"] = xsteps;
-    m_locals["ysteps"] = ysteps;
-    m_locals["zsteps"] = zsteps;
+    locals["xsteps"] = xsteps;
+    locals["ysteps"] = ysteps;
+    locals["zsteps"] = zsteps;
 
     m_code = code;
     if (m_threadRunning == 0) {
@@ -156,17 +157,14 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
             proj->pythonInProgressChanged();
         }
         try {
-            py::exec(m_pythonCode.toStdString().c_str(),py::globals(),m_locals);
+            pybind11::exec(m_pythonCode.toStdString().c_str(),pybind11::globals(),locals);
         } catch (std::exception& e) {
             qDebug() << e.what();
             qDebug() << "Failed to run python code";
         }
         if (!m_threadRunning) {
             m_threadRunning = true;
-            PythonTextWorkerThread *workerThread = new PythonTextWorkerThread;
-            connect(workerThread, &PythonTextWorkerThread::finished, this, &PythonText::postCode);
-            connect(workerThread, &PythonTextWorkerThread::finished, workerThread, &QObject::deleteLater);
-            workerThread->start(QThread::NormalPriority);
+            m_pollingThread.start(QThread::NormalPriority);
         }
     }
 }
@@ -177,7 +175,7 @@ void PythonText::postCode()
     if (ProjectManagement::instance()) {
         ProjectManagement* proj = ProjectManagement::instance();
         proj->reloadProject();
-        auto globals = py::globals();
+        auto globals = pybind11::globals();
         if (globals.contains("errors")) {
             std::cout << globals["errors"].cast<std::string>() << std::endl;
             proj->m_pythonErrors = QString(globals["errors"].cast<std::string>().c_str());
@@ -221,32 +219,35 @@ void PythonTextWorkerThread::run()
 {
     bool running = true;
     while (running) {
-        py::exec("import time\ntime.sleep(0.02)\n");
+        pybind11::exec("import time\ntime.sleep(0.02)\n");
         if (ProjectManagement::instance()) {
             ProjectManagement* proj = ProjectManagement::instance();
-            auto globals = py::globals();
+            auto globals = pybind11::globals();
+            if (proj->m_quiting) {
+                running = false;
+                proj->m_pythonInProgress = 0;
+                proj->pythonInProgressChanged();
+            }
             if (proj->m_pythonInProgress <= 0) {
                 running = false;
-            }
-            if (proj->m_pythonInProgress >= 666) {
+            } else if (proj->m_pythonInProgress >= 666) {
                 if (globals.contains("errors")) {
                     std::cout << globals["errors"].cast<std::string>() << std::endl;
                     proj->m_pythonErrors = QString(globals["errors"].cast<std::string>().c_str());
                     proj->pythonErrorsChanged();
                 }
                 running = false;
-            }
-            if (globals.contains("currentProgress") && running) {
+            } else if (globals.contains("currentProgress") && running) {
                 double progress = globals["currentProgress"].cast<double>() / 100.0;
                 proj->m_pythonInProgress = progress;
                 proj->pythonInProgressChanged();
-            }
-            if (globals.contains("currentProgress") && running) {
-                std::string progressText = globals["currentProgressText"].cast<std::string>();
-                proj->m_pythonProgressText = progressText.c_str();
-                proj->pythonProgressTextChanged();
-                proj->m_pythonProgressTextLineCount = std::count(progressText.begin(),progressText.end(),'\n') + 1;
-                proj->pythonProgressTextLineCountChanged();
+                if (globals.contains("currentProgressText")) {
+                    std::string progressText = globals["currentProgressText"].cast<std::string>();
+                    proj->m_pythonProgressText = progressText.c_str();
+                    proj->pythonProgressTextChanged();
+                    proj->m_pythonProgressTextLineCount = std::count(progressText.begin(),progressText.end(),'\n') + 1;
+                    proj->pythonProgressTextLineCountChanged();
+                }
             }
         }
         msleep(2);

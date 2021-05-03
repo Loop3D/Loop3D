@@ -356,53 +356,63 @@ Scene3DView {
                 ]
             }
         }
-//        Entity {
-//            components: [
-//                SphereMesh { radius: 50 },
-//                Transform { translation: Qt.vector3d(viewer.structureXMax-viewer.structureXMin,
-//                                                     viewer.structureYMax-viewer.structureYMin,
-//                                                     viewer.structureZMax-viewer.structureZMin) },
-//                DiffuseSpecularMaterial {
-//                    ambient: "#555555"
-//                    diffuse: "#ee0000"
-//                    specular: "#00ee00"
-//                }
-//            ]
-//        }
-//        NodeInstantiator {
-//            id: observations
-//            enabled: bar.currentIndex == 4
-//            model: observationsModel
-//            delegate: Entity {
-//                id: observationEntity
-//                property real elemDip: dip
-//                property real elemDipDir: dipDir
-//                enabled: type == 4
-//                components: [
-//                    Mesh {
-//                        id: up_arrow
-//                        source: "qrc:/3dassets/strikeDip.obj"
-////                        source: "qrc:/3dassets/Up_arrow_v1.obj"
-//                    },
-//                    Transform {
-//                        scale: 50.0
-//                         // First rotation is the dip angle and the next is the dip direction
-//                        rotation: fromAxesAndAngles(Qt.vector3d(1.0,0.0,0.0),(viewer.invertedView?90.0-elemDip:90.0+elemDip),
-//                                                    Qt.vector3d(0.0,0.0,1.0),180.0-(elemDipDir))
-//                        translation: (viewer.invertedView ?
-//                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,viewer.structureZMax-altitude)
-//                          :
-//                           Qt.vector3d(easting-viewer.structureXMin,northing-viewer.structureYMin,altitude-viewer.structureZMin)
-//                          )
-//                    },
-////                    PhongMaterial {}
-//                    DiffuseSpecularMaterial {
-//                        ambient:  "#22aa22"
-//                        diffuse:  "#22aa22"
-//                        specular: "#22aa22"
-//                    }
-//                ]
-//            }
-//        }
+
+        Entity {
+            components: [
+                Mesh {
+                    id: up_arrow
+//                    source: "qrc:/3dassets/Up_arrow_v1.obj"
+                    source: "qrc:/3dassets/strikeDip.obj"
+                    instanceCount: project.numObservations
+                },
+                Material {
+                    id: observationsMaterial
+                    parameters: [
+                        Parameter { name: "xmin" ; value: viewer.structureXMin },
+                        Parameter { name: "xmax" ; value: viewer.structureXMax },
+                        Parameter { name: "ymin" ; value: viewer.structureYMin },
+                        Parameter { name: "ymax" ; value: viewer.structureYMax },
+                        Parameter { name: "zmin" ; value: viewer.structureZMin },
+                        Parameter { name: "zmax" ; value: viewer.structureZMax },
+                        Parameter { name: "miscToggle1" ; value: viewer.miscToggle1 },
+                        Parameter { name: "miscToggle2" ; value: viewer.miscToggle2 },
+                        Parameter { name: "miscToggle3" ; value: viewer.miscToggle3 },
+                        Parameter { name: "miscToggle4" ; value: viewer.miscToggle4 },
+                        Parameter { name: "miscToggle5" ; value: viewer.miscToggle5 },
+                        Parameter { name: "miscToggle6" ; value: viewer.miscToggle6 },
+                        Parameter { name: "lightPos" ; value: Qt.vector3d(0.0,0.0,500000.0) },
+                        Parameter { name: "observations" ; value: project.getObservationData() },
+                        Parameter { name: "numObservations" ; value: project.numObservations },
+                        Parameter { name: "invertedView" ; value: viewer.invertedView },
+                        Parameter { name: "colourSteps[0]" ; value: viewer.colourSteps },
+                        Parameter { name: "colourRedOptions[0]" ; value: viewer.colourRedOptions },
+                        Parameter { name: "colourGreenOptions[0]" ; value: viewer.colourGreenOptions },
+                        Parameter { name: "colourBlueOptions[0]" ; value: viewer.colourBlueOptions }
+                    ]
+                    effect: Effect {
+                        techniques: [
+                            Technique {
+                                filterKeys: FilterKey { name: "renderingStyle"; value: "forward" }
+                                graphicsApiFilter {
+                                    api: GraphicsApiFilter.OpenGL
+                                    profile: GraphicsApiFilter.CoreProfile
+                                    majorVersion: 4
+                                    minorVersion: 3
+                                }
+                                renderPasses: [
+                                    RenderPass {
+                                        shaderProgram: ShaderProgram {
+                                            vertexShaderCode: loadSource("qrc:/shaders/observations.vert")
+                                            fragmentShaderCode: loadSource("qrc:/shaders/observations.frag")
+                                        }
+                                        renderStates: [ CullFace { mode: CullFace.NoCulling } ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
     }
 }

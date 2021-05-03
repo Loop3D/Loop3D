@@ -65,6 +65,7 @@ def threadFunc(loopFilename, m2lDataDir, m2lFiles, m2lParams, m2lQuietMode, bbox
     import traceback
     import pandas
     global errors
+
     errors = ""
     def findGlobalVariable(varName, defaultValue):
         if (varName not in vars() and varName not in globals()):
@@ -147,6 +148,7 @@ x = threading.Thread(target=threadFunc,
          ])
 
 try:
+    x.daemon = True
     x.start()
 except Exception as e:
     print(e)
