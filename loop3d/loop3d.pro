@@ -51,7 +51,7 @@ linux {
     LIBS += -L$$(PYTHONHOME)/Lib
     LIBS += -L$$(PYTHONHOME)/Lib/site-packages
     LIBS += -L$$(PYTHONHOME)
-    LIBS += -lnetcdf -lnetcdf-cxx4 -lpython38
+    LIBS += -lnetcdf -lnetcdf-cxx4 -lpython39
 }
 
 SOURCES += \

@@ -121,7 +121,7 @@ bool EventModel::setData(const QModelIndex &index, const QVariant &value, int ro
     std::shared_ptr<LoopProjectFile::Event> item = events->getEvents().at(index.row());
     switch (role) {
     case nameRole:
-        strncpy_s(item->name,value.toString().toStdString().c_str(),30);
+        strncpy(item->name,value.toString().toStdString().c_str(),30);
         break;
     case isActiveRole:
         item->enabled = value.toBool();
@@ -335,7 +335,6 @@ void EventModel::setEvents(EventList *value)
 
     if (events) {
         connect(events, &EventList::preItemAppended, this, [this](int start, int count) {
-//            const int index = events->getEvents().size();
             beginInsertRows(QModelIndex(), start, start+count-1);
         });
         connect(events, &EventList::postItemAppended, this, [this]() {
@@ -366,7 +365,7 @@ EventList *EventModel::getEvents() const
 LoopProjectFile::Event EventModel::get(int index) const
 {
     LoopProjectFile::Event res;
-    if (!events || index <0 || index > events->getEvents().size())
+    if (!events || index < 0 || index > events->getEvents().size())
         return res;
     return (*(events->getEvents()[index]));
 }
@@ -412,3 +411,153 @@ QVariant EventModel::pBlockDataIndexed(int index, QString role) const
         return QVariant(item.maxRank);
     } else return QVariant();
 }
+
+
+/* ******************* EventLinkList area ****************** */
+
+EventLinkModel::EventLinkModel(QObject *parent)
+    : QAbstractListModel(parent)
+    , links(nullptr)
+{
+
+}
+
+int EventLinkModel::rowCount(const QModelIndex &parent) const
+{
+    // For list models only the root node (an invalid parent) should return the list's size. For all
+    // other (valid) parents, rowCount() should return 0 so that it does not become a tree model.
+    if (parent.isValid() || !links)
+        return 0;
+
+    return links->getLinks().size();
+}
+
+QVariant EventLinkModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid() | !links)
+        return QVariant();
+
+    std::shared_ptr<LoopProjectFile::EventLink> item = links->getLinks().at(index.row());
+    switch(role) {
+        case eventID1Role:
+            return QVariant(item->eventId1);
+        case eventID2Role:
+            return QVariant(item->eventId2);
+        case bidirectionalRole:
+            return QVariant(item->bidirectional);
+        default: break;
+    }
+
+    return QVariant(false);
+}
+
+QVariant EventLinkModel::dataIndexed(int index, QString role) const
+{
+    if (index < 0 || index > links->getLinks().size() ) return QVariant();
+    return data(this->index(index,0),lookupRoleName(role));
+}
+
+bool EventLinkModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!links) return false;
+
+    std::shared_ptr<LoopProjectFile::EventLink> item = links->getLinks().at(index.row());
+    switch (role) {
+        case eventID1Role:
+            item->eventId1 = value.toInt();
+            break;
+        case eventID2Role:
+            item->eventId2 = value.toInt();
+            break;
+        case bidirectionalRole:
+            item->bidirectional = value.toBool();
+            break;
+        default: break;
+    }
+
+    Q_EMIT dataChanged(index, index, QVector<int>() << role);
+    return true;
+}
+
+bool EventLinkModel::setDataIndexed(int index, const QVariant &value, QString role)
+{
+    if (index < 0 || index > links->getLinks().size() ) return false;
+    return setData(this->index(index,0),value,lookupRoleName(role));
+}
+
+Qt::ItemFlags EventLinkModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid() | !links)
+        return Qt::NoItemFlags;
+
+    return Qt::ItemIsEditable;
+}
+
+QHash<int, QByteArray> EventLinkModel::roleNames() const
+{
+    QHash<int, QByteArray> role;
+    role[eventID1Role] = "eventId1";
+    role[eventID2Role] = "eventId2";
+    role[bidirectionalRole] = "bidirectional";
+
+    return role;
+}
+
+int EventLinkModel::lookupRoleName(QString name) const
+{
+    if (name == "eventId1") return eventID1Role;
+    if (name == "eventId2") return eventID2Role;
+    if (name == "bidirectional") return bidirectionalRole;
+    return 0;
+}
+
+void EventLinkModel::setLinks(EventLinkList *value)
+{
+    beginResetModel();
+
+    if (links) links->disconnect(this);
+
+    links = value;
+
+    if (links) {
+        connect(links, &EventLinkList::preLinkAppended, this, [this](int start, int count) {
+            beginInsertRows(QModelIndex(), start, start+count-1);
+        });
+        connect(links, &EventLinkList::postLinkAppended, this, [this]() {
+            endInsertRows();
+        });
+        connect(links, &EventLinkList::preLinkRemoved, this, [this](int index) {
+            beginRemoveRows(QModelIndex(), index, index);
+        });
+        connect(links, &EventLinkList::postLinkRemoved, this, [this]() {
+            endRemoveRows();
+        });
+        connect(links, &EventLinkList::preLinkReset, this, [this]() {
+            beginResetModel();
+        });
+        connect(links, &EventLinkList::postLinkReset, this, [this]() {
+            endResetModel();
+        });
+    }
+    endResetModel();
+}
+
+EventLinkList *EventLinkModel::getLinks() const
+{
+    return links;
+}
+
+LoopProjectFile::EventLink EventLinkModel::get(int index) const
+{
+    LoopProjectFile::EventLink res;
+    if (!links || index < 0 || index > links->getLinks().size())
+        return res;
+    return (*(links->getLinks()[index]));
+}
+
+void EventLinkModel::refreshModel()
+{
+    beginResetModel();
+    endResetModel();
+}
+

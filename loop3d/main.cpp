@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
                                                QStringLiteral("DataSourceList should not be created in QML"));
     qmlRegisterUncreatableType<EventList>("loop3d.eventmodel",1,0,"EventList",
                                                QStringLiteral("EventList should not be created in QML"));
+    qmlRegisterUncreatableType<EventLinkList>("loop3d.eventmodel",1,0,"EventLinkList",
+                                               QStringLiteral("EventLinkList should not be created in QML"));
     qmlRegisterUncreatableType<ObservationList>("loop3d.observationmodel",1,0,"ObservationList",
                                                QStringLiteral("ObservationList should not be created in QML"));
     qmlRegisterUncreatableType<M2lConfig>("loop3d.m2lconfig",1,0,"M2lConfig",
@@ -91,6 +93,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<UTMExtents>("loop3d.utmconverter",1,0,"UTMExtents");
     qmlRegisterType<DataSourceModel>("loop3d.datasourcemodel",1,0,"DataSourceModel");
     qmlRegisterType<EventModel>("loop3d.eventmodel",1,0,"EventModel");
+    qmlRegisterType<EventLinkModel>("loop3d.eventmodel",1,0,"EventLinkModel");
     qmlRegisterType<ObservationModel>("loop3d.observationmodel",1,0,"ObservationModel");
     qmlRegisterType<M2lConfig>("loop3d.m2lconfig",1,0,"M2lConfig");
     qmlRegisterType<LSConfig>("loop3d.lsconfig",1,0,"LSConfig");
@@ -99,6 +102,7 @@ int main(int argc, char *argv[])
     project->setQmlQuickView(&view);
     view.rootContext()->setContextProperty(QStringLiteral("dataSourceList"), project->getDataSourceList());
     view.rootContext()->setContextProperty(QStringLiteral("eventList"), project->getEventList());
+    view.rootContext()->setContextProperty(QStringLiteral("eventLinkList"), project->getEventLinkList());
     view.rootContext()->setContextProperty(QStringLiteral("observationList"), project->getObservationList());
     view.rootContext()->setContextProperty(QStringLiteral("m2lConfig"), project->getM2lConfig());
     view.rootContext()->setContextProperty(QStringLiteral("lsConfig"), project->getLSConfig());

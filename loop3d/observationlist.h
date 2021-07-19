@@ -15,7 +15,7 @@ class ObservationList : public QObject {
     Q_OBJECT
     public:
         ObservationList(QObject* parent=nullptr);
-        ~ObservationList();
+        ~ObservationList() override;
 
         void clearList();
         int loadFromFile(QString filename);

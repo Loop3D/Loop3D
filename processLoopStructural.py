@@ -79,6 +79,7 @@ def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLava
         import numpy
         import pandas
         import math
+        import networkx
 
         currentProgress = 20.0
         currentProgressText = "LoopStructural loading more data from loop project file"
@@ -118,7 +119,10 @@ def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLava
             faultEvents = pandas.DataFrame.from_records(resp["value"],
                 columns=['eventId','minAge','maxAge','name','supergroup','enabled',
                          'rank','type','avgDisplacement','avgDownthrowDir',
-                         'influenceDistance','verticalRadius','horizontalRadius','colour'])
+                         'influenceDistance','verticalRadius','horizontalRadius','colour',
+                         'centreEasting','centreNorthing','centreAltitude',
+                         'avgSlipDirEasting','avgSlipDirNorthing','avgSlipDirAltitude',
+                         'avgNormalEasting','avgNormalNorthing','avgNormalAltitude'])
             faultEvents['name'] = faultEvents['name'].str.decode('utf-8')
             faultEvents['supergroup'] = faultEvents['supergroup'].str.decode('utf-8')
             faultEvents['colour'] = faultEvents['colour'].str.decode('utf-8')
@@ -288,6 +292,8 @@ def threadFunc(loopFilename, m2lDataDir, fault_params, foliation_params, useLava
             for fault in completeFaults.drop_duplicates().itertuples():
                 m2l_data['downthrow_dir'][fault.name] = numpy.array([fault.avgDownthrowDir,fault.X,fault.Y])
 
+        ##### Note this should not be here as it adds further dependencies ####
+        m2l_data['fault_graph'] = networkx.Graph()
         postInit = time.time()
         printTime("LOOPSTRUCTURAL collection data from project file took ", postInit-start)
 

@@ -110,10 +110,10 @@ class ProjectManagement : public QQuickItem
         void finishedGeologyModel();
 
 public Q_SLOTS:
-        void setLockedExtents(bool val) { m_lockedExtents = val; lockedExtentsChanged();}
-        void setActiveState(unsigned int val) { m_activeState = val; activeStateChanged();}
+        void setLockedExtents(bool val) { m_lockedExtents = val; Q_EMIT lockedExtentsChanged(); }
+        void setActiveState(unsigned int val) { m_activeState = val; Q_EMIT activeStateChanged(); }
         bool setActiveState(QString state);
-        void setUseLavavu(bool val) { m_useLavavu = val; useLavavuChanged();}
+        void setUseLavavu(bool val) { m_useLavavu = val; Q_EMIT useLavavuChanged(); }
 
     public:
         Q_INVOKABLE void clearProject(bool clearExtents);
@@ -142,6 +142,7 @@ public Q_SLOTS:
         }
         StructuralModel* getStModel() { return &stModel; }
         EventList* getEventList() { return &eventList; }
+        EventLinkList* getEventLinkList() { return &eventLinkList; }
         ObservationList* getObservationList() { return &observationList; }
         M2lConfig* getM2lConfig() { return &m2lConfig; }
         DataSourceList* getDataSourceList() { return &dataSourceList; }
@@ -215,6 +216,7 @@ public Q_SLOTS:
         std::map<int,StructuralModel*> structuralModelMap;
         std::map<int,EventPermutation*> permutationMap;
         EventList eventList;
+        EventLinkList eventLinkList;
         ObservationList observationList;
         M2lConfig m2lConfig;
         LSConfig lsConfig;

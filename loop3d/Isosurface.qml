@@ -57,7 +57,6 @@ Scene3DView {
                 },
                 Transform { translation: Qt.vector3d(0,0,0) }
             ]
-
         }
 
         Entity {

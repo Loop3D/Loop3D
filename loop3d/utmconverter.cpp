@@ -136,13 +136,13 @@ void UTMExtents::fromLL(LLExtents* ll, int in_zone, int in_ns)
     m_zone = in_zone;
     m_north = in_ns;
     m_northStr = (m_north == -1 ? "-" : (m_north == 0 ? "S" : "N"));
-    northStrChanged();
+    Q_EMIT northStrChanged();
 }
 
 void UTMExtents::recalcNorthStr(void)
 {
     m_northStr = (m_north == -1 ? "-" : (m_north == 0 ? "S" : "N"));
-    northStrChanged();
+    Q_EMIT northStrChanged();
 }
 
 

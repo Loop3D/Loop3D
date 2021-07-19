@@ -101,7 +101,7 @@ Item {
             Component {
                 id: eventsDelegate
                 Item {
-                    width: parent.width - mainWindow.myBorders
+                    width: configGL.width - mainWindow.myBorders
                     height: 30
 
                     Text {
@@ -159,10 +159,10 @@ Item {
                 id: mycanvas
                 contextType: "2d"
                 anchors.fill: parent
-                property var ageScale: 40.0;
-                property var ageWidth: 10.0;
-                property var eventWidth: 20.0;
-                property var rankWidth: 45;
+                property real ageScale: 40.0;
+                property real ageWidth: 10.0;
+                property real eventWidth: 20.0;
+                property real rankWidth: 45;
                 onPaint: {
                     clearCanvas();
                     var ctx = getContext("2d");

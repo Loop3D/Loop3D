@@ -33,14 +33,6 @@ Item {
             }
         }
 
-        EventModel {
-            id: eventsModel
-            events: eventList
-        }
-        ObservationModel {
-            id: observationsModel
-            observations: observationList
-        }
         Rectangle {
             id: configDM
             anchors.top: parent.top
@@ -88,7 +80,7 @@ Item {
             Component {
                 id: eventsDelegate
                 Item {
-                    width: parent.width - mainWindow.myBorders
+                    width: configDM.width - mainWindow.myBorders
                     height: 30
 
                     Text {
@@ -132,8 +124,43 @@ Item {
             // eventId, position in (easting,northing,altitude) and appropriate info based on the
             // type of event selected (dip, dipdir, for fault), (dip,dipDir,dipPolarity,layername for strata), etc"
             Text {
-                id: visualisationDMHeader
+                id: visualisationDMEventHeader
                 anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.margins: mainWindow.myBorders
+                text: detailsView.currentIndex >= 0 ? eventsModel.dataIndexed(detailsView.currentIndex,"name") + " Summary\n" : "Select an event above"
+                height: mainWindow.defaultFontSize
+                font.bold: true
+                font.family: mainWindow.headingFontStyle
+                font.pixelSize: mainWindow.headingFontSize
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignTop
+            }
+            Text {
+                property int type: detailsView.currentIndex >= 0 ? eventsModel.dataIndexed(detailsView.currentIndex,"type"):""
+                property string typeStr: type == 0 ? "Fault" : (type == 1 ? "Fold" : (type == 2 ? "Foliation"
+                                          : (type == 3 ? "Discontinuity" : "Strata")))
+                property real minAge: parseFloat(eventsModel.dataIndexed(detailsView.currentIndex,"minAge")).toFixed(1)
+                property real maxAge: parseFloat(eventsModel.dataIndexed(detailsView.currentIndex,"maxAge")).toFixed(1)
+                id: visualisationDMEventDetails
+                anchors.top: visualisationDMEventHeader.bottom
+                anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.margins: mainWindow.myBorders
+                visible: detailsView.currentIndex >= 0
+                text: "ID: " + eventsModel.dataIndexed(detailsView.currentIndex,"eventID") + "\t"
+                    + "Age Range: " + minAge + " - " + maxAge + "\t"
+                height: mainWindow.defaultFontSize
+                font.bold: false
+                font.family: mainWindow.headingFontStyle
+                font.pixelSize: mainWindow.headingFontSize
+                verticalAlignment: Text.AlignTop
+            }
+            Text {
+                id: visualisationDMHeader
+                visible: detailsView.currentIndex >= 0
+                anchors.top: visualisationDMEventDetails.bottom
                 anchors.right: parent.right
                 anchors.left: parent.left
                 anchors.margins: mainWindow.myBorders
@@ -151,11 +178,11 @@ Item {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 anchors.margins: mainWindow.myBorders
-                text: (observationView.selectedEntityType == 0 ? "ID\t(East/North/Alt)\tDipDir\tDip\tDipPol\tDispl\tVal" : "")
-                    + (observationView.selectedEntityType == 1 ? "ID\t(East/North/Alt)\t(AxisX/AxisY/AxisZ)\tFoliation\tWhatisFolded" : "")
-                    + (observationView.selectedEntityType == 2 ? "ID\t(East/North/Alt)\tDipDir\tDip" : "")
-                    + (observationView.selectedEntityType == 3 ? "ID\t(East/North/Alt)\tDipDir\tDip" : "")
-                    + (observationView.selectedEntityType == 4 ? "ID\t(East/North/Alt)\tDipDir\tDip\tDipPol\tLayer" : "")
+                text: (observationView.selectedEntityType == 0 ? "(East/North/Alt)\tDipDir\tDip\tDipPol\tDispl\tVal" : "")
+                    + (observationView.selectedEntityType == 1 ? "(East/North/Alt)\t(AxisX/AxisY/AxisZ)\tFoliation\tWhatisFolded" : "")
+                    + (observationView.selectedEntityType == 2 ? "(East/North/Alt)\tDipDir\tDip" : "")
+                    + (observationView.selectedEntityType == 3 ? "(East/North/Alt)\tDipDir\tDip" : "")
+                    + (observationView.selectedEntityType == 4 ? "(East/North/Alt)\tDipDir\tDip\tDipPol\tLayer" : "")
                 height: mainWindow.defaultFontSize
                 font.bold: true
                 font.family: mainWindow.headingFontStyle
@@ -192,7 +219,7 @@ Item {
                 Item {
                     id: observationComponent
                     property int componentHeight: 30
-                    width: parent.width - mainWindow.myBorders
+                    width: visualisationDM.width - mainWindow.myBorders
                     height: eventID == observationView.selectedEntityId ? 30 : 0
                     Text {
                         anchors.top: parent.top
@@ -202,7 +229,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         color: eventID == observationView.selectedEntityId ? "#000000" : "#00000000"
                         font.italic: observationView.isEntityActive ? false : true
-                        text: eventID + "\t(" + Math.round(easting) + "," + Math.round(northing) + "," + Math.round(altitude) + ")\t"
+                        text: "(" + Math.round(easting) + "," + Math.round(northing) + "," + Math.round(altitude) + ")\t"
                               + (type == 0 ? Math.round(dipDir) + "\t" + dip + "\t" + dipPolarity + "\t" + displacement + "\t" + val : "")
                               + (type == 1 ? "(" + axisX + "," + axisY + "," + axisZ + ")" + "\t" + foliation + "\t" + whatIsFolded : "")
                               + (type == 2 ? dipDir + "\t" + dip : "")
@@ -231,7 +258,6 @@ Item {
                 source: (project.filename === "" ? "" : project.filename + ".png")
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-
             }
             id: detailsDM
             anchors.top: parent.top

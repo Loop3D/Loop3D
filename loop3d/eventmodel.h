@@ -75,4 +75,44 @@ private:
     EventList *events;
 };
 
+class EventLinkModel : public QAbstractListModel
+{
+    Q_OBJECT
+    Q_PROPERTY(EventLinkList *links READ getLinks WRITE setLinks NOTIFY linksChanged)
+
+public:
+    explicit EventLinkModel(QObject *parent = nullptr);
+
+    enum {
+        eventID1Role = Qt::UserRole,
+        eventID2Role,
+        bidirectionalRole
+    };
+
+    // Basic functionality:
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    Q_INVOKABLE QVariant dataIndexed(int index, QString role) const;
+
+    // Editable:
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    Q_INVOKABLE bool setDataIndexed(int index, const QVariant &value, QString role);
+
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
+    virtual QHash<int, QByteArray> roleNames() const override;
+    Q_INVOKABLE int lookupRoleName(QString name) const;
+
+    EventLinkList *getLinks() const;
+    void setLinks(EventLinkList *value);
+    Q_INVOKABLE LoopProjectFile::EventLink get(int index) const;
+    Q_INVOKABLE void refreshModel(void);
+
+Q_SIGNALS:
+    void linksChanged();
+
+private:
+    EventLinkList *links;
+};
+
 #endif // EVENTMODEL_H

@@ -67,6 +67,10 @@ Item {
         id: eventsModel
         events: eventList
     }
+    EventLinkModel {
+        id: eventLinksModel
+        links: eventLinkList
+    }
     ObservationModel {
         id: observationsModel
         observations: observationList
@@ -168,6 +172,7 @@ Item {
             TabButton { text: 'Geophysical Modelling' }
 //            TabButton { text: 'Post Processing' }
             TabButton { text: 'Data Viewer' }
+//            TabButton { text: 'Testing' }
             onCurrentIndexChanged: {
                 project.mainIndex = currentIndex
                 if (currentIndex == 4) dataViewTab.forceActiveFocus()
@@ -189,6 +194,7 @@ Item {
         GeophysTab { id: geophysTab }
 //        PostProTab { id: postProTab }
         DataViewer { id: dataViewTab }
+//        TestingTab { id: testingTab }
     }
 
     Rectangle {

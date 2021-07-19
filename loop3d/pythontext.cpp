@@ -85,7 +85,8 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
         xsteps = static_cast<int>((proj->m_maxEasting - proj->m_minEasting) / proj->m_spacingX)+1;
         ysteps = static_cast<int>((proj->m_maxNorthing - proj->m_minNorthing) / proj->m_spacingY)+1;
         zsteps = static_cast<int>((proj->m_topExtent - proj->m_botExtent) / proj->m_spacingZ)+1;
-        if (loopStage == "DataCollection") {
+        if (loopStage == "DataCollectionCSV") {
+        } else if (loopStage == "DataCollection") {
             structureUrl = replaceKeywords(proj->m_structureUrl);
             geologyUrl = replaceKeywords(proj->m_geologyUrl);
             mindepUrl = replaceKeywords(proj->m_mindepUrl);
@@ -106,6 +107,7 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
             m2lFiles["fault_file"] = faultUrl;
             m2lFiles["fold_file"] = foldUrl;
             m2lFiles["metadata"] = metadataUrl;
+            m2lFiles["dtm_file"] = "AU";
             locals["m2lFiles"] = m2lFiles;
 
             M2lConfig* m2lconf = proj->getM2lConfig();
@@ -141,7 +143,6 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
         }
         std::string m2lDataDirName = proj->m_filename.toStdString();
         m2lDataDirName = std::string("m2l_data/") + m2lDataDirName.substr(m2lDataDirName.find_last_of('/')+1);
-//        qDebug() << "m2lDataDir = " << m2lDataDirName.c_str();
         locals["m2lDataDir"] = m2lDataDirName;
     }
     locals["xsteps"] = xsteps;
@@ -154,7 +155,7 @@ void PythonText::run(QString code, QString loopFilename, QString loopStage)
         if (ProjectManagement::instance()) {
             ProjectManagement* proj = ProjectManagement::instance();
             proj->m_pythonInProgress = 0.1;
-            proj->pythonInProgressChanged();
+            Q_EMIT proj->pythonInProgressChanged();
         }
         try {
             pybind11::exec(m_pythonCode.toStdString().c_str(),pybind11::globals(),locals);
@@ -179,10 +180,10 @@ void PythonText::postCode()
         if (globals.contains("errors")) {
             std::cout << globals["errors"].cast<std::string>() << std::endl;
             proj->m_pythonErrors = QString(globals["errors"].cast<std::string>().c_str());
-            proj->pythonErrorsChanged();
+            Q_EMIT proj->pythonErrorsChanged();
         }
-        if (m_threadRunningStage == "DataCollection")  proj->finishedMap2Loop();
-        else if (m_threadRunningStage == "GeologyModel") proj->finishedGeologyModel();
+        if (m_threadRunningStage == "DataCollection") Q_EMIT proj->finishedMap2Loop();
+        else if (m_threadRunningStage == "GeologyModel") Q_EMIT proj->finishedGeologyModel();
 
         m_threadRunningStage = "";
     } else {
@@ -215,6 +216,30 @@ std::string PythonText::replaceKeywords(std::string incoming)
     return incoming;
 }
 
+void PythonText::runInSync(QString code)
+{
+    if (ProjectManagement::instance()) {
+        ProjectManagement* proj = ProjectManagement::instance();
+        QStringList list;
+        QString name;
+        // Find last '/' of the first set of '/'s as in file:/// or url:///
+    #ifdef _WIN32
+        list = proj->m_filename.split(QRegExp("///"));
+        name = (list.length() > 1 ? list[1] : list[0]);
+    #elif __linux__
+        list = loopFilename.split(QRegExp("///"));
+        name = "/" + (list.length() > 1 ? list[1] : list[0]);
+    #endif
+        try {
+            pybind11::dict locals = pybind11::dict("loopFilename"_a = name.toStdString().c_str());
+            pybind11::exec(code.toStdString().c_str(),pybind11::globals(),locals);
+        } catch (std::exception& e) {
+            qDebug() << e.what();
+            qDebug() << "Failed to run python code";
+        }
+    }
+}
+
 void PythonTextWorkerThread::run()
 {
     bool running = true;
@@ -226,7 +251,7 @@ void PythonTextWorkerThread::run()
             if (proj->m_quiting) {
                 running = false;
                 proj->m_pythonInProgress = 0;
-                proj->pythonInProgressChanged();
+                Q_EMIT proj->pythonInProgressChanged();
             }
             if (proj->m_pythonInProgress <= 0) {
                 running = false;
@@ -234,19 +259,19 @@ void PythonTextWorkerThread::run()
                 if (globals.contains("errors")) {
                     std::cout << globals["errors"].cast<std::string>() << std::endl;
                     proj->m_pythonErrors = QString(globals["errors"].cast<std::string>().c_str());
-                    proj->pythonErrorsChanged();
+                    Q_EMIT proj->pythonErrorsChanged();
                 }
                 running = false;
             } else if (globals.contains("currentProgress") && running) {
                 double progress = globals["currentProgress"].cast<double>() / 100.0;
                 proj->m_pythonInProgress = progress;
-                proj->pythonInProgressChanged();
+                Q_EMIT proj->pythonInProgressChanged();
                 if (globals.contains("currentProgressText")) {
                     std::string progressText = globals["currentProgressText"].cast<std::string>();
                     proj->m_pythonProgressText = progressText.c_str();
-                    proj->pythonProgressTextChanged();
+                    Q_EMIT proj->pythonProgressTextChanged();
                     proj->m_pythonProgressTextLineCount = std::count(progressText.begin(),progressText.end(),'\n') + 1;
-                    proj->pythonProgressTextLineCountChanged();
+                    Q_EMIT proj->pythonProgressTextLineCountChanged();
                 }
             }
         }

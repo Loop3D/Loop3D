@@ -40,6 +40,7 @@ class PythonText : public QObject
         bool isThreadRunning(void) { return m_threadRunning; }
 
         Q_INVOKABLE void run(QString code, QString loopFilename="", QString loopStage="DataCollection");
+        Q_INVOKABLE void runInSync(QString code);
 
     Q_SIGNALS:
         void pythonCodeChanged();

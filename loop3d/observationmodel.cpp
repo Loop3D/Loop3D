@@ -176,10 +176,10 @@ bool ObservationModel::setData(const QModelIndex &index, const QVariant &value, 
                         fold_item->axisZ = value.toDouble();
                         break;
                     case valRole:
-                        strncpy_s(fold_item->foliation,value.toString().toStdString().c_str(),LOOP_FOLIATION_NAME_LENGTH);
+                        strncpy(fold_item->foliation,value.toString().toStdString().c_str(),LOOP_FOLIATION_NAME_LENGTH);
                         break;
                     case displacementRole:
-                        strncpy_s(fold_item->whatIsFolded,value.toString().toStdString().c_str(),LOOP_WHAT_IS_FOLDED_NAME_LENGTH);
+                        strncpy(fold_item->whatIsFolded,value.toString().toStdString().c_str(),LOOP_WHAT_IS_FOLDED_NAME_LENGTH);
                         break;
                 }
             break;
@@ -221,7 +221,7 @@ bool ObservationModel::setData(const QModelIndex &index, const QVariant &value, 
                         stratigraphic_item->dipPolarity = value.toDouble();
                         break;
                     case valRole:
-                        strncpy_s(stratigraphic_item->layer,value.toString().toStdString().c_str(),LOOP_NAME_LENGTH);
+                        strncpy(stratigraphic_item->layer,value.toString().toStdString().c_str(),LOOP_NAME_LENGTH);
                         break;
                 }
             break;

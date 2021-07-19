@@ -47,7 +47,7 @@ ProjectManagement::ProjectManagement():
     m_pythonProgressTextLineCount(1),
     m_quiting(false)
 {
-    numObservationsChanged();
+    Q_EMIT numObservationsChanged();
 }
 
 bool ProjectManagement::setActiveState(QString state)
@@ -60,7 +60,7 @@ bool ProjectManagement::setActiveState(QString state)
     else if (state == "NSW") { m_activeState = 5; m_activeStateName = "NSW"; changed = true; }
     else if (state == "VIC") { m_activeState = 6; m_activeStateName = "VIC"; changed = true; }
     else if (state == "TAS") { m_activeState = 7; m_activeStateName = "TAS"; changed = true; }
-    if (changed) { activeStateChanged(); activeStateNameChanged(); }
+    if (changed) { Q_EMIT activeStateChanged(); Q_EMIT activeStateNameChanged(); }
     return changed;
 }
 
@@ -95,15 +95,16 @@ void ProjectManagement::clearProject(bool clearExtents)
         m_flowChoice = 1;
         m_loopStructuralFlowOption = 2;
         m_numObservations = 0;
-        minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
-        minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
-        utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
-        spacingXChanged(); spacingYChanged(); spacingZChanged(); extentsChangedChanged();
-        flowChoiceChanged(); flowChoiceMadeChanged(); loopStructuralFlowOptionChanged(); numObservationsChanged();
+        Q_EMIT minLatitudeChanged(); Q_EMIT maxLatitudeChanged(); Q_EMIT minLongitudeChanged(); Q_EMIT maxLongitudeChanged();
+        Q_EMIT minNorthingChanged(); Q_EMIT maxNorthingChanged(); Q_EMIT minEastingChanged(); Q_EMIT maxEastingChanged();
+        Q_EMIT utmZoneChanged(); Q_EMIT utmNorthSouthChanged(); Q_EMIT utmNorthSouthStrChanged();
+        Q_EMIT spacingXChanged(); Q_EMIT spacingYChanged(); Q_EMIT spacingZChanged(); Q_EMIT extentsChangedChanged();
+        Q_EMIT flowChoiceChanged(); Q_EMIT flowChoiceMadeChanged(); Q_EMIT loopStructuralFlowOptionChanged(); Q_EMIT numObservationsChanged();
     }
     m_sharedTextureId = 0;
     m_observationsTextureId = 0;
     eventList.clearList();
+    eventLinkList.clearList();
     observationList.clearList();
     stModel.clearData();
     m_lockedExtents = false;
@@ -193,13 +194,13 @@ int ProjectManagement::saveProject(QString filename)
     }
 
     LoopProjectFile::DataCollectionSources sources;
-    strncpy_s(sources.structureUrl,m_structureUrl.c_str(),200);
-    strncpy_s(sources.geologyUrl, m_geologyUrl.c_str(),200);
-    strncpy_s(sources.faultUrl, m_faultUrl.c_str(),200);
-    strncpy_s(sources.foldUrl, m_foldUrl.c_str(),200);
-    strncpy_s(sources.mindepUrl, m_mindepUrl.c_str(),200);
-    strncpy_s(sources.metadataUrl, m_metadataUrl.c_str(),200);
-    strncpy_s(sources.sourceTags, dataSourceList.getTagsFromList().toStdString().c_str(),200);
+    strncpy(sources.structureUrl,m_structureUrl.c_str(),200);
+    strncpy(sources.geologyUrl, m_geologyUrl.c_str(),200);
+    strncpy(sources.faultUrl, m_faultUrl.c_str(),200);
+    strncpy(sources.foldUrl, m_foldUrl.c_str(),200);
+    strncpy(sources.mindepUrl, m_mindepUrl.c_str(),200);
+    strncpy(sources.metadataUrl, m_metadataUrl.c_str(),200);
+    strncpy(sources.sourceTags, dataSourceList.getTagsFromList().toStdString().c_str(),200);
     resp = LoopProjectFile::SetDataCollectionSources(name.toStdString(),sources,false);
     if (resp.errorCode) {
         qDebug() << resp.errorMessage.c_str();
@@ -207,6 +208,7 @@ int ProjectManagement::saveProject(QString filename)
 
     stModel.saveToFile(filename);
     eventList.saveToFile(filename);
+    eventLinkList.saveToFile(filename);
     observationList.saveToFile(filename);
     m2lConfig.saveToFile(filename);
     lsConfig.saveToFile(filename);
@@ -214,8 +216,8 @@ int ProjectManagement::saveProject(QString filename)
     m_extentsChanged = false;
     m_lockedExtents = true;
     m_filename = filename;
-    filenameChanged();
-    lockedExtentsChanged();
+    Q_EMIT filenameChanged();
+    Q_EMIT lockedExtentsChanged();
     return 0;
 }
 
@@ -269,9 +271,9 @@ int ProjectManagement::loadProject(QString filename)
     m_inUtm = extents.workingFormat;
 
     updateGeodeticLimits(m_minLatitude,m_maxLatitude,m_minLongitude,m_maxLongitude);
-    botExtentChanged(); topExtentChanged();
-    spacingXChanged(); spacingYChanged(); spacingZChanged();
-    inUtmChanged();
+    Q_EMIT botExtentChanged(); Q_EMIT topExtentChanged();
+    Q_EMIT spacingXChanged(); Q_EMIT spacingYChanged(); Q_EMIT spacingZChanged();
+    Q_EMIT inUtmChanged();
     // Data file all working so save filename
 
     LoopProjectFile::DataCollectionSources sources;
@@ -291,6 +293,7 @@ int ProjectManagement::loadProject(QString filename)
     // Load structural data
     stModel.loadFromFile(filename);
     eventList.loadFromFile(filename);
+    eventLinkList.loadFromFile(filename);
     observationList.loadFromFile(filename);
     m2lConfig.loadFromFile(filename);
     lsConfig.loadFromFile(filename);
@@ -298,8 +301,8 @@ int ProjectManagement::loadProject(QString filename)
     m_extentsChanged = false;
     m_lockedExtents = true;
     m_filename = filename;
-    filenameChanged();
-    lockedExtentsChanged();
+    Q_EMIT filenameChanged();
+    Q_EMIT lockedExtentsChanged();
     return 0;
 }
 
@@ -315,7 +318,7 @@ void ProjectManagement::updateGeodeticLimits(double minLatitude, double maxLatit
     m_minLongitude = minLongitude;
     m_maxLongitude = maxLongitude;
     checkGeodeticLimits();
-    minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
+    Q_EMIT minLatitudeChanged(); Q_EMIT maxLatitudeChanged(); Q_EMIT minLongitudeChanged(); Q_EMIT maxLongitudeChanged();
     convertGeodeticToUTM();
 }
 
@@ -333,8 +336,8 @@ void ProjectManagement::convertGeodeticToUTM(void)
     m_utmNorthSouthStr = (m_utmNorthSouth == -1 ? "-" : (m_utmNorthSouth == 0 ? "S" : "N"));
     m_mapCentreLatitude = (m_minLatitude + m_maxLatitude )/2.0;
     m_mapCentreLongitude = (m_minLongitude + m_maxLongitude )/2.0;
-    minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
-    utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
+    Q_EMIT minNorthingChanged(); Q_EMIT maxNorthingChanged(); Q_EMIT minEastingChanged(); Q_EMIT maxEastingChanged();
+    Q_EMIT utmZoneChanged(); Q_EMIT utmNorthSouthChanged(); Q_EMIT utmNorthSouthStrChanged();
 }
 
 void ProjectManagement::updateUTMLimits(double minNorthing, double maxNorthing, double minEasting, double maxEasting, int zone, int northSouth)
@@ -347,8 +350,8 @@ void ProjectManagement::updateUTMLimits(double minNorthing, double maxNorthing, 
     m_utmNorthSouth = northSouth;
     m_utmNorthSouthStr = (m_utmNorthSouth == -1 ? "-" : (m_utmNorthSouth == 0 ? "S" : "N"));
     checkUTMLimits();
-    minNorthingChanged(); maxNorthingChanged(); minEastingChanged(); maxEastingChanged();
-    utmZoneChanged(); utmNorthSouthChanged(); utmNorthSouthStrChanged();
+    Q_EMIT minNorthingChanged(); Q_EMIT maxNorthingChanged(); Q_EMIT minEastingChanged(); Q_EMIT maxEastingChanged();
+    Q_EMIT utmZoneChanged(); Q_EMIT utmNorthSouthChanged(); Q_EMIT utmNorthSouthStrChanged();
     convertUTMToGeodetic();
 
 }
@@ -364,13 +367,13 @@ void ProjectManagement::convertUTMToGeodetic(void)
     m_maxLongitude = llExtents.m_maxLongitude;
     m_mapCentreLatitude = (m_minLatitude + m_maxLatitude )/2.0;
     m_mapCentreLongitude = (m_minLongitude + m_maxLongitude )/2.0;
-    minLatitudeChanged(); maxLatitudeChanged(); minLongitudeChanged(); maxLongitudeChanged();
+    Q_EMIT minLatitudeChanged(); Q_EMIT maxLatitudeChanged(); Q_EMIT minLongitudeChanged(); Q_EMIT maxLongitudeChanged();
 }
 
 void ProjectManagement::loadTextures()
 {
-    if (getStModel() && getStModel()->loadTextures()) sharedTextureIdChanged();
-    if (observationList.loadTextures()) observationsTextureIdChanged();
+    if (getStModel() && getStModel()->loadTextures()) Q_EMIT sharedTextureIdChanged();
+    if (observationList.loadTextures()) Q_EMIT observationsTextureIdChanged();
 }
 
 Qt3DRender::QSharedGLTexture *ProjectManagement::getStructuralModelData()
@@ -390,13 +393,13 @@ void ProjectManagement::checkGeodeticLimits()
         double tmp = m_minLatitude;
         m_minLatitude = m_maxLatitude;
         m_maxLatitude = tmp;
-        minLatitudeChanged(); maxLatitudeChanged();
+        Q_EMIT minLatitudeChanged(); Q_EMIT maxLatitudeChanged();
     }
     if (m_minLongitude > m_maxLongitude) {
         double tmp = m_minLongitude;
         m_minLongitude = m_maxLongitude;
         m_maxLongitude = tmp;
-        minLongitudeChanged(); maxLongitudeChanged();
+        Q_EMIT minLongitudeChanged(); Q_EMIT maxLongitudeChanged();
     }
 }
 
@@ -406,13 +409,13 @@ void ProjectManagement::checkUTMLimits()
         double tmp = m_minNorthing;
         m_minNorthing = m_maxNorthing;
         m_maxNorthing = tmp;
-        minNorthingChanged(); maxNorthingChanged();
+        Q_EMIT minNorthingChanged(); Q_EMIT maxNorthingChanged();
     }
     if (m_minEasting > m_maxEasting) {
         double tmp = m_minEasting;
         m_minEasting = m_maxEasting;
         m_maxEasting = tmp;
-        minEastingChanged(); maxEastingChanged();
+        Q_EMIT minEastingChanged(); Q_EMIT maxEastingChanged();
     }
 }
 
@@ -442,12 +445,12 @@ void ProjectManagement::incrementFlowChoice()
 {
     m_loopStructuralFlowOption++;
     if (m_loopStructuralFlowOption > 3) m_loopStructuralFlowOption -= 4;
-    loopStructuralFlowOptionChanged();
+    Q_EMIT loopStructuralFlowOptionChanged();
 }
 
 void ProjectManagement::decrementFlowChoice()
 {
     m_loopStructuralFlowOption--;
     if (m_loopStructuralFlowOption < 0) m_loopStructuralFlowOption += 4;
-    loopStructuralFlowOptionChanged();
+    Q_EMIT loopStructuralFlowOptionChanged();
 }

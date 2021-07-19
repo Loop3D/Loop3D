@@ -22,7 +22,7 @@ class DataSourceList : public QObject {
     Q_OBJECT
     public:
         DataSourceList(QObject* parent = nullptr);
-        ~DataSourceList() { dataSources.clear(); }
+        ~DataSourceList() override { dataSources.clear(); }
 
         bool setDataSourceAt(int index, const DataSourceItem& dataSource);
         void loadDataSources(QString resourceFile);

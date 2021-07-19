@@ -25,7 +25,7 @@ class EventList : public QObject {
     Q_OBJECT
     public:
         EventList(QObject* parent=nullptr);
-        ~EventList() { events.clear(); pBlocks.clear(); }
+        ~EventList() override { events.clear(); pBlocks.clear(); }
 
         void clearList();
         int loadFromFile(QString filename);
@@ -63,6 +63,33 @@ class EventList : public QObject {
         unsigned long long factorial(unsigned int n);
         unsigned long long ApproxPerm(unsigned int numElements, unsigned long long numRestrictions);
         unsigned long long numPermutations(std::vector<int> elements, std::vector<int> currentPerm, std::vector<int>& restrictionElem1, std::vector<int>& restrictionElem2);
+};
+
+class EventLinkList : public QObject {
+    Q_OBJECT
+    public:
+        EventLinkList(QObject* parent=nullptr);
+        ~EventLinkList() override { links.clear(); }
+
+        void clearList();
+        int loadFromFile(QString filename);
+        int saveToFile(QString filename);
+        QVector<std::shared_ptr<LoopProjectFile::EventLink>> getLinks() const { return links; }
+
+    Q_SIGNALS:
+        void preLinkAppended(int start, int count);
+        void postLinkAppended();
+        void preLinkRemoved(int index);
+        void postLinkRemoved();
+        void preLinkReset();
+        void postLinkReset();
+
+    public Q_SLOTS:
+        bool appendLink(int eventID1, int eventID2, bool bidirectional);
+        bool removeLink(int index);
+
+    private:
+        QVector<std::shared_ptr<LoopProjectFile::EventLink>> links;
 };
 
 #endif // EVENTLIST_H

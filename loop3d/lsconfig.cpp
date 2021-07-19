@@ -94,18 +94,18 @@ int LSConfig::loadFromFile(QString filename)
         m_faultCpw = config.faultCpw;
         m_faultNpw = config.faultNpw;
 
-        foliationInterpolatorChanged();
-        foliationNumElementsChanged();
-        foliationBufferChanged();
-        foliationSolverChanged();
-        foliationDampChanged();
+        Q_EMIT foliationInterpolatorChanged();
+        Q_EMIT foliationNumElementsChanged();
+        Q_EMIT foliationBufferChanged();
+        Q_EMIT foliationSolverChanged();
+        Q_EMIT foliationDampChanged();
 
-        faultInterpolatorChanged();
-        faultNumElementsChanged();
-        faultDataRegionChanged();
-        faultSolverChanged();
-        faultCpwChanged();
-        faultNpwChanged();
+        Q_EMIT faultInterpolatorChanged();
+        Q_EMIT faultNumElementsChanged();
+        Q_EMIT faultDataRegionChanged();
+        Q_EMIT faultSolverChanged();
+        Q_EMIT faultCpwChanged();
+        Q_EMIT faultNpwChanged();
     } else result = resp.errorCode;
     return result;
 }

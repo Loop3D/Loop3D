@@ -18,7 +18,7 @@ class LL : public QObject {
     public:
         explicit LL(QObject* parent = nullptr);
         LL(double lat, double lon);
-        virtual ~LL() {}
+        virtual ~LL() override {}
 
         Q_INVOKABLE void fromUTM(UTM* utm, int in_zone = 0, int in_ns = -1);
 
@@ -39,7 +39,7 @@ class UTM : public QObject {
     public:
         explicit UTM(QObject* parent = nullptr);
         UTM(double northing, double easting, int zone, int north);
-        virtual ~UTM() {}
+        virtual ~UTM() override {}
 
         Q_INVOKABLE void fromLL(LL*, int in_zone = 0, int in_ns = -1);
 
@@ -68,7 +68,7 @@ class LLExtents : public QObject {
     public:
         explicit LLExtents(QObject* parent = nullptr);
         LLExtents(double minlat, double maxlat, double minlon, double maxlon);
-        virtual ~LLExtents() {}
+        virtual ~LLExtents() override {}
 
         Q_INVOKABLE void fromUTM(UTMExtents* utm, int in_zone = 0, int in_ns = -1);
 
@@ -104,7 +104,7 @@ class UTMExtents: public QObject {
     public:
         explicit UTMExtents(QObject* parent = nullptr);
         UTMExtents(double minnorthing, double maxnorthing, double mineasting, double maxeasting, int zone, int north);
-        virtual ~UTMExtents() {}
+        virtual ~UTMExtents() override {}
 
         Q_INVOKABLE void fromLL(LLExtents* ll, int in_zone = 0, int in_ns = -1);
 

@@ -10,9 +10,9 @@ EventList::EventList(QObject *parent) : QObject(parent)
 void EventList::clearList()
 {
 //    qDebug() << "Loop: Clearing event list";
-    preItemReset();
+    Q_EMIT preItemReset();
     events.clear();
-    postItemReset();
+    Q_EMIT postItemReset();
 //    qDebug() << "Loop: Cleared event list";
 }
 
@@ -32,7 +32,7 @@ int EventList::loadFromFile(QString filename)
     name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-    preItemReset();
+    Q_EMIT preItemReset();
     std::vector<LoopProjectFile::FaultEvent> faultEvents;
     LoopProjectFile::GetFaultEvents(name.toStdString(),faultEvents,false);
     if (faultEvents.size()) {
@@ -73,8 +73,9 @@ int EventList::loadFromFile(QString filename)
             events.append(layer);
         }
     }
-    postItemReset();
+    Q_EMIT postItemReset();
     sort();
+
     return result;
 }
 
@@ -178,8 +179,8 @@ void EventList::sort()
 bool EventList::appendItem(int eventID, QString name, QString supergroup, double minAge, double maxAge, LoopProjectFile::EventType type, int rank, bool isActive)
 {
     std::shared_ptr<LoopProjectFile::Event> event = std::make_shared<LoopProjectFile::Event>();
-    strncpy_s(event->name,name.toStdString().c_str(),30);
-    strncpy_s(event->supergroup,supergroup.toStdString().c_str(),30);
+    strncpy(event->name,name.toStdString().c_str(),30);
+    strncpy(event->supergroup,supergroup.toStdString().c_str(),30);
     event->eventId = eventID;
     event->minAge = minAge;
     event->maxAge = maxAge;
@@ -187,20 +188,19 @@ bool EventList::appendItem(int eventID, QString name, QString supergroup, double
     event->enabled = isActive;
     event->rank = rank;
 
-    preItemAppended(events.size(),1);
+    Q_EMIT preItemAppended(events.size(),1);
     events.append(event);
-    postItemAppended();
+    Q_EMIT postItemAppended();
     return 1;
 }
-
 
 bool EventList::removeItem(int index)
 {
     if (index < 0 || index >= events.size()) return false;
 
-    preItemRemoved(index);
+    Q_EMIT preItemRemoved(index);
     events.removeAt(index);
-    postItemRemoved();
+    Q_EMIT postItemRemoved();
     return true;
 }
 
@@ -321,4 +321,97 @@ unsigned long long EventList::calcPermutations()
         startIndex = endIndex;
     }
     return totalPermutations;
+}
+
+
+
+/* ******************* EventLinkList area ****************** */
+EventLinkList::EventLinkList(QObject *parent) : QObject(parent)
+{
+}
+
+
+void EventLinkList::clearList()
+{
+    Q_EMIT preLinkReset();
+    links.clear();
+    Q_EMIT postLinkReset();
+}
+
+int EventLinkList::loadFromFile(QString filename)
+{
+    int result = 0;
+    while (links.size()) removeLink(0);
+
+    QStringList list;
+    QString name;
+    // Find last '/' of the first set of '/'s as in file:/// or url:///
+#ifdef _WIN32
+    list = filename.split(QRegExp("///"));
+    name = (list.length() > 1 ? list[1] : list[0]);
+#elif __linux__
+    list = filename.split(QRegExp("///"));
+    name = "/" + (list.length() > 1 ? list[1] : list[0]);
+#endif
+
+    Q_EMIT preLinkReset();
+    std::vector<LoopProjectFile::EventLink> eventLinks;
+    LoopProjectFile::GetEventRelationships(name.toStdString(),eventLinks,false);
+    if (eventLinks.size()) {
+        for (auto it=eventLinks.begin();it!=eventLinks.end();it++) {
+            std::shared_ptr<LoopProjectFile::EventLink> link = std::make_shared<LoopProjectFile::EventLink>(std::move(*it));
+            links.append(link);
+        }
+    }
+    Q_EMIT postLinkReset();
+
+    return result;
+}
+
+int EventLinkList::saveToFile(QString filename)
+{
+    int result = 0;
+    // Find last '/' of the first set of '/'s as in file:/// or url:///
+    QStringList list;
+    QString name;
+
+#ifdef _WIN32
+    list = filename.split(QRegExp("///"));
+    name = (list.length() > 1 ? list[1] : list[0]);
+#elif __linux__
+    list = filename.split(QRegExp("///"));
+    name = "/" + (list.length() > 1 ? list[1] : list[0]);
+#endif
+
+    std::vector<LoopProjectFile::EventLink> eventLinks;
+    auto eventLinkList = getLinks();
+    for (auto it=eventLinkList.begin();it!=eventLinkList.end();it++) {
+        eventLinks.push_back(*(LoopProjectFile::EventLink*)(it->get()));
+    }
+    if (eventLinks.size()) LoopProjectFile::SetEventRelationships(name.toStdString(),eventLinks,false);
+
+    return result;
+}
+
+bool EventLinkList::appendLink(int eventID1, int eventID2, bool bidirectional)
+{
+    std::shared_ptr<LoopProjectFile::EventLink> link = std::make_shared<LoopProjectFile::EventLink>();
+    link->eventId1 = eventID1;
+    link->eventId2 = eventID2;
+    link->bidirectional = bidirectional;
+
+    Q_EMIT preLinkAppended(links.size(),1);
+    links.append(link);
+    Q_EMIT postLinkAppended();
+    return 1;
+}
+
+bool EventLinkList::removeLink(int index)
+{
+    if (index < 0 || index >= links.size()) return false;
+
+    Q_EMIT preLinkRemoved(index);
+    links.removeAt(index);
+    Q_EMIT postLinkRemoved();
+    return true;
 }
