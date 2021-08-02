@@ -65,31 +65,31 @@ class EventList : public QObject {
         unsigned long long numPermutations(std::vector<int> elements, std::vector<int> currentPerm, std::vector<int>& restrictionElem1, std::vector<int>& restrictionElem2);
 };
 
-class EventLinkList : public QObject {
+class EventRelationshipList : public QObject {
     Q_OBJECT
     public:
-        EventLinkList(QObject* parent=nullptr);
-        ~EventLinkList() override { links.clear(); }
+        EventRelationshipList(QObject* parent=nullptr);
+        ~EventRelationshipList() override { relationships.clear(); }
 
         void clearList();
         int loadFromFile(QString filename);
         int saveToFile(QString filename);
-        QVector<std::shared_ptr<LoopProjectFile::EventLink>> getLinks() const { return links; }
+        QVector<std::shared_ptr<LoopProjectFile::EventRelationship>> getRelationships() const { return relationships; }
 
     Q_SIGNALS:
-        void preLinkAppended(int start, int count);
-        void postLinkAppended();
-        void preLinkRemoved(int index);
-        void postLinkRemoved();
-        void preLinkReset();
-        void postLinkReset();
+        void preRelationshipAppended(int start, int count);
+        void postRelationshipAppended();
+        void preRelationshipRemoved(int index);
+        void postRelationshipRemoved();
+        void preRelationshipReset();
+        void postRelationshipReset();
 
     public Q_SLOTS:
-        bool appendLink(int eventID1, int eventID2, bool bidirectional);
-        bool removeLink(int index);
+        bool appendRelationship(int eventID1, int eventID2, bool bidirectional);
+        bool removeRelationship(int index);
 
     private:
-        QVector<std::shared_ptr<LoopProjectFile::EventLink>> links;
+        QVector<std::shared_ptr<LoopProjectFile::EventRelationship>> relationships;
 };
 
 #endif // EVENTLIST_H

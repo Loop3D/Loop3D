@@ -75,13 +75,13 @@ private:
     EventList *events;
 };
 
-class EventLinkModel : public QAbstractListModel
+class EventRelationshipModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(EventLinkList *links READ getLinks WRITE setLinks NOTIFY linksChanged)
+    Q_PROPERTY(EventRelationshipList *relationships READ getRelationships WRITE setRelationships NOTIFY relationshipsChanged)
 
 public:
-    explicit EventLinkModel(QObject *parent = nullptr);
+    explicit EventRelationshipModel(QObject *parent = nullptr);
 
     enum {
         eventID1Role = Qt::UserRole,
@@ -103,16 +103,16 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
     Q_INVOKABLE int lookupRoleName(QString name) const;
 
-    EventLinkList *getLinks() const;
-    void setLinks(EventLinkList *value);
-    Q_INVOKABLE LoopProjectFile::EventLink get(int index) const;
+    EventRelationshipList *getRelationships() const;
+    void setRelationships(EventRelationshipList *value);
+    Q_INVOKABLE LoopProjectFile::EventRelationship get(int index) const;
     Q_INVOKABLE void refreshModel(void);
 
 Q_SIGNALS:
-    void linksChanged();
+    void relationshipsChanged();
 
 private:
-    EventLinkList *links;
+    EventRelationshipList *relationships;
 };
 
 #endif // EVENTMODEL_H

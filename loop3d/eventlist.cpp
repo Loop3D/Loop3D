@@ -325,23 +325,23 @@ unsigned long long EventList::calcPermutations()
 
 
 
-/* ******************* EventLinkList area ****************** */
-EventLinkList::EventLinkList(QObject *parent) : QObject(parent)
+/* ******************* EventRelationshipList area ****************** */
+EventRelationshipList::EventRelationshipList(QObject *parent) : QObject(parent)
 {
 }
 
 
-void EventLinkList::clearList()
+void EventRelationshipList::clearList()
 {
-    Q_EMIT preLinkReset();
-    links.clear();
-    Q_EMIT postLinkReset();
+    Q_EMIT preRelationshipReset();
+    relationships.clear();
+    Q_EMIT postRelationshipReset();
 }
 
-int EventLinkList::loadFromFile(QString filename)
+int EventRelationshipList::loadFromFile(QString filename)
 {
     int result = 0;
-    while (links.size()) removeLink(0);
+    while (relationships.size()) removeRelationship(0);
 
     QStringList list;
     QString name;
@@ -354,21 +354,21 @@ int EventLinkList::loadFromFile(QString filename)
     name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-    Q_EMIT preLinkReset();
-    std::vector<LoopProjectFile::EventLink> eventLinks;
-    LoopProjectFile::GetEventRelationships(name.toStdString(),eventLinks,false);
-    if (eventLinks.size()) {
-        for (auto it=eventLinks.begin();it!=eventLinks.end();it++) {
-            std::shared_ptr<LoopProjectFile::EventLink> link = std::make_shared<LoopProjectFile::EventLink>(std::move(*it));
-            links.append(link);
+    Q_EMIT preRelationshipReset();
+    std::vector<LoopProjectFile::EventRelationship> eventRelationships;
+    LoopProjectFile::GetEventRelationships(name.toStdString(),eventRelationships,false);
+    if (eventRelationships.size()) {
+        for (auto it=eventRelationships.begin();it!=eventRelationships.end();it++) {
+            std::shared_ptr<LoopProjectFile::EventRelationship> relationship = std::make_shared<LoopProjectFile::EventRelationship>(std::move(*it));
+            relationships.append(relationship);
         }
     }
-    Q_EMIT postLinkReset();
+    Q_EMIT postRelationshipReset();
 
     return result;
 }
 
-int EventLinkList::saveToFile(QString filename)
+int EventRelationshipList::saveToFile(QString filename)
 {
     int result = 0;
     // Find last '/' of the first set of '/'s as in file:/// or url:///
@@ -383,35 +383,35 @@ int EventLinkList::saveToFile(QString filename)
     name = "/" + (list.length() > 1 ? list[1] : list[0]);
 #endif
 
-    std::vector<LoopProjectFile::EventLink> eventLinks;
-    auto eventLinkList = getLinks();
-    for (auto it=eventLinkList.begin();it!=eventLinkList.end();it++) {
-        eventLinks.push_back(*(LoopProjectFile::EventLink*)(it->get()));
+    std::vector<LoopProjectFile::EventRelationship> eventRelationships;
+    auto eventRelationshipList = getRelationships();
+    for (auto it=eventRelationshipList.begin();it!=eventRelationshipList.end();it++) {
+        eventRelationships.push_back(*(LoopProjectFile::EventRelationship*)(it->get()));
     }
-    if (eventLinks.size()) LoopProjectFile::SetEventRelationships(name.toStdString(),eventLinks,false);
+    if (eventRelationships.size()) LoopProjectFile::SetEventRelationships(name.toStdString(),eventRelationships,false);
 
     return result;
 }
 
-bool EventLinkList::appendLink(int eventID1, int eventID2, bool bidirectional)
+bool EventRelationshipList::appendRelationship(int eventID1, int eventID2, bool bidirectional)
 {
-    std::shared_ptr<LoopProjectFile::EventLink> link = std::make_shared<LoopProjectFile::EventLink>();
-    link->eventId1 = eventID1;
-    link->eventId2 = eventID2;
-    link->bidirectional = bidirectional;
+    std::shared_ptr<LoopProjectFile::EventRelationship> relationship = std::make_shared<LoopProjectFile::EventRelationship>();
+    relationship->eventId1 = eventID1;
+    relationship->eventId2 = eventID2;
+    relationship->bidirectional = bidirectional;
 
-    Q_EMIT preLinkAppended(links.size(),1);
-    links.append(link);
-    Q_EMIT postLinkAppended();
+    Q_EMIT preRelationshipAppended(relationships.size(),1);
+    relationships.append(relationship);
+    Q_EMIT postRelationshipAppended();
     return 1;
 }
 
-bool EventLinkList::removeLink(int index)
+bool EventRelationshipList::removeRelationship(int index)
 {
-    if (index < 0 || index >= links.size()) return false;
+    if (index < 0 || index >= relationships.size()) return false;
 
-    Q_EMIT preLinkRemoved(index);
-    links.removeAt(index);
-    Q_EMIT postLinkRemoved();
+    Q_EMIT preRelationshipRemoved(index);
+    relationships.removeAt(index);
+    Q_EMIT postRelationshipRemoved();
     return true;
 }

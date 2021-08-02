@@ -104,7 +104,7 @@ void ProjectManagement::clearProject(bool clearExtents)
     m_sharedTextureId = 0;
     m_observationsTextureId = 0;
     eventList.clearList();
-    eventLinkList.clearList();
+    eventRelationshipList.clearList();
     observationList.clearList();
     stModel.clearData();
     m_lockedExtents = false;
@@ -208,7 +208,7 @@ int ProjectManagement::saveProject(QString filename)
 
     stModel.saveToFile(filename);
     eventList.saveToFile(filename);
-    eventLinkList.saveToFile(filename);
+    eventRelationshipList.saveToFile(filename);
     observationList.saveToFile(filename);
     m2lConfig.saveToFile(filename);
     lsConfig.saveToFile(filename);
@@ -293,7 +293,7 @@ int ProjectManagement::loadProject(QString filename)
     // Load structural data
     stModel.loadFromFile(filename);
     eventList.loadFromFile(filename);
-    eventLinkList.loadFromFile(filename);
+    eventRelationshipList.loadFromFile(filename);
     observationList.loadFromFile(filename);
     m2lConfig.loadFromFile(filename);
     lsConfig.loadFromFile(filename);

@@ -142,7 +142,7 @@ public Q_SLOTS:
         }
         StructuralModel* getStModel() { return &stModel; }
         EventList* getEventList() { return &eventList; }
-        EventLinkList* getEventLinkList() { return &eventLinkList; }
+        EventRelationshipList* getEventRelationshipList() { return &eventRelationshipList; }
         ObservationList* getObservationList() { return &observationList; }
         M2lConfig* getM2lConfig() { return &m2lConfig; }
         DataSourceList* getDataSourceList() { return &dataSourceList; }
@@ -216,7 +216,7 @@ public Q_SLOTS:
         std::map<int,StructuralModel*> structuralModelMap;
         std::map<int,EventPermutation*> permutationMap;
         EventList eventList;
-        EventLinkList eventLinkList;
+        EventRelationshipList eventRelationshipList;
         ObservationList observationList;
         M2lConfig m2lConfig;
         LSConfig lsConfig;

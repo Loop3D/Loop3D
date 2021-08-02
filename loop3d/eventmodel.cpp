@@ -413,31 +413,31 @@ QVariant EventModel::pBlockDataIndexed(int index, QString role) const
 }
 
 
-/* ******************* EventLinkList area ****************** */
+/* ******************* EventRelationshipList area ****************** */
 
-EventLinkModel::EventLinkModel(QObject *parent)
+EventRelationshipModel::EventRelationshipModel(QObject *parent)
     : QAbstractListModel(parent)
-    , links(nullptr)
+    , relationships(nullptr)
 {
 
 }
 
-int EventLinkModel::rowCount(const QModelIndex &parent) const
+int EventRelationshipModel::rowCount(const QModelIndex &parent) const
 {
     // For list models only the root node (an invalid parent) should return the list's size. For all
     // other (valid) parents, rowCount() should return 0 so that it does not become a tree model.
-    if (parent.isValid() || !links)
+    if (parent.isValid() || !relationships)
         return 0;
 
-    return links->getLinks().size();
+    return relationships->getRelationships().size();
 }
 
-QVariant EventLinkModel::data(const QModelIndex &index, int role) const
+QVariant EventRelationshipModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() | !links)
+    if (!index.isValid() | !relationships)
         return QVariant();
 
-    std::shared_ptr<LoopProjectFile::EventLink> item = links->getLinks().at(index.row());
+    std::shared_ptr<LoopProjectFile::EventRelationship> item = relationships->getRelationships().at(index.row());
     switch(role) {
         case eventID1Role:
             return QVariant(item->eventId1);
@@ -451,17 +451,17 @@ QVariant EventLinkModel::data(const QModelIndex &index, int role) const
     return QVariant(false);
 }
 
-QVariant EventLinkModel::dataIndexed(int index, QString role) const
+QVariant EventRelationshipModel::dataIndexed(int index, QString role) const
 {
-    if (index < 0 || index > links->getLinks().size() ) return QVariant();
+    if (index < 0 || index > relationships->getRelationships().size() ) return QVariant();
     return data(this->index(index,0),lookupRoleName(role));
 }
 
-bool EventLinkModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool EventRelationshipModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!links) return false;
+    if (!relationships) return false;
 
-    std::shared_ptr<LoopProjectFile::EventLink> item = links->getLinks().at(index.row());
+    std::shared_ptr<LoopProjectFile::EventRelationship> item = relationships->getRelationships().at(index.row());
     switch (role) {
         case eventID1Role:
             item->eventId1 = value.toInt();
@@ -479,21 +479,21 @@ bool EventLinkModel::setData(const QModelIndex &index, const QVariant &value, in
     return true;
 }
 
-bool EventLinkModel::setDataIndexed(int index, const QVariant &value, QString role)
+bool EventRelationshipModel::setDataIndexed(int index, const QVariant &value, QString role)
 {
-    if (index < 0 || index > links->getLinks().size() ) return false;
+    if (index < 0 || index > relationships->getRelationships().size() ) return false;
     return setData(this->index(index,0),value,lookupRoleName(role));
 }
 
-Qt::ItemFlags EventLinkModel::flags(const QModelIndex &index) const
+Qt::ItemFlags EventRelationshipModel::flags(const QModelIndex &index) const
 {
-    if (!index.isValid() | !links)
+    if (!index.isValid() | !relationships)
         return Qt::NoItemFlags;
 
     return Qt::ItemIsEditable;
 }
 
-QHash<int, QByteArray> EventLinkModel::roleNames() const
+QHash<int, QByteArray> EventRelationshipModel::roleNames() const
 {
     QHash<int, QByteArray> role;
     role[eventID1Role] = "eventId1";
@@ -503,7 +503,7 @@ QHash<int, QByteArray> EventLinkModel::roleNames() const
     return role;
 }
 
-int EventLinkModel::lookupRoleName(QString name) const
+int EventRelationshipModel::lookupRoleName(QString name) const
 {
     if (name == "eventId1") return eventID1Role;
     if (name == "eventId2") return eventID2Role;
@@ -511,51 +511,51 @@ int EventLinkModel::lookupRoleName(QString name) const
     return 0;
 }
 
-void EventLinkModel::setLinks(EventLinkList *value)
+void EventRelationshipModel::setRelationships(EventRelationshipList *value)
 {
     beginResetModel();
 
-    if (links) links->disconnect(this);
+    if (relationships) relationships->disconnect(this);
 
-    links = value;
+    relationships = value;
 
-    if (links) {
-        connect(links, &EventLinkList::preLinkAppended, this, [this](int start, int count) {
+    if (relationships) {
+        connect(relationships, &EventRelationshipList::preRelationshipAppended, this, [this](int start, int count) {
             beginInsertRows(QModelIndex(), start, start+count-1);
         });
-        connect(links, &EventLinkList::postLinkAppended, this, [this]() {
+        connect(relationships, &EventRelationshipList::postRelationshipAppended, this, [this]() {
             endInsertRows();
         });
-        connect(links, &EventLinkList::preLinkRemoved, this, [this](int index) {
+        connect(relationships, &EventRelationshipList::preRelationshipRemoved, this, [this](int index) {
             beginRemoveRows(QModelIndex(), index, index);
         });
-        connect(links, &EventLinkList::postLinkRemoved, this, [this]() {
+        connect(relationships, &EventRelationshipList::postRelationshipRemoved, this, [this]() {
             endRemoveRows();
         });
-        connect(links, &EventLinkList::preLinkReset, this, [this]() {
+        connect(relationships, &EventRelationshipList::preRelationshipReset, this, [this]() {
             beginResetModel();
         });
-        connect(links, &EventLinkList::postLinkReset, this, [this]() {
+        connect(relationships, &EventRelationshipList::postRelationshipReset, this, [this]() {
             endResetModel();
         });
     }
     endResetModel();
 }
 
-EventLinkList *EventLinkModel::getLinks() const
+EventRelationshipList *EventRelationshipModel::getRelationships() const
 {
-    return links;
+    return relationships;
 }
 
-LoopProjectFile::EventLink EventLinkModel::get(int index) const
+LoopProjectFile::EventRelationship EventRelationshipModel::get(int index) const
 {
-    LoopProjectFile::EventLink res;
-    if (!links || index < 0 || index > links->getLinks().size())
+    LoopProjectFile::EventRelationship res;
+    if (!relationships || index < 0 || index > relationships->getRelationships().size())
         return res;
-    return (*(links->getLinks()[index]));
+    return (*(relationships->getRelationships()[index]));
 }
 
-void EventLinkModel::refreshModel()
+void EventRelationshipModel::refreshModel()
 {
     beginResetModel();
     endResetModel();

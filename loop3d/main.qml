@@ -67,9 +67,9 @@ Item {
         id: eventsModel
         events: eventList
     }
-    EventLinkModel {
-        id: eventLinksModel
-        links: eventLinkList
+    EventRelationshipModel {
+        id: eventRelationshipsModel
+        relationships: eventRelationshipList
     }
     ObservationModel {
         id: observationsModel
@@ -127,6 +127,7 @@ Item {
                 text: qsTr("&Close")
                 shortcut: "Ctrl+W"
                 onTriggered: {
+                    // TODO: Change this to reinitialise all states
                     console.log("Extents currently are " + project.minLatitude + " " + project.maxLatitude + " " + project.minLongitude + " " + project.maxLongitude)
                 }
             }
